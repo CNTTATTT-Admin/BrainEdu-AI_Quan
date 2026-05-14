@@ -1,0 +1,45 @@
+
+services:
+  # Database: MySQL
+  mysql:
+    image: mysql:8.0
+    container_name: brainedu-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: brainedu
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # Backend: Java Spring Boot
+  backend:
+    build: ./BrainEduBackend
+    container_name: brainedu-backend
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/brainedu?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=123456
+      - JWT_SECRET=QuanNguyen_TechByte_2026_SecureKey
+
+  # Frontend: ReactJS
+  frontend:
+    build: ./BrainEduFrontend
+    container_name: brainedu-frontend
+    restart: always
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./BrainEduFrontend:/app  # Đã sửa thành BrainEduFrontend
+      - /app/node_modules
+    stdin_open: true
+    tty: true
+
+volumes:
+  mysql_data:
