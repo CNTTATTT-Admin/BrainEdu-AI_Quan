@@ -139,6 +139,23 @@ public class SecurityConfig {
                                 "/api/v1/user-answers/**"
                         ).authenticated()
 
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/roadmaps/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                "/api/v1/roadmaps/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                "/api/v1/user-learning-paths/**"
+                        ).authenticated()
+
+                        .requestMatchers(
+                                "/api/v1/ai-recommendations/**"
+                        ).authenticated()
+
                         .anyRequest()
                         .authenticated()
                 )
