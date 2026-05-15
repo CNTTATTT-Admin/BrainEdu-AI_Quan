@@ -117,6 +117,28 @@ public class SecurityConfig {
                                 "/api/v1/quizzes/**"
                         ).hasRole("ADMIN")
 
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/questions/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                "/api/v1/questions/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/answers/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                "/api/v1/answers/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                "/api/v1/user-answers/**"
+                        ).authenticated()
+
                         .anyRequest()
                         .authenticated()
                 )
