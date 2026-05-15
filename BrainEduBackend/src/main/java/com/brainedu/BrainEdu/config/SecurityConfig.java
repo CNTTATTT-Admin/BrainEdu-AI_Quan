@@ -58,6 +58,65 @@ public class SecurityConfig {
                                 "/api/v1/fields/**"
                         ).hasRole("ADMIN")
 
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/lessons/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                "/api/v1/lessons/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/courses/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                "/api/v1/courses/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                "/api/v1/enrollments/**"
+                        ).hasAnyRole(
+                                "USER",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                "/api/v1/lesson-progress/**"
+                        ).hasAnyRole(
+                                "USER",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/skills/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                "/api/v1/skills/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/course-skills/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                "/api/v1/course-skills/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/quizzes/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                "/api/v1/quizzes/**"
+                        ).hasRole("ADMIN")
+
                         .anyRequest()
                         .authenticated()
                 )

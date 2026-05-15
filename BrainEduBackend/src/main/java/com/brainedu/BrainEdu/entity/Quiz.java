@@ -19,8 +19,8 @@ public class Quiz {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "course_id")
-    private Course course;
+    @JoinColumn(name = "lesson_id")
+    private Lesson lesson;
 
     private String title;
 
