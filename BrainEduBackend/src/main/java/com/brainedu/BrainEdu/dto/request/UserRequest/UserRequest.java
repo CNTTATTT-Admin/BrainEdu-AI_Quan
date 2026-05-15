@@ -1,4 +1,4 @@
-package com.brainedu.BrainEdu.dto.request;
+package com.brainedu.BrainEdu.dto.request.UserRequest;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package com.brainedu.BrainEdu.dto.response;
+package com.brainedu.BrainEdu.dto.response.UserResponse;
 
 import lombok.*;
 
@@ -13,4 +13,6 @@ public class UserResponse {
     private String name;
 
     private String email;
+
+    private String role;
 }

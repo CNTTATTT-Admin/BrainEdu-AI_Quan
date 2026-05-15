@@ -1,4 +1,4 @@
-package com.brainedu.BrainEdu.ultils;
+package com.brainedu.BrainEdu.middleware;
 
 import com.brainedu.BrainEdu.config.ApiException;
 import com.brainedu.BrainEdu.dto.response.ErrorResponse;
