@@ -11,4 +11,8 @@ public interface CourseRepository
     List<Course> findByCategoryId(
             Long categoryId
     );
+
+    List<Course> findByInstructorId(
+            Long instructorId
+    );
 }

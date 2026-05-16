@@ -44,9 +44,13 @@ public class Course {
     @Column(name = "difficulty_score")
     private Float difficultyScore;
 
+    // đổi createdBy -> instructor
     @ManyToOne
-    @JoinColumn(name = "created_by")
-    private User createdBy;
+    @JoinColumn(name = "instructor_id")
+    private User instructor;
+
+    // thêm price nếu muốn bán course
+    private Float price;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

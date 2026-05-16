@@ -10,9 +10,9 @@ import com.brainedu.BrainEdu.mapper.CourseMapper;
 import com.brainedu.BrainEdu.repository.CategoryRepository;
 import com.brainedu.BrainEdu.repository.CourseRepository;
 import com.brainedu.BrainEdu.repository.UserRepository;
-import com.brainedu.BrainEdu.service.courseService.CourseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -41,19 +41,19 @@ public class CourseServiceImpl
     ) {
 
         Authentication authentication =
-                org.springframework.security.core
-                        .context.SecurityContextHolder
+                SecurityContextHolder
                         .getContext()
                         .getAuthentication();
 
         String email =
                 authentication.getName();
 
-        User user =
-                userRepository.findByEmail(email)
+        User instructor =
+                userRepository
+                        .findByEmail(email)
                         .orElseThrow(
                                 () -> new ApiException(
-                                        "User not found"
+                                        "Instructor not found"
                                 )
                         );
 
@@ -99,7 +99,13 @@ public class CourseServiceImpl
                                         .getDifficultyScore()
                         )
 
-                        .createdBy(user)
+                        .price(
+                                request.getPrice()
+                        )
+
+                        .instructor(
+                                instructor
+                        )
 
                         .createdAt(
                                 LocalDateTime.now()
@@ -117,7 +123,8 @@ public class CourseServiceImpl
     @Override
     public List<CourseResponse> getAll() {
 
-        return courseRepository.findAll()
+        return courseRepository
+                .findAll()
                 .stream()
                 .map(
                         courseMapper::toResponse
@@ -147,7 +154,8 @@ public class CourseServiceImpl
     ) {
 
         Course course =
-                courseRepository.findById(id)
+                courseRepository
+                        .findById(id)
                         .orElseThrow(
                                 () -> new ApiException(
                                         "Course not found"
@@ -166,7 +174,8 @@ public class CourseServiceImpl
     ) {
 
         Course course =
-                courseRepository.findById(id)
+                courseRepository
+                        .findById(id)
                         .orElseThrow(
                                 () -> new ApiException(
                                         "Course not found"
@@ -210,6 +219,10 @@ public class CourseServiceImpl
                 request.getDifficultyScore()
         );
 
+        course.setPrice(
+                request.getPrice()
+        );
+
         courseRepository.save(course);
 
         return courseMapper.toResponse(
@@ -223,7 +236,8 @@ public class CourseServiceImpl
     ) {
 
         Course course =
-                courseRepository.findById(id)
+                courseRepository
+                        .findById(id)
                         .orElseThrow(
                                 () -> new ApiException(
                                         "Course not found"

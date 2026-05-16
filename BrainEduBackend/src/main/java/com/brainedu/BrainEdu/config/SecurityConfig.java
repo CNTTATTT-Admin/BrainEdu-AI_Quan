@@ -40,7 +40,8 @@ public class SecurityConfig {
                                 "/api/v1/users/me"
                         ).hasAnyRole(
                                 "USER",
-                                "ADMIN"
+                                "ADMIN",
+                                "INSTRUCTOR"
                         )
 
                         .requestMatchers(
@@ -65,16 +66,15 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 "/api/v1/lessons/**"
-                        ).hasRole("ADMIN")
+                        ).hasAnyRole("ADMIN", "INSTRUCTOR")
 
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/v1/courses/**"
                         ).permitAll()
 
-                        .requestMatchers(
-                                "/api/v1/courses/**"
-                        ).hasRole("ADMIN")
+                        .requestMatchers("/api/v1/courses/**")
+                        .hasAnyRole("ADMIN", "INSTRUCTOR")
 
                         .requestMatchers(
                                 "/api/v1/enrollments/**"
@@ -97,7 +97,7 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 "/api/v1/skills/**"
-                        ).hasRole("ADMIN")
+                        ).hasAnyRole("ADMIN", "INSTRUCTOR")
 
                         .requestMatchers(
                                 HttpMethod.GET,
@@ -106,7 +106,7 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 "/api/v1/course-skills/**"
-                        ).hasRole("ADMIN")
+                        ).hasAnyRole("ADMIN", "INSTRUCTOR")
 
                         .requestMatchers(
                                 HttpMethod.GET,
@@ -115,7 +115,7 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 "/api/v1/quizzes/**"
-                        ).hasRole("ADMIN")
+                        ).hasAnyRole("ADMIN", "INSTRUCTOR")
 
                         .requestMatchers(
                                 HttpMethod.GET,
@@ -124,7 +124,7 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 "/api/v1/questions/**"
-                        ).hasRole("ADMIN")
+                        ).hasAnyRole("ADMIN", "INSTRUCTOR")
 
                         .requestMatchers(
                                 HttpMethod.GET,
@@ -133,7 +133,7 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 "/api/v1/answers/**"
-                        ).hasRole("ADMIN")
+                        ).hasAnyRole("ADMIN", "INSTRUCTOR")
 
                         .requestMatchers(
                                 "/api/v1/user-answers/**"
@@ -156,6 +156,18 @@ public class SecurityConfig {
                                 "/api/v1/ai-recommendations/**"
                         ).authenticated()
 
+                        .requestMatchers(
+                                "/api/v1/instructor/**"
+                        )
+                        .hasRole("INSTRUCTOR")
+                        .requestMatchers(
+                                "/api/v1/student/**"
+                        )
+                        .hasAnyRole(
+                                "USER",
+                                "ADMIN",
+                                "INSTRUCTOR"
+                        )
                         .anyRequest()
                         .authenticated()
                 )

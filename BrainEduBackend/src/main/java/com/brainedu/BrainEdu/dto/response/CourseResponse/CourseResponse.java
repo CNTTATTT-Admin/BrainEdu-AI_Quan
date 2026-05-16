@@ -3,6 +3,8 @@ package com.brainedu.BrainEdu.dto.response.CourseResponse;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 public class CourseResponse {
@@ -25,7 +27,11 @@ public class CourseResponse {
 
     private Float difficultyScore;
 
-    private Long createdById;
+    private Long instructorId;
 
-    private String createdByName;
+    private String instructorName;
+
+    private Float price;
+
+    private LocalDateTime createdAt;
 }

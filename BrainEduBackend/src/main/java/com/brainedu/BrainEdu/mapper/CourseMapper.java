@@ -44,14 +44,24 @@ public class CourseMapper {
                         course.getDifficultyScore()
                 )
 
-                .createdById(
-                        course.getCreatedBy()
-                                .getId()
+                .instructorId(
+                        course.getInstructor() != null
+                                ? course.getInstructor().getId()
+                                : null
                 )
 
-                .createdByName(
-                        course.getCreatedBy()
-                                .getName()
+                .instructorName(
+                        course.getInstructor() != null
+                                ? course.getInstructor().getName()
+                                : null
+                )
+
+                .price(
+                        course.getPrice()
+                )
+
+                .createdAt(
+                        course.getCreatedAt()
                 )
 
                 .build();

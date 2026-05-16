@@ -18,4 +18,6 @@ public class CourseRequest {
     private String thumbnail;
 
     private Float difficultyScore;
+
+    private Float price;
 }
