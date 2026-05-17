@@ -2,6 +2,7 @@ package com.brainedu.BrainEdu.service.lessonService;
 
 import com.brainedu.BrainEdu.dto.request.LessonRequest.*;
 import com.brainedu.BrainEdu.dto.response.LessonResponse.*;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -11,8 +12,10 @@ public interface LessonService {
             LessonRequest request
     );
 
-    List<LessonResponse> getByCourse(
-            Long courseId
+    Page<LessonResponse> getByCourse(
+            Long courseId,
+            int page,
+            int size
     );
 
     LessonResponse getById(

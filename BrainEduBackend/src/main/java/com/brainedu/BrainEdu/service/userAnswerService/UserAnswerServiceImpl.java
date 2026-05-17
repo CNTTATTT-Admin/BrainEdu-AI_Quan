@@ -13,6 +13,9 @@ import com.brainedu.BrainEdu.repository.QuestionRepository;
 import com.brainedu.BrainEdu.repository.UserAnswerRepository;
 import com.brainedu.BrainEdu.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -116,14 +119,12 @@ public class UserAnswerServiceImpl
     }
 
     @Override
-    public List<UserAnswerResponse> getAll() {
-
-        return userAnswerRepository.findAll()
-                .stream()
+    public Page<UserAnswerResponse> getAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userAnswerRepository.findAll(pageable)
                 .map(
                         userAnswerMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override
@@ -145,35 +146,39 @@ public class UserAnswerServiceImpl
     }
 
     @Override
-    public List<UserAnswerResponse> getByUser(
-            Long userId
+    public Page<UserAnswerResponse> getByUser(
+            Long userId,
+            int page,
+            int size
     ) {
+        Pageable pageable = PageRequest.of(page, size);
 
         return userAnswerRepository
                 .findByUserId(
-                        userId
+                        userId,
+                        pageable
                 )
-                .stream()
                 .map(
                         userAnswerMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override
-    public List<UserAnswerResponse> getByQuestion(
-            Long questionId
+    public Page<UserAnswerResponse> getByQuestion(
+            Long questionId,
+            int page,
+            int size
     ) {
+        Pageable pageable = PageRequest.of(page, size);
 
         return userAnswerRepository
                 .findByQuestionId(
-                        questionId
+                        questionId,
+                        pageable
                 )
-                .stream()
                 .map(
                         userAnswerMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override

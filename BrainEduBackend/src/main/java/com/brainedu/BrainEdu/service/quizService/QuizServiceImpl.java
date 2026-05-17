@@ -10,6 +10,9 @@ import com.brainedu.BrainEdu.repository.LessonRepository;
 import com.brainedu.BrainEdu.repository.QuizRepository;
 import com.brainedu.BrainEdu.service.quizService.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -78,14 +81,12 @@ public class QuizServiceImpl
     }
 
     @Override
-    public List<QuizResponse> getAll() {
-
-        return quizRepository.findAll()
-                .stream()
+    public Page<QuizResponse> getAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return quizRepository.findAll(pageable)
                 .map(
                         quizMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override
@@ -107,19 +108,21 @@ public class QuizServiceImpl
     }
 
     @Override
-    public List<QuizResponse> getByLesson(
-            Long lessonId
+    public Page<QuizResponse> getByLesson(
+            Long lessonId,
+            int page,
+            int size
     ) {
+        Pageable pageable = PageRequest.of(page, size);
 
         return quizRepository
                 .findByLessonId(
-                        lessonId
+                        lessonId,
+                        pageable
                 )
-                .stream()
                 .map(
                         quizMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override

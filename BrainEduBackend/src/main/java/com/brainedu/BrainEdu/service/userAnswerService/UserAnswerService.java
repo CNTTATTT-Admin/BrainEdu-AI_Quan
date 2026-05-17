@@ -2,6 +2,7 @@ package com.brainedu.BrainEdu.service.userAnswerService;
 
 import com.brainedu.BrainEdu.dto.request.UserAnswerRequest.*;
 import com.brainedu.BrainEdu.dto.response.UserAnswerResponse.*;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -11,18 +12,22 @@ public interface UserAnswerService {
             UserAnswerRequest request
     );
 
-    List<UserAnswerResponse> getAll();
+    Page<UserAnswerResponse> getAll(int page, int size);
 
     UserAnswerResponse getById(
             Long id
     );
 
-    List<UserAnswerResponse> getByUser(
-            Long userId
+    Page<UserAnswerResponse> getByUser(
+            Long userId,
+            int page,
+            int size
     );
 
-    List<UserAnswerResponse> getByQuestion(
-            Long questionId
+    Page<UserAnswerResponse> getByQuestion(
+            Long questionId,
+            int page,
+            int size
     );
 
     String delete(

@@ -14,6 +14,9 @@ import com.brainedu.BrainEdu.repository.UserLearningPathRepository;
 import com.brainedu.BrainEdu.repository.UserRepository;
 import com.brainedu.BrainEdu.service.userLearningPathService.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -115,14 +118,12 @@ public class UserLearningPathServiceImpl
     }
 
     @Override
-    public List<UserLearningPathResponse> getAll() {
-
-        return learningPathRepository.findAll()
-                .stream()
+    public Page<UserLearningPathResponse> getAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return learningPathRepository.findAll(pageable)
                 .map(
                         learningPathMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override
@@ -144,51 +145,57 @@ public class UserLearningPathServiceImpl
     }
 
     @Override
-    public List<UserLearningPathResponse> getByUser(
-            Long userId
+    public Page<UserLearningPathResponse> getByUser(
+            Long userId,
+            int page,
+            int size
     ) {
+        Pageable pageable = PageRequest.of(page, size);
 
         return learningPathRepository
                 .findByUserId(
-                        userId
+                        userId,
+                        pageable
                 )
-                .stream()
                 .map(
                         learningPathMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override
-    public List<UserLearningPathResponse> getByRoadmap(
-            Long roadmapId
+    public Page<UserLearningPathResponse> getByRoadmap(
+            Long roadmapId,
+            int page,
+            int size
     ) {
+        Pageable pageable = PageRequest.of(page, size);
 
         return learningPathRepository
                 .findByRoadmapId(
-                        roadmapId
+                        roadmapId,
+                        pageable
                 )
-                .stream()
                 .map(
                         learningPathMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override
-    public List<UserLearningPathResponse> getByCourse(
-            Long courseId
+    public Page<UserLearningPathResponse> getByCourse(
+            Long courseId,
+            int page,
+            int size
     ) {
+        Pageable pageable = PageRequest.of(page, size);
 
         return learningPathRepository
                 .findByCourseId(
-                        courseId
+                        courseId,
+                        pageable
                 )
-                .stream()
                 .map(
                         learningPathMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override

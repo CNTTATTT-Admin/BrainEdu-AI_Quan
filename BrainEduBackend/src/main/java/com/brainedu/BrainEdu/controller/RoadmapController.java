@@ -1,10 +1,12 @@
 package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
-import com.brainedu.BrainEdu.dto.request.RoadmapRequest.*;
-import com.brainedu.BrainEdu.dto.response.RoadmapResponse.*;
+import com.brainedu.BrainEdu.common.response.PaginationMeta;
+import com.brainedu.BrainEdu.dto.request.RoadmapRequest.RoadmapRequest;
+import com.brainedu.BrainEdu.dto.response.RoadmapResponse.RoadmapResponse;
 import com.brainedu.BrainEdu.service.roadmapService.RoadmapService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -40,6 +42,8 @@ public class RoadmapController {
                         )
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -49,7 +53,56 @@ public class RoadmapController {
 
     @GetMapping
     public ApiResponse<List<RoadmapResponse>>
-    getAll() {
+    getAll(
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
+    ) {
+
+        Page<RoadmapResponse> roadmaps =
+                roadmapService.getAll(
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                roadmaps.getNumber()
+                        )
+
+                        .size(
+                                roadmaps.getSize()
+                        )
+
+                        .totalElements(
+                                roadmaps
+                                        .getTotalElements()
+                        )
+
+                        .totalPages(
+                                roadmaps
+                                        .getTotalPages()
+                        )
+
+                        .hasNext(
+                                roadmaps.hasNext()
+                        )
+
+                        .hasPrevious(
+                                roadmaps
+                                        .hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<RoadmapResponse>>builder()
@@ -61,8 +114,10 @@ public class RoadmapController {
                 )
 
                 .data(
-                        roadmapService.getAll()
+                        roadmaps.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -90,6 +145,8 @@ public class RoadmapController {
                         roadmapService.getById(id)
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -100,8 +157,58 @@ public class RoadmapController {
     @GetMapping("/category/{categoryId}")
     public ApiResponse<List<RoadmapResponse>>
     getByCategory(
-            @PathVariable Long categoryId
+
+            @PathVariable Long categoryId,
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
     ) {
+
+        Page<RoadmapResponse> roadmaps =
+                roadmapService.getByCategory(
+                        categoryId,
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                roadmaps.getNumber()
+                        )
+
+                        .size(
+                                roadmaps.getSize()
+                        )
+
+                        .totalElements(
+                                roadmaps
+                                        .getTotalElements()
+                        )
+
+                        .totalPages(
+                                roadmaps
+                                        .getTotalPages()
+                        )
+
+                        .hasNext(
+                                roadmaps.hasNext()
+                        )
+
+                        .hasPrevious(
+                                roadmaps
+                                        .hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<RoadmapResponse>>builder()
@@ -113,10 +220,10 @@ public class RoadmapController {
                 )
 
                 .data(
-                        roadmapService.getByCategory(
-                                categoryId
-                        )
+                        roadmaps.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -128,8 +235,58 @@ public class RoadmapController {
     @GetMapping("/level/{level}")
     public ApiResponse<List<RoadmapResponse>>
     getByLevel(
-            @PathVariable String level
+
+            @PathVariable String level,
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
     ) {
+
+        Page<RoadmapResponse> roadmaps =
+                roadmapService.getByLevel(
+                        level,
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                roadmaps.getNumber()
+                        )
+
+                        .size(
+                                roadmaps.getSize()
+                        )
+
+                        .totalElements(
+                                roadmaps
+                                        .getTotalElements()
+                        )
+
+                        .totalPages(
+                                roadmaps
+                                        .getTotalPages()
+                        )
+
+                        .hasNext(
+                                roadmaps.hasNext()
+                        )
+
+                        .hasPrevious(
+                                roadmaps
+                                        .hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<RoadmapResponse>>builder()
@@ -141,10 +298,10 @@ public class RoadmapController {
                 )
 
                 .data(
-                        roadmapService.getByLevel(
-                                level
-                        )
+                        roadmaps.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -178,6 +335,8 @@ public class RoadmapController {
                         )
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -203,6 +362,8 @@ public class RoadmapController {
                 .data(
                         roadmapService.delete(id)
                 )
+
+                .meta(null)
 
                 .timestamp(
                         LocalDateTime.now()

@@ -11,6 +11,9 @@ import com.brainedu.BrainEdu.repository.AssignmentSubmissionRepository;
 import com.brainedu.BrainEdu.repository.UserRepository;
 import com.brainedu.BrainEdu.service.instructorService.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -111,8 +114,8 @@ public class StudentAssignmentServiceImpl
     }
 
     @Override
-    public List<AssignmentSubmissionResponse>
-    getMySubmissions() {
+    public Page<AssignmentSubmissionResponse>
+    getMySubmissions(int page, int size) {
 
         String email =
                 SecurityContextHolder
@@ -128,12 +131,13 @@ public class StudentAssignmentServiceImpl
                                         "User not found"
                                 )
                         );
+        Pageable pageable = PageRequest.of(page, size);
 
         return submissionRepository
                 .findByStudentId(
-                        student.getId()
+                        student.getId(),
+                        pageable
                 )
-                .stream()
                 .map(submission ->
                         AssignmentSubmissionResponse
                                 .builder()
@@ -162,7 +166,6 @@ public class StudentAssignmentServiceImpl
                                                 .getSubmittedAt()
                                 )
                                 .build()
-                )
-                .toList();
+                );
     }
 }

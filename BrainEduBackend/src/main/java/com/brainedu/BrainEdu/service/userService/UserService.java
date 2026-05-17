@@ -5,10 +5,11 @@ import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateProfileRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateUserRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UserRequest;
 import com.brainedu.BrainEdu.dto.response.UserResponse.UserResponse;
+import org.springframework.data.domain.Page;
 
 public interface UserService {
 
-    List<UserResponse> getAllUsers();
+    Page<UserResponse> getAllUsers(int page, int size);
     UserResponse createUser(UserRequest request);
     UserResponse getUser(Long id);
     UserResponse getMe();

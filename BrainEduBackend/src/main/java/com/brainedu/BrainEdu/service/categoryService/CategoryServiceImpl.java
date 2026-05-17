@@ -7,6 +7,9 @@ import com.brainedu.BrainEdu.entity.Category;
 import com.brainedu.BrainEdu.mapper.CategoryMapper;
 import com.brainedu.BrainEdu.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,12 +54,13 @@ public class CategoryServiceImpl
     }
 
     @Override
-    public List<CategoryResponse> getAll() {
-
-        return categoryRepository.findAll()
-                .stream()
-                .map(categoryMapper::toResponse)
-                .toList();
+    public Page<CategoryResponse> getAll(int page, int size) {
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size
+                );
+        return categoryRepository.findAll(pageable).map(categoryMapper::toResponse);
     }
 
     @Override

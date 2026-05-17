@@ -6,10 +6,14 @@ import com.brainedu.BrainEdu.dto.response.AnswerResponse.*;
 import com.brainedu.BrainEdu.entity.Answer;
 import com.brainedu.BrainEdu.entity.Question;
 import com.brainedu.BrainEdu.mapper.AnswerMapper;
+import com.brainedu.BrainEdu.mapper.UserMapper;
 import com.brainedu.BrainEdu.repository.AnswerRepository;
 import com.brainedu.BrainEdu.repository.QuestionRepository;
 import com.brainedu.BrainEdu.service.answerService.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -66,14 +70,15 @@ public class AnswerServiceImpl
     }
 
     @Override
-    public List<AnswerResponse> getAll() {
-
-        return answerRepository.findAll()
-                .stream()
-                .map(
-                        answerMapper::toResponse
-                )
-                .toList();
+    public Page<AnswerResponse> getAll(int page, int size) {
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size
+                );
+        return answerRepository
+                .findAll(pageable)
+                .map(answerMapper::toResponse);
     }
 
     @Override
@@ -95,19 +100,26 @@ public class AnswerServiceImpl
     }
 
     @Override
-    public List<AnswerResponse> getByQuestion(
-            Long questionId
+    public Page<AnswerResponse> getByQuestion(
+            Long questionId,
+            int page,
+            int size
     ) {
+
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size
+                );
 
         return answerRepository
                 .findByQuestionId(
-                        questionId
+                        questionId,
+                        pageable
                 )
-                .stream()
                 .map(
                         answerMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override

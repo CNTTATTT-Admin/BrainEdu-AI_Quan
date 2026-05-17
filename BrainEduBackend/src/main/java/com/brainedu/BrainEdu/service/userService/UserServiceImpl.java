@@ -9,6 +9,9 @@ import com.brainedu.BrainEdu.entity.User;
 import com.brainedu.BrainEdu.mapper.UserMapper;
 import com.brainedu.BrainEdu.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,15 +32,20 @@ public class UserServiceImpl
             passwordEncoder;
 
     @Override
-    public List<UserResponse> getAllUsers() {
+    public Page<UserResponse> getAllUsers(
+            int page,
+            int size
+    ) {
+
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size
+                );
 
         return userRepository
-                .findAll()
-                .stream()
-                .map(
-                        UserMapper::toResponse
-                )
-                .toList();
+                .findAll(pageable)
+                .map(UserMapper::toResponse);
     }
 
     @Override

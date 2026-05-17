@@ -11,6 +11,9 @@ import com.brainedu.BrainEdu.repository.CategoryRepository;
 import com.brainedu.BrainEdu.repository.CourseRepository;
 import com.brainedu.BrainEdu.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -121,31 +124,35 @@ public class CourseServiceImpl
     }
 
     @Override
-    public List<CourseResponse> getAll() {
-
+    public Page<CourseResponse> getAll(int page, int size) {
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size
+                );
         return courseRepository
-                .findAll()
-                .stream()
-                .map(
-                        courseMapper::toResponse
-                )
-                .toList();
+                .findAll(pageable)
+                .map(courseMapper::toResponse);
     }
 
     @Override
-    public List<CourseResponse> getByCategory(
-            Long categoryId
+    public Page<CourseResponse> getByCategory(
+            Long categoryId,
+            int page,
+            int size
     ) {
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size
+                );
 
         return courseRepository
                 .findByCategoryId(
-                        categoryId
+                        categoryId,
+                        pageable
                 )
-                .stream()
-                .map(
-                        courseMapper::toResponse
-                )
-                .toList();
+                .map(courseMapper::toResponse);
     }
 
     @Override

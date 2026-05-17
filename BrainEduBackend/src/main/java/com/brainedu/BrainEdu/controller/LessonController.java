@@ -1,10 +1,12 @@
 package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
-import com.brainedu.BrainEdu.dto.request.LessonRequest.*;
-import com.brainedu.BrainEdu.dto.response.LessonResponse.*;
+import com.brainedu.BrainEdu.common.response.PaginationMeta;
+import com.brainedu.BrainEdu.dto.request.LessonRequest.LessonRequest;
+import com.brainedu.BrainEdu.dto.response.LessonResponse.LessonResponse;
 import com.brainedu.BrainEdu.service.lessonService.LessonService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -40,6 +42,8 @@ public class LessonController {
                         )
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -50,8 +54,58 @@ public class LessonController {
     @GetMapping("/course/{courseId}")
     public ApiResponse<List<LessonResponse>>
     getByCourse(
-            @PathVariable Long courseId
+
+            @PathVariable Long courseId,
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
     ) {
+
+        Page<LessonResponse> lessons =
+                lessonService.getByCourse(
+                        courseId,
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                lessons.getNumber()
+                        )
+
+                        .size(
+                                lessons.getSize()
+                        )
+
+                        .totalElements(
+                                lessons
+                                        .getTotalElements()
+                        )
+
+                        .totalPages(
+                                lessons
+                                        .getTotalPages()
+                        )
+
+                        .hasNext(
+                                lessons.hasNext()
+                        )
+
+                        .hasPrevious(
+                                lessons
+                                        .hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<LessonResponse>>builder()
@@ -63,10 +117,10 @@ public class LessonController {
                 )
 
                 .data(
-                        lessonService.getByCourse(
-                                courseId
-                        )
+                        lessons.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -93,6 +147,8 @@ public class LessonController {
                 .data(
                         lessonService.getById(id)
                 )
+
+                .meta(null)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -126,6 +182,8 @@ public class LessonController {
                         )
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -151,6 +209,8 @@ public class LessonController {
                 .data(
                         lessonService.delete(id)
                 )
+
+                .meta(null)
 
                 .timestamp(
                         LocalDateTime.now()

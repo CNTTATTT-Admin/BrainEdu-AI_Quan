@@ -1,10 +1,12 @@
 package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
+import com.brainedu.BrainEdu.common.response.PaginationMeta;
 import com.brainedu.BrainEdu.dto.request.AnswerRequest.*;
 import com.brainedu.BrainEdu.dto.response.AnswerResponse.*;
 import com.brainedu.BrainEdu.service.answerService.AnswerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -40,6 +42,8 @@ public class AnswerController {
                         )
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -49,7 +53,53 @@ public class AnswerController {
 
     @GetMapping
     public ApiResponse<List<AnswerResponse>>
-    getAll() {
+    getAll(
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
+    ) {
+
+        Page<AnswerResponse> answers =
+                answerService.getAll(
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                answers.getNumber()
+                        )
+
+                        .size(
+                                answers.getSize()
+                        )
+
+                        .totalElements(
+                                answers.getTotalElements()
+                        )
+
+                        .totalPages(
+                                answers.getTotalPages()
+                        )
+
+                        .hasNext(
+                                answers.hasNext()
+                        )
+
+                        .hasPrevious(
+                                answers.hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<AnswerResponse>>builder()
@@ -61,8 +111,10 @@ public class AnswerController {
                 )
 
                 .data(
-                        answerService.getAll()
+                        answers.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -90,6 +142,8 @@ public class AnswerController {
                         answerService.getById(id)
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -100,8 +154,54 @@ public class AnswerController {
     @GetMapping("/question/{questionId}")
     public ApiResponse<List<AnswerResponse>>
     getByQuestion(
-            @PathVariable Long questionId
+            @PathVariable Long questionId,
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
     ) {
+
+        Page<AnswerResponse> answers =
+                answerService.getByQuestion(
+                        questionId,
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                answers.getNumber()
+                        )
+
+                        .size(
+                                answers.getSize()
+                        )
+
+                        .totalElements(
+                                answers.getTotalElements()
+                        )
+
+                        .totalPages(
+                                answers.getTotalPages()
+                        )
+
+                        .hasNext(
+                                answers.hasNext()
+                        )
+
+                        .hasPrevious(
+                                answers.hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<AnswerResponse>>builder()
@@ -113,10 +213,10 @@ public class AnswerController {
                 )
 
                 .data(
-                        answerService.getByQuestion(
-                                questionId
-                        )
+                        answers.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -150,6 +250,8 @@ public class AnswerController {
                         )
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -175,6 +277,8 @@ public class AnswerController {
                 .data(
                         answerService.delete(id)
                 )
+
+                .meta(null)
 
                 .timestamp(
                         LocalDateTime.now()

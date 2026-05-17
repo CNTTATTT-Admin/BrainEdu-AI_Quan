@@ -1,6 +1,8 @@
 package com.brainedu.BrainEdu.repository;
 
 import com.brainedu.BrainEdu.entity.UserAnswer;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -8,11 +10,13 @@ import java.util.List;
 public interface UserAnswerRepository
         extends JpaRepository<UserAnswer, Long> {
 
-    List<UserAnswer> findByUserId(
-            Long userId
+    Page<UserAnswer> findByUserId(
+            Long userId,
+            Pageable pageable
     );
 
-    List<UserAnswer> findByQuestionId(
-            Long questionId
+    Page<UserAnswer> findByQuestionId(
+            Long questionId,
+            Pageable pageable
     );
 }

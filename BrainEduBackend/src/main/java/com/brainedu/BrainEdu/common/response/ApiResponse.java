@@ -15,5 +15,7 @@ public class ApiResponse<T> {
 
     private T data;
 
+    private Object meta;
+
     private LocalDateTime timestamp;
 }

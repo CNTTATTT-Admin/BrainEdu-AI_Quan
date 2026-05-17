@@ -4,6 +4,7 @@ import com.brainedu.BrainEdu.dto.request.AssignmentRequest.CreateAssignmentReque
 import com.brainedu.BrainEdu.dto.request.AssignmentRequest.GradeSubmissionRequest;
 import com.brainedu.BrainEdu.dto.response.AssignmentResponse.AssignmentResponse;
 import com.brainedu.BrainEdu.dto.response.AssignmentResponse.AssignmentSubmissionResponse;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -13,10 +14,10 @@ public interface InstructorAssignmentService {
             CreateAssignmentRequest request
     );
 
-    List<AssignmentResponse> getMyAssignments();
+    Page<AssignmentResponse> getMyAssignments(int page, int size);
 
-    List<AssignmentSubmissionResponse>
-    getSubmissions(Long assignmentId);
+    Page<AssignmentSubmissionResponse>
+    getSubmissions(Long assignmentId, int page, int size);
 
     AssignmentSubmissionResponse
     gradeSubmission(

@@ -10,6 +10,9 @@ import com.brainedu.BrainEdu.repository.CategoryRepository;
 import com.brainedu.BrainEdu.repository.SkillRepository;
 import com.brainedu.BrainEdu.service.skillService.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -67,30 +70,30 @@ public class SkillServiceImpl
     }
 
     @Override
-    public List<SkillResponse> getAll() {
-
-        return skillRepository.findAll()
-                .stream()
+    public Page<SkillResponse> getAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return skillRepository.findAll(pageable)
                 .map(
                         skillMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override
-    public List<SkillResponse> getByCategory(
-            Long categoryId
+    public Page<SkillResponse> getByCategory(
+            Long categoryId,
+            int page,
+            int size
     ) {
+        Pageable pageable = PageRequest.of(page, size);
 
         return skillRepository
                 .findByCategoryId(
-                        categoryId
+                        categoryId,
+                        pageable
                 )
-                .stream()
                 .map(
                         skillMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override

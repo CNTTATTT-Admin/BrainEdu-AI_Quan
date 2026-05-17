@@ -2,6 +2,7 @@ package com.brainedu.BrainEdu.service.answerService;
 
 import com.brainedu.BrainEdu.dto.request.AnswerRequest.*;
 import com.brainedu.BrainEdu.dto.response.AnswerResponse.*;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -11,14 +12,16 @@ public interface AnswerService {
             AnswerRequest request
     );
 
-    List<AnswerResponse> getAll();
+    Page<AnswerResponse> getAll(int page, int size);
 
     AnswerResponse getById(
             Long id
     );
 
-    List<AnswerResponse> getByQuestion(
-            Long questionId
+    Page<AnswerResponse> getByQuestion(
+            Long questionId,
+            int page,
+            int size
     );
 
     AnswerResponse update(

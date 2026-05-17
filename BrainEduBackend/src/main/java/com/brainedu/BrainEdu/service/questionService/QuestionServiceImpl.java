@@ -12,6 +12,9 @@ import com.brainedu.BrainEdu.repository.QuizRepository;
 import com.brainedu.BrainEdu.repository.SkillRepository;
 import com.brainedu.BrainEdu.service.questionService.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -91,14 +94,13 @@ public class QuestionServiceImpl
     }
 
     @Override
-    public List<QuestionResponse> getAll() {
+    public Page<QuestionResponse> getAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
 
-        return questionRepository.findAll()
-                .stream()
+        return questionRepository.findAll(pageable)
                 .map(
                         questionMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override
@@ -120,35 +122,39 @@ public class QuestionServiceImpl
     }
 
     @Override
-    public List<QuestionResponse> getByQuiz(
-            Long quizId
+    public Page<QuestionResponse> getByQuiz(
+            Long quizId,
+            int page,
+            int size
     ) {
+        Pageable pageable = PageRequest.of(page, size);
 
         return questionRepository
                 .findByQuizId(
-                        quizId
+                        quizId,
+                        pageable
                 )
-                .stream()
                 .map(
                         questionMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override
-    public List<QuestionResponse> getBySkill(
-            Long skillId
+    public Page<QuestionResponse> getBySkill(
+            Long skillId,
+            int page,
+            int size
     ) {
+        Pageable pageable = PageRequest.of(page, size);
 
         return questionRepository
                 .findBySkillId(
-                        skillId
+                        skillId,
+                        pageable
                 )
-                .stream()
                 .map(
                         questionMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override

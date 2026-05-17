@@ -2,6 +2,7 @@ package com.brainedu.BrainEdu.service.categoryService;
 
 import com.brainedu.BrainEdu.dto.request.CategoryRequest.*;
 import com.brainedu.BrainEdu.dto.response.CategoryResponse.*;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ public interface CategoryService {
             CategoryRequest request
     );
 
-    List<CategoryResponse> getAll();
+    Page<CategoryResponse> getAll(int page, int size);
 
     CategoryResponse getById(
             Long id

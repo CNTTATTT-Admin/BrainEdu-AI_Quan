@@ -2,6 +2,7 @@ package com.brainedu.BrainEdu.service.userLearningPathService;
 
 import com.brainedu.BrainEdu.dto.request.UserLearningPathRequest.*;
 import com.brainedu.BrainEdu.dto.response.UserLearningPathResponse.*;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -11,22 +12,28 @@ public interface UserLearningPathService {
             UserLearningPathRequest request
     );
 
-    List<UserLearningPathResponse> getAll();
+    Page<UserLearningPathResponse> getAll(int page, int size);
 
     UserLearningPathResponse getById(
             Long id
     );
 
-    List<UserLearningPathResponse> getByUser(
-            Long userId
+    Page<UserLearningPathResponse> getByUser(
+            Long userId,
+            int page,
+            int size
     );
 
-    List<UserLearningPathResponse> getByRoadmap(
-            Long roadmapId
+    Page<UserLearningPathResponse> getByRoadmap(
+            Long roadmapId,
+            int page,
+            int size
     );
 
-    List<UserLearningPathResponse> getByCourse(
-            Long courseId
+    Page<UserLearningPathResponse> getByCourse(
+            Long courseId,
+            int page,
+            int size
     );
 
     UserLearningPathResponse update(

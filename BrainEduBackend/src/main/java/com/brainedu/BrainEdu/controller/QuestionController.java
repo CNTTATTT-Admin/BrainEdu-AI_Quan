@@ -1,10 +1,12 @@
 package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
-import com.brainedu.BrainEdu.dto.request.QuestionRequest.*;
-import com.brainedu.BrainEdu.dto.response.QuestionResponse.*;
+import com.brainedu.BrainEdu.common.response.PaginationMeta;
+import com.brainedu.BrainEdu.dto.request.QuestionRequest.QuestionRequest;
+import com.brainedu.BrainEdu.dto.response.QuestionResponse.QuestionResponse;
 import com.brainedu.BrainEdu.service.questionService.QuestionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -40,6 +42,8 @@ public class QuestionController {
                         )
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -49,7 +53,56 @@ public class QuestionController {
 
     @GetMapping
     public ApiResponse<List<QuestionResponse>>
-    getAll() {
+    getAll(
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
+    ) {
+
+        Page<QuestionResponse> questions =
+                questionService.getAll(
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                questions.getNumber()
+                        )
+
+                        .size(
+                                questions.getSize()
+                        )
+
+                        .totalElements(
+                                questions
+                                        .getTotalElements()
+                        )
+
+                        .totalPages(
+                                questions
+                                        .getTotalPages()
+                        )
+
+                        .hasNext(
+                                questions.hasNext()
+                        )
+
+                        .hasPrevious(
+                                questions
+                                        .hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<QuestionResponse>>builder()
@@ -61,8 +114,10 @@ public class QuestionController {
                 )
 
                 .data(
-                        questionService.getAll()
+                        questions.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -90,6 +145,8 @@ public class QuestionController {
                         questionService.getById(id)
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -100,8 +157,58 @@ public class QuestionController {
     @GetMapping("/quiz/{quizId}")
     public ApiResponse<List<QuestionResponse>>
     getByQuiz(
-            @PathVariable Long quizId
+
+            @PathVariable Long quizId,
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
     ) {
+
+        Page<QuestionResponse> questions =
+                questionService.getByQuiz(
+                        quizId,
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                questions.getNumber()
+                        )
+
+                        .size(
+                                questions.getSize()
+                        )
+
+                        .totalElements(
+                                questions
+                                        .getTotalElements()
+                        )
+
+                        .totalPages(
+                                questions
+                                        .getTotalPages()
+                        )
+
+                        .hasNext(
+                                questions.hasNext()
+                        )
+
+                        .hasPrevious(
+                                questions
+                                        .hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<QuestionResponse>>builder()
@@ -113,10 +220,10 @@ public class QuestionController {
                 )
 
                 .data(
-                        questionService.getByQuiz(
-                                quizId
-                        )
+                        questions.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -128,8 +235,58 @@ public class QuestionController {
     @GetMapping("/skill/{skillId}")
     public ApiResponse<List<QuestionResponse>>
     getBySkill(
-            @PathVariable Long skillId
+
+            @PathVariable Long skillId,
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
     ) {
+
+        Page<QuestionResponse> questions =
+                questionService.getBySkill(
+                        skillId,
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                questions.getNumber()
+                        )
+
+                        .size(
+                                questions.getSize()
+                        )
+
+                        .totalElements(
+                                questions
+                                        .getTotalElements()
+                        )
+
+                        .totalPages(
+                                questions
+                                        .getTotalPages()
+                        )
+
+                        .hasNext(
+                                questions.hasNext()
+                        )
+
+                        .hasPrevious(
+                                questions
+                                        .hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<QuestionResponse>>builder()
@@ -141,10 +298,10 @@ public class QuestionController {
                 )
 
                 .data(
-                        questionService.getBySkill(
-                                skillId
-                        )
+                        questions.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -178,6 +335,8 @@ public class QuestionController {
                         )
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -203,6 +362,8 @@ public class QuestionController {
                 .data(
                         questionService.delete(id)
                 )
+
+                .meta(null)
 
                 .timestamp(
                         LocalDateTime.now()

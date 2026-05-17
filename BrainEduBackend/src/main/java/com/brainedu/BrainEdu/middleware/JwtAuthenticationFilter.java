@@ -33,7 +33,7 @@ public class JwtAuthenticationFilter
             @Nonnull HttpServletResponse response,
             @Nonnull FilterChain filterChain
     ) throws ServletException, IOException {
-
+        
         String authHeader =
                 request.getHeader("Authorization");
 

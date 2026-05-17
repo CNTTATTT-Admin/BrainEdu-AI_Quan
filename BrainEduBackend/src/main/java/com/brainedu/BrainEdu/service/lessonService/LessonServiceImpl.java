@@ -10,6 +10,9 @@ import com.brainedu.BrainEdu.repository.CourseRepository;
 import com.brainedu.BrainEdu.repository.LessonRepository;
 import com.brainedu.BrainEdu.service.lessonService.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -73,19 +76,24 @@ public class LessonServiceImpl
     }
 
     @Override
-    public List<LessonResponse> getByCourse(
-            Long courseId
+    public Page<LessonResponse> getByCourse(
+            Long courseId,
+            int page,
+            int size
     ) {
-
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size
+                );
         return lessonRepository
                 .findByCourseIdOrderByLessonOrderAsc(
-                        courseId
+                        courseId,
+                        pageable
                 )
-                .stream()
                 .map(
                         lessonMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override

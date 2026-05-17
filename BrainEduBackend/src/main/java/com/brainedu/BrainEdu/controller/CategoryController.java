@@ -1,10 +1,12 @@
 package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
+import com.brainedu.BrainEdu.common.response.PaginationMeta;
 import com.brainedu.BrainEdu.dto.request.CategoryRequest.*;
 import com.brainedu.BrainEdu.dto.response.CategoryResponse.*;
 import com.brainedu.BrainEdu.service.categoryService.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -49,7 +51,53 @@ public class CategoryController {
 
     @GetMapping
     public ApiResponse<List<CategoryResponse>>
-    getAll() {
+    getAll(
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
+    ) {
+
+        Page<CategoryResponse> categories =
+                categoryService.getAll(
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                categories.getNumber()
+                        )
+
+                        .size(
+                                categories.getSize()
+                        )
+
+                        .totalElements(
+                                categories.getTotalElements()
+                        )
+
+                        .totalPages(
+                                categories.getTotalPages()
+                        )
+
+                        .hasNext(
+                                categories.hasNext()
+                        )
+
+                        .hasPrevious(
+                                categories.hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<CategoryResponse>>builder()
@@ -61,8 +109,10 @@ public class CategoryController {
                 )
 
                 .data(
-                        categoryService.getAll()
+                        categories.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()

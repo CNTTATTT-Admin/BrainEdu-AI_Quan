@@ -7,6 +7,9 @@ import com.brainedu.BrainEdu.entity.*;
 import com.brainedu.BrainEdu.repository.*;
 import com.brainedu.BrainEdu.service.instructorService.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -106,8 +109,11 @@ public class InstructorAssignmentServiceImpl
     }
 
     @Override
-    public List<AssignmentResponse>
-    getMyAssignments() {
+    public Page<AssignmentResponse>
+    getMyAssignments(
+            int page,
+            int size
+    ) {
 
         String email =
                 SecurityContextHolder
@@ -124,50 +130,73 @@ public class InstructorAssignmentServiceImpl
                                 )
                         );
 
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size
+                );
+
         return assignmentRepository
                 .findByInstructorId(
-                        instructor.getId()
+                        instructor.getId(),
+                        pageable
                 )
-                .stream()
                 .map(a ->
                         AssignmentResponse.builder()
+
                                 .id(a.getId())
+
                                 .title(a.getTitle())
+
                                 .description(
                                         a.getDescription()
                                 )
+
                                 .courseId(
                                         a.getCourse().getId()
                                 )
+
                                 .courseTitle(
                                         a.getCourse()
                                                 .getTitle()
                                 )
+
                                 .dueDate(
                                         a.getDueDate()
                                 )
+
                                 .maxScore(
                                         a.getMaxScore()
                                 )
+
                                 .createdAt(
                                         a.getCreatedAt()
                                 )
+
                                 .build()
-                )
-                .toList();
+                );
     }
 
     @Override
-    public List<AssignmentSubmissionResponse>
-    getSubmissions(Long assignmentId) {
+    public Page<AssignmentSubmissionResponse>
+    getSubmissions(
+            Long assignmentId,
+            int page,
+            int size
+    ) {
+
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size
+                );
 
         return submissionRepository
                 .findByAssignmentId(
-                        assignmentId
+                        assignmentId,
+                        pageable
                 )
-                .stream()
-                .map(this::mapSubmission)
-                .toList();
+                .map(this::mapSubmission);
     }
 
     @Override

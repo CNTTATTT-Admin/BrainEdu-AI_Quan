@@ -1,10 +1,12 @@
 package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
+import com.brainedu.BrainEdu.common.response.PaginationMeta;
 import com.brainedu.BrainEdu.dto.request.AssignmentRequest.*;
 import com.brainedu.BrainEdu.dto.response.AssignmentResponse.*;
 import com.brainedu.BrainEdu.service.instructorService.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -50,10 +52,60 @@ public class StudentAssignmentController {
 
     @GetMapping("/my-submissions")
     public ApiResponse<List<AssignmentSubmissionResponse>>
-    getMySubmissions() {
+    getMySubmissions(
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
+    ) {
+
+        Page<AssignmentSubmissionResponse> submissions =
+                assignmentService.getMySubmissions(
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                submissions.getNumber()
+                        )
+
+                        .size(
+                                submissions.getSize()
+                        )
+
+                        .totalElements(
+                                submissions
+                                        .getTotalElements()
+                        )
+
+                        .totalPages(
+                                submissions
+                                        .getTotalPages()
+                        )
+
+                        .hasNext(
+                                submissions.hasNext()
+                        )
+
+                        .hasPrevious(
+                                submissions
+                                        .hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
-                .<List<AssignmentSubmissionResponse>>builder()
+                .<List<AssignmentSubmissionResponse>>
+                        builder()
 
                 .success(true)
 
@@ -62,9 +114,10 @@ public class StudentAssignmentController {
                 )
 
                 .data(
-                        assignmentService
-                                .getMySubmissions()
+                        submissions.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()

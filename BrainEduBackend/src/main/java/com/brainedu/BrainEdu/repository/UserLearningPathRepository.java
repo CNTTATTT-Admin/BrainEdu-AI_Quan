@@ -1,6 +1,8 @@
 package com.brainedu.BrainEdu.repository;
 
 import com.brainedu.BrainEdu.entity.UserLearningPath;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -8,15 +10,18 @@ import java.util.List;
 public interface UserLearningPathRepository
         extends JpaRepository<UserLearningPath, Long> {
 
-    List<UserLearningPath> findByUserId(
-            Long userId
+    Page<UserLearningPath> findByUserId(
+            Long userId,
+            Pageable pageable
     );
 
-    List<UserLearningPath> findByRoadmapId(
-            Long roadmapId
+    Page<UserLearningPath> findByRoadmapId(
+            Long roadmapId,
+            Pageable pageable
     );
 
-    List<UserLearningPath> findByCourseId(
-            Long courseId
+    Page<UserLearningPath> findByCourseId(
+            Long courseId,
+            Pageable pageable
     );
 }

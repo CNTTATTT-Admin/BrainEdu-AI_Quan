@@ -1,10 +1,12 @@
 package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
-import com.brainedu.BrainEdu.dto.request.UserLearningPathRequest.*;
-import com.brainedu.BrainEdu.dto.response.UserLearningPathResponse.*;
+import com.brainedu.BrainEdu.common.response.PaginationMeta;
+import com.brainedu.BrainEdu.dto.request.UserLearningPathRequest.UserLearningPathRequest;
+import com.brainedu.BrainEdu.dto.response.UserLearningPathResponse.UserLearningPathResponse;
 import com.brainedu.BrainEdu.service.userLearningPathService.UserLearningPathService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -40,6 +42,8 @@ public class UserLearningPathController {
                         )
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -49,7 +53,56 @@ public class UserLearningPathController {
 
     @GetMapping
     public ApiResponse<List<UserLearningPathResponse>>
-    getAll() {
+    getAll(
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
+    ) {
+
+        Page<UserLearningPathResponse> learningPaths =
+                learningPathService.getAll(
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                learningPaths.getNumber()
+                        )
+
+                        .size(
+                                learningPaths.getSize()
+                        )
+
+                        .totalElements(
+                                learningPaths
+                                        .getTotalElements()
+                        )
+
+                        .totalPages(
+                                learningPaths
+                                        .getTotalPages()
+                        )
+
+                        .hasNext(
+                                learningPaths.hasNext()
+                        )
+
+                        .hasPrevious(
+                                learningPaths
+                                        .hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<UserLearningPathResponse>>builder()
@@ -61,8 +114,10 @@ public class UserLearningPathController {
                 )
 
                 .data(
-                        learningPathService.getAll()
+                        learningPaths.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -90,6 +145,8 @@ public class UserLearningPathController {
                         learningPathService.getById(id)
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -100,8 +157,58 @@ public class UserLearningPathController {
     @GetMapping("/user/{userId}")
     public ApiResponse<List<UserLearningPathResponse>>
     getByUser(
-            @PathVariable Long userId
+
+            @PathVariable Long userId,
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
     ) {
+
+        Page<UserLearningPathResponse> learningPaths =
+                learningPathService.getByUser(
+                        userId,
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                learningPaths.getNumber()
+                        )
+
+                        .size(
+                                learningPaths.getSize()
+                        )
+
+                        .totalElements(
+                                learningPaths
+                                        .getTotalElements()
+                        )
+
+                        .totalPages(
+                                learningPaths
+                                        .getTotalPages()
+                        )
+
+                        .hasNext(
+                                learningPaths.hasNext()
+                        )
+
+                        .hasPrevious(
+                                learningPaths
+                                        .hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<UserLearningPathResponse>>builder()
@@ -113,10 +220,10 @@ public class UserLearningPathController {
                 )
 
                 .data(
-                        learningPathService.getByUser(
-                                userId
-                        )
+                        learningPaths.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -128,8 +235,58 @@ public class UserLearningPathController {
     @GetMapping("/roadmap/{roadmapId}")
     public ApiResponse<List<UserLearningPathResponse>>
     getByRoadmap(
-            @PathVariable Long roadmapId
+
+            @PathVariable Long roadmapId,
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
     ) {
+
+        Page<UserLearningPathResponse> learningPaths =
+                learningPathService.getByRoadmap(
+                        roadmapId,
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                learningPaths.getNumber()
+                        )
+
+                        .size(
+                                learningPaths.getSize()
+                        )
+
+                        .totalElements(
+                                learningPaths
+                                        .getTotalElements()
+                        )
+
+                        .totalPages(
+                                learningPaths
+                                        .getTotalPages()
+                        )
+
+                        .hasNext(
+                                learningPaths.hasNext()
+                        )
+
+                        .hasPrevious(
+                                learningPaths
+                                        .hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<UserLearningPathResponse>>builder()
@@ -141,10 +298,10 @@ public class UserLearningPathController {
                 )
 
                 .data(
-                        learningPathService.getByRoadmap(
-                                roadmapId
-                        )
+                        learningPaths.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -156,8 +313,58 @@ public class UserLearningPathController {
     @GetMapping("/course/{courseId}")
     public ApiResponse<List<UserLearningPathResponse>>
     getByCourse(
-            @PathVariable Long courseId
+
+            @PathVariable Long courseId,
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
     ) {
+
+        Page<UserLearningPathResponse> learningPaths =
+                learningPathService.getByCourse(
+                        courseId,
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                learningPaths.getNumber()
+                        )
+
+                        .size(
+                                learningPaths.getSize()
+                        )
+
+                        .totalElements(
+                                learningPaths
+                                        .getTotalElements()
+                        )
+
+                        .totalPages(
+                                learningPaths
+                                        .getTotalPages()
+                        )
+
+                        .hasNext(
+                                learningPaths.hasNext()
+                        )
+
+                        .hasPrevious(
+                                learningPaths
+                                        .hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<UserLearningPathResponse>>builder()
@@ -169,10 +376,10 @@ public class UserLearningPathController {
                 )
 
                 .data(
-                        learningPathService.getByCourse(
-                                courseId
-                        )
+                        learningPaths.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -206,6 +413,8 @@ public class UserLearningPathController {
                         )
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -231,6 +440,8 @@ public class UserLearningPathController {
                 .data(
                         learningPathService.delete(id)
                 )
+
+                .meta(null)
 
                 .timestamp(
                         LocalDateTime.now()

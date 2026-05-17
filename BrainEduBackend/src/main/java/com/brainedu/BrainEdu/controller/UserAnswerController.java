@@ -1,10 +1,12 @@
 package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
-import com.brainedu.BrainEdu.dto.request.UserAnswerRequest.*;
-import com.brainedu.BrainEdu.dto.response.UserAnswerResponse.*;
+import com.brainedu.BrainEdu.common.response.PaginationMeta;
+import com.brainedu.BrainEdu.dto.request.UserAnswerRequest.UserAnswerRequest;
+import com.brainedu.BrainEdu.dto.response.UserAnswerResponse.UserAnswerResponse;
 import com.brainedu.BrainEdu.service.userAnswerService.UserAnswerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -40,6 +42,8 @@ public class UserAnswerController {
                         )
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -49,7 +53,56 @@ public class UserAnswerController {
 
     @GetMapping
     public ApiResponse<List<UserAnswerResponse>>
-    getAll() {
+    getAll(
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
+    ) {
+
+        Page<UserAnswerResponse> answers =
+                userAnswerService.getAll(
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                answers.getNumber()
+                        )
+
+                        .size(
+                                answers.getSize()
+                        )
+
+                        .totalElements(
+                                answers
+                                        .getTotalElements()
+                        )
+
+                        .totalPages(
+                                answers
+                                        .getTotalPages()
+                        )
+
+                        .hasNext(
+                                answers.hasNext()
+                        )
+
+                        .hasPrevious(
+                                answers
+                                        .hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<UserAnswerResponse>>builder()
@@ -61,8 +114,10 @@ public class UserAnswerController {
                 )
 
                 .data(
-                        userAnswerService.getAll()
+                        answers.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -90,6 +145,8 @@ public class UserAnswerController {
                         userAnswerService.getById(id)
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -100,8 +157,58 @@ public class UserAnswerController {
     @GetMapping("/user/{userId}")
     public ApiResponse<List<UserAnswerResponse>>
     getByUser(
-            @PathVariable Long userId
+
+            @PathVariable Long userId,
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
     ) {
+
+        Page<UserAnswerResponse> answers =
+                userAnswerService.getByUser(
+                        userId,
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                answers.getNumber()
+                        )
+
+                        .size(
+                                answers.getSize()
+                        )
+
+                        .totalElements(
+                                answers
+                                        .getTotalElements()
+                        )
+
+                        .totalPages(
+                                answers
+                                        .getTotalPages()
+                        )
+
+                        .hasNext(
+                                answers.hasNext()
+                        )
+
+                        .hasPrevious(
+                                answers
+                                        .hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<UserAnswerResponse>>builder()
@@ -113,10 +220,10 @@ public class UserAnswerController {
                 )
 
                 .data(
-                        userAnswerService.getByUser(
-                                userId
-                        )
+                        answers.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -128,8 +235,58 @@ public class UserAnswerController {
     @GetMapping("/question/{questionId}")
     public ApiResponse<List<UserAnswerResponse>>
     getByQuestion(
-            @PathVariable Long questionId
+
+            @PathVariable Long questionId,
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
     ) {
+
+        Page<UserAnswerResponse> answers =
+                userAnswerService.getByQuestion(
+                        questionId,
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                answers.getNumber()
+                        )
+
+                        .size(
+                                answers.getSize()
+                        )
+
+                        .totalElements(
+                                answers
+                                        .getTotalElements()
+                        )
+
+                        .totalPages(
+                                answers
+                                        .getTotalPages()
+                        )
+
+                        .hasNext(
+                                answers.hasNext()
+                        )
+
+                        .hasPrevious(
+                                answers
+                                        .hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<UserAnswerResponse>>builder()
@@ -141,10 +298,10 @@ public class UserAnswerController {
                 )
 
                 .data(
-                        userAnswerService.getByQuestion(
-                                questionId
-                        )
+                        answers.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -171,6 +328,8 @@ public class UserAnswerController {
                 .data(
                         userAnswerService.delete(id)
                 )
+
+                .meta(null)
 
                 .timestamp(
                         LocalDateTime.now()

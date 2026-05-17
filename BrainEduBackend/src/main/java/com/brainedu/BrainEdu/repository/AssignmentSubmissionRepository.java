@@ -1,6 +1,8 @@
 package com.brainedu.BrainEdu.repository;
 
 import com.brainedu.BrainEdu.entity.AssignmentSubmission;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -11,9 +13,11 @@ public interface AssignmentSubmissionRepository
                 Long
                 > {
 
-    List<AssignmentSubmission>
-    findByAssignmentId(Long assignmentId);
+    Page<AssignmentSubmission>
+    findByAssignmentId(
+            Long assignmentId,
+            Pageable pageable);
 
-    List<AssignmentSubmission>
-    findByStudentId(Long studentId);
+    Page<AssignmentSubmission>
+    findByStudentId(Long studentId, Pageable pageable);
 }

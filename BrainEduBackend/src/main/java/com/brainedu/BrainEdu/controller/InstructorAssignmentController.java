@@ -1,19 +1,19 @@
 package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
+import com.brainedu.BrainEdu.common.response.PaginationMeta;
 import com.brainedu.BrainEdu.dto.request.AssignmentRequest.*;
 import com.brainedu.BrainEdu.dto.response.AssignmentResponse.*;
 import com.brainedu.BrainEdu.service.instructorService.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping(
-        "/api/v1/instructor/assignments"
-)
+@RequestMapping("/api/v1/instructor/assignments")
 @RequiredArgsConstructor
 public class InstructorAssignmentController {
 
@@ -43,6 +43,8 @@ public class InstructorAssignmentController {
                                 )
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -51,9 +53,58 @@ public class InstructorAssignmentController {
     }
 
     @GetMapping
-    public ApiResponse<
-            List<AssignmentResponse>
-            > getMyAssignments() {
+    public ApiResponse<List<AssignmentResponse>>
+    getMyAssignments(
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
+    ) {
+
+        Page<AssignmentResponse> assignments =
+                assignmentService
+                        .getMyAssignments(
+                                page,
+                                size
+                        );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                assignments.getNumber()
+                        )
+
+                        .size(
+                                assignments.getSize()
+                        )
+
+                        .totalElements(
+                                assignments
+                                        .getTotalElements()
+                        )
+
+                        .totalPages(
+                                assignments
+                                        .getTotalPages()
+                        )
+
+                        .hasNext(
+                                assignments.hasNext()
+                        )
+
+                        .hasPrevious(
+                                assignments
+                                        .hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<AssignmentResponse>>
@@ -66,9 +117,10 @@ public class InstructorAssignmentController {
                 )
 
                 .data(
-                        assignmentService
-                                .getMyAssignments()
+                        assignments.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -81,8 +133,60 @@ public class InstructorAssignmentController {
     public ApiResponse<
             List<AssignmentSubmissionResponse>
             > getSubmissions(
-            @PathVariable Long id
+
+            @PathVariable Long id,
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
     ) {
+
+        Page<AssignmentSubmissionResponse>
+                submissions =
+                assignmentService
+                        .getSubmissions(
+                                id,
+                                page,
+                                size
+                        );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                submissions.getNumber()
+                        )
+
+                        .size(
+                                submissions.getSize()
+                        )
+
+                        .totalElements(
+                                submissions
+                                        .getTotalElements()
+                        )
+
+                        .totalPages(
+                                submissions
+                                        .getTotalPages()
+                        )
+
+                        .hasNext(
+                                submissions.hasNext()
+                        )
+
+                        .hasPrevious(
+                                submissions
+                                        .hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<
@@ -96,9 +200,10 @@ public class InstructorAssignmentController {
                 )
 
                 .data(
-                        assignmentService
-                                .getSubmissions(id)
+                        submissions.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -113,6 +218,7 @@ public class InstructorAssignmentController {
     public ApiResponse<
             AssignmentSubmissionResponse
             > gradeSubmission(
+
             @PathVariable Long id,
 
             @RequestBody
@@ -136,6 +242,8 @@ public class InstructorAssignmentController {
                                         request
                                 )
                 )
+
+                .meta(null)
 
                 .timestamp(
                         LocalDateTime.now()

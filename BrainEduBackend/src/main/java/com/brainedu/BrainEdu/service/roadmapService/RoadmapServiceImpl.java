@@ -10,6 +10,9 @@ import com.brainedu.BrainEdu.repository.CategoryRepository;
 import com.brainedu.BrainEdu.repository.RoadmapRepository;
 import com.brainedu.BrainEdu.service.roadmapService.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -72,14 +75,12 @@ public class RoadmapServiceImpl
     }
 
     @Override
-    public List<RoadmapResponse> getAll() {
-
-        return roadmapRepository.findAll()
-                .stream()
+    public Page<RoadmapResponse> getAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return roadmapRepository.findAll(pageable)
                 .map(
                         roadmapMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override
@@ -101,35 +102,39 @@ public class RoadmapServiceImpl
     }
 
     @Override
-    public List<RoadmapResponse> getByCategory(
-            Long categoryId
+    public Page<RoadmapResponse> getByCategory(
+            Long categoryId,
+            int page,
+            int size
     ) {
+        Pageable pageable = PageRequest.of(page, size);
 
         return roadmapRepository
                 .findByCategoryId(
-                        categoryId
+                        categoryId,
+                        pageable
                 )
-                .stream()
                 .map(
                         roadmapMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override
-    public List<RoadmapResponse> getByLevel(
-            String level
+    public Page<RoadmapResponse> getByLevel(
+            String level,
+            int page,
+            int size
     ) {
+        Pageable pageable = PageRequest.of(page, size);
 
         return roadmapRepository
                 .findByLevel(
-                        level
+                        level,
+                        pageable
                 )
-                .stream()
                 .map(
                         roadmapMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override

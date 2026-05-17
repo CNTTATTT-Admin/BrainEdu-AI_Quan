@@ -1,10 +1,12 @@
 package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
-import com.brainedu.BrainEdu.dto.request.SkillRequest.*;
-import com.brainedu.BrainEdu.dto.response.SkillResponse.*;
+import com.brainedu.BrainEdu.common.response.PaginationMeta;
+import com.brainedu.BrainEdu.dto.request.SkillRequest.SkillRequest;
+import com.brainedu.BrainEdu.dto.response.SkillResponse.SkillResponse;
 import com.brainedu.BrainEdu.service.skillService.SkillService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -40,6 +42,8 @@ public class SkillController {
                         )
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -49,7 +53,56 @@ public class SkillController {
 
     @GetMapping
     public ApiResponse<List<SkillResponse>>
-    getAll() {
+    getAll(
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
+    ) {
+
+        Page<SkillResponse> skills =
+                skillService.getAll(
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                skills.getNumber()
+                        )
+
+                        .size(
+                                skills.getSize()
+                        )
+
+                        .totalElements(
+                                skills
+                                        .getTotalElements()
+                        )
+
+                        .totalPages(
+                                skills
+                                        .getTotalPages()
+                        )
+
+                        .hasNext(
+                                skills.hasNext()
+                        )
+
+                        .hasPrevious(
+                                skills
+                                        .hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<SkillResponse>>builder()
@@ -61,8 +114,10 @@ public class SkillController {
                 )
 
                 .data(
-                        skillService.getAll()
+                        skills.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -90,6 +145,8 @@ public class SkillController {
                         skillService.getById(id)
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -100,8 +157,58 @@ public class SkillController {
     @GetMapping("/category/{categoryId}")
     public ApiResponse<List<SkillResponse>>
     getByCategory(
-            @PathVariable Long categoryId
+
+            @PathVariable Long categoryId,
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
     ) {
+
+        Page<SkillResponse> skills =
+                skillService.getByCategory(
+                        categoryId,
+                        page,
+                        size
+                );
+
+        PaginationMeta meta =
+                PaginationMeta.builder()
+
+                        .page(
+                                skills.getNumber()
+                        )
+
+                        .size(
+                                skills.getSize()
+                        )
+
+                        .totalElements(
+                                skills
+                                        .getTotalElements()
+                        )
+
+                        .totalPages(
+                                skills
+                                        .getTotalPages()
+                        )
+
+                        .hasNext(
+                                skills.hasNext()
+                        )
+
+                        .hasPrevious(
+                                skills
+                                        .hasPrevious()
+                        )
+
+                        .build();
 
         return ApiResponse
                 .<List<SkillResponse>>builder()
@@ -113,10 +220,10 @@ public class SkillController {
                 )
 
                 .data(
-                        skillService.getByCategory(
-                                categoryId
-                        )
+                        skills.getContent()
                 )
+
+                .meta(meta)
 
                 .timestamp(
                         LocalDateTime.now()
@@ -150,6 +257,8 @@ public class SkillController {
                         )
                 )
 
+                .meta(null)
+
                 .timestamp(
                         LocalDateTime.now()
                 )
@@ -175,6 +284,8 @@ public class SkillController {
                 .data(
                         skillService.delete(id)
                 )
+
+                .meta(null)
 
                 .timestamp(
                         LocalDateTime.now()
