@@ -1,11 +1,13 @@
 package com.brainedu.BrainEdu.controller;
 
+import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.dto.request.CategoryRequest.*;
 import com.brainedu.BrainEdu.dto.response.CategoryResponse.*;
-import com.brainedu.BrainEdu.service.categoryService.*;
+import com.brainedu.BrainEdu.service.categoryService.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -17,47 +19,139 @@ public class CategoryController {
             categoryService;
 
     @PostMapping
-    public CategoryResponse create(
+    public ApiResponse<CategoryResponse>
+    create(
             @RequestBody
             CategoryRequest request
     ) {
 
-        return categoryService.create(
-                request
-        );
+        return ApiResponse
+                .<CategoryResponse>builder()
+
+                .success(true)
+
+                .message(
+                        "Category created successfully"
+                )
+
+                .data(
+                        categoryService.create(
+                                request
+                        )
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @GetMapping
-    public List<CategoryResponse> getAll() {
+    public ApiResponse<List<CategoryResponse>>
+    getAll() {
 
-        return categoryService.getAll();
+        return ApiResponse
+                .<List<CategoryResponse>>builder()
+
+                .success(true)
+
+                .message(
+                        "Categories fetched successfully"
+                )
+
+                .data(
+                        categoryService.getAll()
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @GetMapping("/{id}")
-    public CategoryResponse getById(
+    public ApiResponse<CategoryResponse>
+    getById(
             @PathVariable Long id
     ) {
 
-        return categoryService.getById(id);
+        return ApiResponse
+                .<CategoryResponse>builder()
+
+                .success(true)
+
+                .message(
+                        "Category fetched successfully"
+                )
+
+                .data(
+                        categoryService.getById(id)
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @PutMapping("/{id}")
-    public CategoryResponse update(
+    public ApiResponse<CategoryResponse>
+    update(
             @PathVariable Long id,
-            @RequestBody CategoryRequest request
+
+            @RequestBody
+            CategoryRequest request
     ) {
 
-        return categoryService.update(
-                id,
-                request
-        );
+        return ApiResponse
+                .<CategoryResponse>builder()
+
+                .success(true)
+
+                .message(
+                        "Category updated successfully"
+                )
+
+                .data(
+                        categoryService.update(
+                                id,
+                                request
+                        )
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @DeleteMapping("/{id}")
-    public String delete(
+    public ApiResponse<String>
+    delete(
             @PathVariable Long id
     ) {
 
-        return categoryService.delete(id);
+        return ApiResponse
+                .<String>builder()
+
+                .success(true)
+
+                .message(
+                        "Category deleted successfully"
+                )
+
+                .data(
+                        categoryService.delete(id)
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 }

@@ -1,11 +1,13 @@
 package com.brainedu.BrainEdu.controller;
 
+import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.dto.request.AssignmentRequest.*;
 import com.brainedu.BrainEdu.dto.response.AssignmentResponse.*;
 import com.brainedu.BrainEdu.service.instructorService.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -19,48 +21,126 @@ public class InstructorAssignmentController {
             assignmentService;
 
     @PostMapping
-    public AssignmentResponse createAssignment(
+    public ApiResponse<AssignmentResponse>
+    createAssignment(
             @RequestBody
             CreateAssignmentRequest request
     ) {
 
-        return assignmentService
-                .createAssignment(request);
+        return ApiResponse
+                .<AssignmentResponse>builder()
+
+                .success(true)
+
+                .message(
+                        "Assignment created successfully"
+                )
+
+                .data(
+                        assignmentService
+                                .createAssignment(
+                                        request
+                                )
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @GetMapping
-    public List<AssignmentResponse>
-    getMyAssignments() {
+    public ApiResponse<
+            List<AssignmentResponse>
+            > getMyAssignments() {
 
-        return assignmentService
-                .getMyAssignments();
+        return ApiResponse
+                .<List<AssignmentResponse>>
+                        builder()
+
+                .success(true)
+
+                .message(
+                        "Assignments fetched successfully"
+                )
+
+                .data(
+                        assignmentService
+                                .getMyAssignments()
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @GetMapping("/{id}/submissions")
-    public List<AssignmentSubmissionResponse>
-    getSubmissions(
+    public ApiResponse<
+            List<AssignmentSubmissionResponse>
+            > getSubmissions(
             @PathVariable Long id
     ) {
 
-        return assignmentService
-                .getSubmissions(id);
+        return ApiResponse
+                .<List<
+                        AssignmentSubmissionResponse
+                        >>builder()
+
+                .success(true)
+
+                .message(
+                        "Assignment submissions fetched successfully"
+                )
+
+                .data(
+                        assignmentService
+                                .getSubmissions(id)
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @PutMapping(
             "/submissions/{id}/grade"
     )
-    public AssignmentSubmissionResponse
-    gradeSubmission(
+    public ApiResponse<
+            AssignmentSubmissionResponse
+            > gradeSubmission(
             @PathVariable Long id,
 
             @RequestBody
             GradeSubmissionRequest request
     ) {
 
-        return assignmentService
-                .gradeSubmission(
-                        id,
-                        request
-                );
+        return ApiResponse
+                .<AssignmentSubmissionResponse>
+                        builder()
+
+                .success(true)
+
+                .message(
+                        "Submission graded successfully"
+                )
+
+                .data(
+                        assignmentService
+                                .gradeSubmission(
+                                        id,
+                                        request
+                                )
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 }

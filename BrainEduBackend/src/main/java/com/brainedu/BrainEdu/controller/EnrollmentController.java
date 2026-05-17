@@ -1,11 +1,13 @@
 package com.brainedu.BrainEdu.controller;
 
+import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.dto.request.EnrollmentRequest.*;
 import com.brainedu.BrainEdu.dto.response.EnrollmentResponse.*;
 import com.brainedu.BrainEdu.service.enrollmentService.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -17,39 +19,111 @@ public class EnrollmentController {
             enrollmentService;
 
     @PostMapping
-    public EnrollmentResponse enroll(
+    public ApiResponse<EnrollmentResponse>
+    enroll(
             @RequestBody
             EnrollmentRequest request
     ) {
 
-        return enrollmentService.enroll(
-                request
-        );
+        return ApiResponse
+                .<EnrollmentResponse>builder()
+
+                .success(true)
+
+                .message(
+                        "Enrollment created successfully"
+                )
+
+                .data(
+                        enrollmentService.enroll(
+                                request
+                        )
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @GetMapping("/me")
-    public List<EnrollmentResponse> myCourses() {
+    public ApiResponse<List<EnrollmentResponse>>
+    myCourses() {
 
-        return enrollmentService.myCourses();
+        return ApiResponse
+                .<List<EnrollmentResponse>>builder()
+
+                .success(true)
+
+                .message(
+                        "My enrolled courses fetched successfully"
+                )
+
+                .data(
+                        enrollmentService.myCourses()
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @GetMapping("/{id}")
-    public EnrollmentResponse getById(
+    public ApiResponse<EnrollmentResponse>
+    getById(
             @PathVariable Long id
     ) {
 
-        return enrollmentService.getById(
-                id
-        );
+        return ApiResponse
+                .<EnrollmentResponse>builder()
+
+                .success(true)
+
+                .message(
+                        "Enrollment fetched successfully"
+                )
+
+                .data(
+                        enrollmentService.getById(
+                                id
+                        )
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @DeleteMapping("/{id}")
-    public String cancel(
+    public ApiResponse<String>
+    cancel(
             @PathVariable Long id
     ) {
 
-        return enrollmentService.cancel(
-                id
-        );
+        return ApiResponse
+                .<String>builder()
+
+                .success(true)
+
+                .message(
+                        "Enrollment cancelled successfully"
+                )
+
+                .data(
+                        enrollmentService.cancel(
+                                id
+                        )
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 }

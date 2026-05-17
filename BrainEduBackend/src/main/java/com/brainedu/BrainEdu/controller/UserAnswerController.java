@@ -1,11 +1,13 @@
 package com.brainedu.BrainEdu.controller;
 
+import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.dto.request.UserAnswerRequest.*;
 import com.brainedu.BrainEdu.dto.response.UserAnswerResponse.*;
-import com.brainedu.BrainEdu.service.userAnswerService.*;
+import com.brainedu.BrainEdu.service.userAnswerService.UserAnswerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -17,55 +19,163 @@ public class UserAnswerController {
             userAnswerService;
 
     @PostMapping
-    public UserAnswerResponse submit(
+    public ApiResponse<UserAnswerResponse>
+    submit(
             @RequestBody
             UserAnswerRequest request
     ) {
 
-        return userAnswerService.submit(
-                request
-        );
+        return ApiResponse
+                .<UserAnswerResponse>builder()
+
+                .success(true)
+
+                .message(
+                        "User answer submitted successfully"
+                )
+
+                .data(
+                        userAnswerService.submit(
+                                request
+                        )
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @GetMapping
-    public List<UserAnswerResponse> getAll() {
+    public ApiResponse<List<UserAnswerResponse>>
+    getAll() {
 
-        return userAnswerService.getAll();
+        return ApiResponse
+                .<List<UserAnswerResponse>>builder()
+
+                .success(true)
+
+                .message(
+                        "User answers fetched successfully"
+                )
+
+                .data(
+                        userAnswerService.getAll()
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @GetMapping("/{id}")
-    public UserAnswerResponse getById(
+    public ApiResponse<UserAnswerResponse>
+    getById(
             @PathVariable Long id
     ) {
 
-        return userAnswerService.getById(id);
+        return ApiResponse
+                .<UserAnswerResponse>builder()
+
+                .success(true)
+
+                .message(
+                        "User answer fetched successfully"
+                )
+
+                .data(
+                        userAnswerService.getById(id)
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @GetMapping("/user/{userId}")
-    public List<UserAnswerResponse> getByUser(
+    public ApiResponse<List<UserAnswerResponse>>
+    getByUser(
             @PathVariable Long userId
     ) {
 
-        return userAnswerService.getByUser(
-                userId
-        );
+        return ApiResponse
+                .<List<UserAnswerResponse>>builder()
+
+                .success(true)
+
+                .message(
+                        "User answers by user fetched successfully"
+                )
+
+                .data(
+                        userAnswerService.getByUser(
+                                userId
+                        )
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @GetMapping("/question/{questionId}")
-    public List<UserAnswerResponse> getByQuestion(
+    public ApiResponse<List<UserAnswerResponse>>
+    getByQuestion(
             @PathVariable Long questionId
     ) {
 
-        return userAnswerService.getByQuestion(
-                questionId
-        );
+        return ApiResponse
+                .<List<UserAnswerResponse>>builder()
+
+                .success(true)
+
+                .message(
+                        "User answers by question fetched successfully"
+                )
+
+                .data(
+                        userAnswerService.getByQuestion(
+                                questionId
+                        )
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @DeleteMapping("/{id}")
-    public String delete(
+    public ApiResponse<String>
+    delete(
             @PathVariable Long id
     ) {
 
-        return userAnswerService.delete(id);
+        return ApiResponse
+                .<String>builder()
+
+                .success(true)
+
+                .message(
+                        "User answer deleted successfully"
+                )
+
+                .data(
+                        userAnswerService.delete(id)
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 }

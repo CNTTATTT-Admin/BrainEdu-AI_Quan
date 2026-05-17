@@ -1,11 +1,13 @@
 package com.brainedu.BrainEdu.controller;
 
+import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.dto.request.QuizRequest.*;
 import com.brainedu.BrainEdu.dto.response.QuizResponse.*;
-import com.brainedu.BrainEdu.service.quizService.*;
+import com.brainedu.BrainEdu.service.quizService.QuizService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -17,57 +19,167 @@ public class QuizController {
             quizService;
 
     @PostMapping
-    public QuizResponse create(
+    public ApiResponse<QuizResponse>
+    create(
             @RequestBody
             QuizRequest request
     ) {
 
-        return quizService.create(
-                request
-        );
+        return ApiResponse
+                .<QuizResponse>builder()
+
+                .success(true)
+
+                .message(
+                        "Quiz created successfully"
+                )
+
+                .data(
+                        quizService.create(
+                                request
+                        )
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @GetMapping
-    public List<QuizResponse> getAll() {
+    public ApiResponse<List<QuizResponse>>
+    getAll() {
 
-        return quizService.getAll();
+        return ApiResponse
+                .<List<QuizResponse>>builder()
+
+                .success(true)
+
+                .message(
+                        "Quizzes fetched successfully"
+                )
+
+                .data(
+                        quizService.getAll()
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @GetMapping("/{id}")
-    public QuizResponse getById(
+    public ApiResponse<QuizResponse>
+    getById(
             @PathVariable Long id
     ) {
 
-        return quizService.getById(id);
+        return ApiResponse
+                .<QuizResponse>builder()
+
+                .success(true)
+
+                .message(
+                        "Quiz fetched successfully"
+                )
+
+                .data(
+                        quizService.getById(id)
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @GetMapping("/lesson/{lessonId}")
-    public List<QuizResponse> getByLesson(
+    public ApiResponse<List<QuizResponse>>
+    getByLesson(
             @PathVariable Long lessonId
     ) {
 
-        return quizService.getByLesson(
-                lessonId
-        );
+        return ApiResponse
+                .<List<QuizResponse>>builder()
+
+                .success(true)
+
+                .message(
+                        "Quizzes by lesson fetched successfully"
+                )
+
+                .data(
+                        quizService.getByLesson(
+                                lessonId
+                        )
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @PutMapping("/{id}")
-    public QuizResponse update(
+    public ApiResponse<QuizResponse>
+    update(
             @PathVariable Long id,
-            @RequestBody QuizRequest request
+
+            @RequestBody
+            QuizRequest request
     ) {
 
-        return quizService.update(
-                id,
-                request
-        );
+        return ApiResponse
+                .<QuizResponse>builder()
+
+                .success(true)
+
+                .message(
+                        "Quiz updated successfully"
+                )
+
+                .data(
+                        quizService.update(
+                                id,
+                                request
+                        )
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @DeleteMapping("/{id}")
-    public String delete(
+    public ApiResponse<String>
+    delete(
             @PathVariable Long id
     ) {
 
-        return quizService.delete(id);
+        return ApiResponse
+                .<String>builder()
+
+                .success(true)
+
+                .message(
+                        "Quiz deleted successfully"
+                )
+
+                .data(
+                        quizService.delete(id)
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 }

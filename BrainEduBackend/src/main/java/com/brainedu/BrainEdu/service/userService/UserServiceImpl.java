@@ -1,82 +1,32 @@
 package com.brainedu.BrainEdu.service.userService;
-import java.util.List;
 
 import com.brainedu.BrainEdu.config.ApiException;
+import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateProfileRequest;
+import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateUserRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UserRequest;
 import com.brainedu.BrainEdu.dto.response.UserResponse.UserResponse;
 import com.brainedu.BrainEdu.entity.User;
 import com.brainedu.BrainEdu.mapper.UserMapper;
 import com.brainedu.BrainEdu.repository.UserRepository;
-import com.brainedu.BrainEdu.dto.request.UserRequest.*;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+@Transactional
+public class UserServiceImpl
+        implements UserService {
 
-    private final UserRepository userRepository;
+    private final UserRepository
+            userRepository;
 
-    @Override
-    public UserResponse createUser(UserRequest request) {
-
-        User user = UserMapper.toEntity(request);
-
-        User savedUser = userRepository.save(user);
-
-        return UserMapper.toResponse(savedUser);
-    }
-
-    @Override
-    public UserResponse getUser(Long id) {
-
-        User user = userRepository.findById(id)
-                .orElseThrow(
-                        () -> new RuntimeException("User not found")
-                );
-
-        return UserMapper.toResponse(user);
-    }
-
-    private User getCurrentUser() {
-
-        return (User) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-    }
-
-    private UserResponse map(User user) {
-
-        return UserResponse.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .build();
-    }
-
-    @Override
-    public UserResponse getMe() {
-
-        return map(getCurrentUser());
-    }
-
-    @Override
-    public UserResponse updateMe(
-            UpdateProfileRequest request
-    ) {
-
-        User user = getCurrentUser();
-
-        user.setName(request.getName());
-
-        userRepository.save(user);
-
-        return map(user);
-    }
+    private final PasswordEncoder
+            passwordEncoder;
 
     @Override
     public List<UserResponse> getAllUsers() {
@@ -84,22 +34,123 @@ public class UserServiceImpl implements UserService {
         return userRepository
                 .findAll()
                 .stream()
-                .map(this::map)
+                .map(
+                        UserMapper::toResponse
+                )
                 .toList();
     }
 
     @Override
-    public UserResponse getUserById(Long id) {
+    public UserResponse createUser(
+            UserRequest request
+    ) {
 
-        User user = userRepository
-                .findById(id)
+        User user =
+                UserMapper.toEntity(request);
+
+        user.setPassword(
+                passwordEncoder.encode(
+                        request.getPassword()
+                )
+        );
+
+        if (user.getRole() == null) {
+
+            user.setRole("USER");
+        }
+
+        User savedUser =
+                userRepository.save(user);
+
+        return UserMapper.toResponse(
+                savedUser
+        );
+    }
+
+    @Override
+    public UserResponse getUser(
+            Long id
+    ) {
+
+        User user =
+                userRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () -> new ApiException(
+                                        "User not found"
+                                )
+                        );
+
+        return UserMapper.toResponse(
+                user
+        );
+    }
+
+    private User getCurrentUser() {
+
+        String email =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getName();
+
+        return userRepository
+                .findByEmail(email)
                 .orElseThrow(
                         () -> new ApiException(
                                 "User not found"
                         )
                 );
+    }
 
-        return map(user);
+    @Override
+    public UserResponse getMe() {
+
+        User user =
+                getCurrentUser();
+
+        return UserMapper.toResponse(
+                user
+        );
+    }
+
+    @Override
+    public UserResponse updateMe(
+            UpdateProfileRequest request
+    ) {
+
+        User user =
+                getCurrentUser();
+
+        user.setName(
+                request.getName()
+        );
+
+        User updatedUser =
+                userRepository.save(user);
+
+        return UserMapper.toResponse(
+                updatedUser
+        );
+    }
+
+    @Override
+    public UserResponse getUserById(
+            Long id
+    ) {
+
+        User user =
+                userRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () -> new ApiException(
+                                        "User not found"
+                                )
+                        );
+
+        return UserMapper.toResponse(
+                user
+        );
     }
 
     @Override
@@ -108,35 +159,43 @@ public class UserServiceImpl implements UserService {
             UpdateUserRequest request
     ) {
 
-        User user = userRepository
-                .findById(id)
-                .orElseThrow(
-                        () -> new ApiException(
-                                "User not found"
-                        )
-                );
+        User user =
+                userRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () -> new ApiException(
+                                        "User not found"
+                                )
+                        );
 
-        user.setRole(request.getRole());
+        user.setRole(
+                request.getRole()
+        );
 
-        userRepository.save(user);
+        User updatedUser =
+                userRepository.save(user);
 
-        return map(user);
+        return UserMapper.toResponse(
+                updatedUser
+        );
     }
 
     @Override
-    public String deleteUser(Long id) {
+    public String deleteUser(
+            Long id
+    ) {
 
-        User user = userRepository
-                .findById(id)
-                .orElseThrow(
-                        () -> new ApiException(
-                                "User not found"
-                        )
-                );
+        User user =
+                userRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () -> new ApiException(
+                                        "User not found"
+                                )
+                        );
 
         userRepository.delete(user);
 
         return "User deleted successfully";
     }
-
 }

@@ -1,11 +1,13 @@
 package com.brainedu.BrainEdu.controller;
 
+import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.dto.request.UserLearningPathRequest.*;
 import com.brainedu.BrainEdu.dto.response.UserLearningPathResponse.*;
-import com.brainedu.BrainEdu.service.userLearningPathService.*;
+import com.brainedu.BrainEdu.service.userLearningPathService.UserLearningPathService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -17,77 +19,223 @@ public class UserLearningPathController {
             learningPathService;
 
     @PostMapping
-    public UserLearningPathResponse create(
+    public ApiResponse<UserLearningPathResponse>
+    create(
             @RequestBody
             UserLearningPathRequest request
     ) {
 
-        return learningPathService.create(
-                request
-        );
+        return ApiResponse
+                .<UserLearningPathResponse>builder()
+
+                .success(true)
+
+                .message(
+                        "User learning path created successfully"
+                )
+
+                .data(
+                        learningPathService.create(
+                                request
+                        )
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @GetMapping
-    public List<UserLearningPathResponse> getAll() {
+    public ApiResponse<List<UserLearningPathResponse>>
+    getAll() {
 
-        return learningPathService.getAll();
+        return ApiResponse
+                .<List<UserLearningPathResponse>>builder()
+
+                .success(true)
+
+                .message(
+                        "User learning paths fetched successfully"
+                )
+
+                .data(
+                        learningPathService.getAll()
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @GetMapping("/{id}")
-    public UserLearningPathResponse getById(
+    public ApiResponse<UserLearningPathResponse>
+    getById(
             @PathVariable Long id
     ) {
 
-        return learningPathService.getById(id);
+        return ApiResponse
+                .<UserLearningPathResponse>builder()
+
+                .success(true)
+
+                .message(
+                        "User learning path fetched successfully"
+                )
+
+                .data(
+                        learningPathService.getById(id)
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @GetMapping("/user/{userId}")
-    public List<UserLearningPathResponse> getByUser(
+    public ApiResponse<List<UserLearningPathResponse>>
+    getByUser(
             @PathVariable Long userId
     ) {
 
-        return learningPathService.getByUser(
-                userId
-        );
+        return ApiResponse
+                .<List<UserLearningPathResponse>>builder()
+
+                .success(true)
+
+                .message(
+                        "User learning paths by user fetched successfully"
+                )
+
+                .data(
+                        learningPathService.getByUser(
+                                userId
+                        )
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @GetMapping("/roadmap/{roadmapId}")
-    public List<UserLearningPathResponse> getByRoadmap(
+    public ApiResponse<List<UserLearningPathResponse>>
+    getByRoadmap(
             @PathVariable Long roadmapId
     ) {
 
-        return learningPathService.getByRoadmap(
-                roadmapId
-        );
+        return ApiResponse
+                .<List<UserLearningPathResponse>>builder()
+
+                .success(true)
+
+                .message(
+                        "User learning paths by roadmap fetched successfully"
+                )
+
+                .data(
+                        learningPathService.getByRoadmap(
+                                roadmapId
+                        )
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @GetMapping("/course/{courseId}")
-    public List<UserLearningPathResponse> getByCourse(
+    public ApiResponse<List<UserLearningPathResponse>>
+    getByCourse(
             @PathVariable Long courseId
     ) {
 
-        return learningPathService.getByCourse(
-                courseId
-        );
+        return ApiResponse
+                .<List<UserLearningPathResponse>>builder()
+
+                .success(true)
+
+                .message(
+                        "User learning paths by course fetched successfully"
+                )
+
+                .data(
+                        learningPathService.getByCourse(
+                                courseId
+                        )
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @PutMapping("/{id}")
-    public UserLearningPathResponse update(
+    public ApiResponse<UserLearningPathResponse>
+    update(
             @PathVariable Long id,
-            @RequestBody UserLearningPathRequest request
+
+            @RequestBody
+            UserLearningPathRequest request
     ) {
 
-        return learningPathService.update(
-                id,
-                request
-        );
+        return ApiResponse
+                .<UserLearningPathResponse>builder()
+
+                .success(true)
+
+                .message(
+                        "User learning path updated successfully"
+                )
+
+                .data(
+                        learningPathService.update(
+                                id,
+                                request
+                        )
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 
     @DeleteMapping("/{id}")
-    public String delete(
+    public ApiResponse<String>
+    delete(
             @PathVariable Long id
     ) {
 
-        return learningPathService.delete(id);
+        return ApiResponse
+                .<String>builder()
+
+                .success(true)
+
+                .message(
+                        "User learning path deleted successfully"
+                )
+
+                .data(
+                        learningPathService.delete(id)
+                )
+
+                .timestamp(
+                        LocalDateTime.now()
+                )
+
+                .build();
     }
 }
