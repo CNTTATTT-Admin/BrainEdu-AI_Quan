@@ -2,14 +2,14 @@ package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.common.response.PaginationMeta;
-import com.brainedu.BrainEdu.dto.request.CategoryRequest.*;
-import com.brainedu.BrainEdu.dto.response.CategoryResponse.*;
+import com.brainedu.BrainEdu.common.response.ResponseFactory;
+import com.brainedu.BrainEdu.dto.request.CategoryRequest.CategoryRequest;
+import com.brainedu.BrainEdu.dto.response.CategoryResponse.CategoryResponse;
 import com.brainedu.BrainEdu.service.categoryService.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -27,26 +27,10 @@ public class CategoryController {
             CategoryRequest request
     ) {
 
-        return ApiResponse
-                .<CategoryResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Category created successfully"
-                )
-
-                .data(
-                        categoryService.create(
-                                request
-                        )
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Category created successfully",
+                categoryService.create(request)
+        );
     }
 
     @GetMapping
@@ -71,54 +55,15 @@ public class CategoryController {
                 );
 
         PaginationMeta meta =
-                PaginationMeta.builder()
+                ResponseFactory.pagination(
+                        categories
+                );
 
-                        .page(
-                                categories.getNumber()
-                        )
-
-                        .size(
-                                categories.getSize()
-                        )
-
-                        .totalElements(
-                                categories.getTotalElements()
-                        )
-
-                        .totalPages(
-                                categories.getTotalPages()
-                        )
-
-                        .hasNext(
-                                categories.hasNext()
-                        )
-
-                        .hasPrevious(
-                                categories.hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<CategoryResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "Categories fetched successfully"
-                )
-
-                .data(
-                        categories.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Categories fetched successfully",
+                categories.getContent(),
+                meta
+        );
     }
 
     @GetMapping("/{id}")
@@ -127,56 +72,29 @@ public class CategoryController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<CategoryResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Category fetched successfully"
-                )
-
-                .data(
-                        categoryService.getById(id)
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Category fetched successfully",
+                categoryService.getById(id)
+        );
     }
 
     @PutMapping("/{id}")
     public ApiResponse<CategoryResponse>
     update(
+
             @PathVariable Long id,
 
             @RequestBody
             CategoryRequest request
     ) {
 
-        return ApiResponse
-                .<CategoryResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Category updated successfully"
+        return ResponseFactory.success(
+                "Category updated successfully",
+                categoryService.update(
+                        id,
+                        request
                 )
-
-                .data(
-                        categoryService.update(
-                                id,
-                                request
-                        )
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @DeleteMapping("/{id}")
@@ -185,23 +103,9 @@ public class CategoryController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<String>builder()
-
-                .success(true)
-
-                .message(
-                        "Category deleted successfully"
-                )
-
-                .data(
-                        categoryService.delete(id)
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Category deleted successfully",
+                categoryService.delete(id)
+        );
     }
 }

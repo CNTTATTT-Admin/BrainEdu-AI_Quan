@@ -1,19 +1,20 @@
 package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
+import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.AIRecommendationRequest.*;
 import com.brainedu.BrainEdu.dto.response.AIRecommendationResponse.*;
 import com.brainedu.BrainEdu.service.AIRecommendationService.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping(
-        "/api/v1/ai-recommendations"
-)
+@RequestMapping("/api/v1/ai-recommendations")
 @RequiredArgsConstructor
 public class AIRecommendationController {
 
@@ -27,52 +28,41 @@ public class AIRecommendationController {
             AIRecommendationRequest request
     ) {
 
-        return ApiResponse
-                .<AIRecommendationResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "AI recommendation created successfully"
-                )
-
-                .data(
-                        recommendationService.create(
-                                request
-                        )
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "AI recommendation created successfully",
+                recommendationService.create(request)
+        );
     }
 
     @GetMapping
-    public ApiResponse<
-            List<AIRecommendationResponse>
-            > getAll() {
+    public ApiResponse<List<AIRecommendationResponse>>
+    getAll(
 
-        return ApiResponse
-                .<List<AIRecommendationResponse>>
-                        builder()
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
 
-                .success(true)
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
+    ) {
 
-                .message(
-                        "AI recommendations fetched successfully"
+        Page<AIRecommendationResponse>
+                recommendations =
+                recommendationService.getAll(
+                        page,
+                        size
+                );
+
+        return ResponseFactory.success(
+                "AI recommendations fetched successfully",
+                recommendations.getContent(),
+                ResponseFactory.pagination(
+                        recommendations
                 )
-
-                .data(
-                        recommendationService.getAll()
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @GetMapping("/{id}")
@@ -81,108 +71,89 @@ public class AIRecommendationController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<AIRecommendationResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "AI recommendation fetched successfully"
-                )
-
-                .data(
-                        recommendationService.getById(id)
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "AI recommendation fetched successfully",
+                recommendationService.getById(id)
+        );
     }
 
     @GetMapping("/user/{userId}")
-    public ApiResponse<
-            List<AIRecommendationResponse>
-            > getByUser(
-            @PathVariable Long userId
+    public ApiResponse<List<AIRecommendationResponse>>
+    getByUser(
+
+            @PathVariable Long userId,
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
     ) {
 
-        return ApiResponse
-                .<List<AIRecommendationResponse>>
-                        builder()
+        Page<AIRecommendationResponse>
+                recommendations =
+                recommendationService.getByUser(
+                        userId,
+                        page,
+                        size
+                );
 
-                .success(true)
-
-                .message(
-                        "User AI recommendations fetched successfully"
+        return ResponseFactory.success(
+                "User AI recommendations fetched successfully",
+                recommendations.getContent(),
+                ResponseFactory.pagination(
+                        recommendations
                 )
-
-                .data(
-                        recommendationService.getByUser(
-                                userId
-                        )
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @GetMapping("/type/{type}")
-    public ApiResponse<
-            List<AIRecommendationResponse>
-            > getByType(
-            @PathVariable String type
+    public ApiResponse<List<AIRecommendationResponse>>
+    getByType(
+
+            @PathVariable String type,
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size
     ) {
 
-        return ApiResponse
-                .<List<AIRecommendationResponse>>
-                        builder()
+        Page<AIRecommendationResponse>
+                recommendations =
+                recommendationService.getByType(
+                        type,
+                        page,
+                        size
+                );
 
-                .success(true)
-
-                .message(
-                        "AI recommendations by type fetched successfully"
+        return ResponseFactory.success(
+                "AI recommendations by type fetched successfully",
+                recommendations.getContent(),
+                ResponseFactory.pagination(
+                        recommendations
                 )
-
-                .data(
-                        recommendationService.getByType(
-                                type
-                        )
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<String> delete(
+    public ApiResponse<String>
+    delete(
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<String>builder()
-
-                .success(true)
-
-                .message(
-                        "AI recommendation deleted successfully"
-                )
-
-                .data(
-                        recommendationService.delete(id)
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "AI recommendation deleted successfully",
+                recommendationService.delete(id)
+        );
     }
 }

@@ -2,6 +2,7 @@ package com.brainedu.BrainEdu.service.AIRecommendationService;
 
 import com.brainedu.BrainEdu.dto.request.AIRecommendationRequest.*;
 import com.brainedu.BrainEdu.dto.response.AIRecommendationResponse.*;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -11,18 +12,22 @@ public interface AIRecommendationService {
             AIRecommendationRequest request
     );
 
-    List<AIRecommendationResponse> getAll();
+    Page<AIRecommendationResponse> getAll(int page, int size);
 
     AIRecommendationResponse getById(
             Long id
     );
 
-    List<AIRecommendationResponse> getByUser(
-            Long userId
+    Page<AIRecommendationResponse> getByUser(
+            Long userId,
+            int page,
+            int size
     );
 
-    List<AIRecommendationResponse> getByType(
-            String type
+    Page<AIRecommendationResponse> getByType(
+            String type,
+            int page,
+            int size
     );
 
     String delete(

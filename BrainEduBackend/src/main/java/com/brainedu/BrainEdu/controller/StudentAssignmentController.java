@@ -2,14 +2,14 @@ package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.common.response.PaginationMeta;
-import com.brainedu.BrainEdu.dto.request.AssignmentRequest.*;
-import com.brainedu.BrainEdu.dto.response.AssignmentResponse.*;
+import com.brainedu.BrainEdu.common.response.ResponseFactory;
+import com.brainedu.BrainEdu.dto.request.AssignmentRequest.SubmitAssignmentRequest;
+import com.brainedu.BrainEdu.dto.response.AssignmentResponse.AssignmentSubmissionResponse;
 import com.brainedu.BrainEdu.service.instructorService.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -27,27 +27,12 @@ public class StudentAssignmentController {
             SubmitAssignmentRequest request
     ) {
 
-        return ApiResponse
-                .<AssignmentSubmissionResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Assignment submitted successfully"
+        return ResponseFactory.success(
+                "Assignment submitted successfully",
+                assignmentService.submitAssignment(
+                        request
                 )
-
-                .data(
-                        assignmentService
-                                .submitAssignment(
-                                        request
-                                )
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @GetMapping("/my-submissions")
@@ -72,57 +57,14 @@ public class StudentAssignmentController {
                 );
 
         PaginationMeta meta =
-                PaginationMeta.builder()
+                ResponseFactory.pagination(
+                        submissions
+                );
 
-                        .page(
-                                submissions.getNumber()
-                        )
-
-                        .size(
-                                submissions.getSize()
-                        )
-
-                        .totalElements(
-                                submissions
-                                        .getTotalElements()
-                        )
-
-                        .totalPages(
-                                submissions
-                                        .getTotalPages()
-                        )
-
-                        .hasNext(
-                                submissions.hasNext()
-                        )
-
-                        .hasPrevious(
-                                submissions
-                                        .hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<AssignmentSubmissionResponse>>
-                        builder()
-
-                .success(true)
-
-                .message(
-                        "Student submissions fetched successfully"
-                )
-
-                .data(
-                        submissions.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Student submissions fetched successfully",
+                submissions.getContent(),
+                meta
+        );
     }
 }

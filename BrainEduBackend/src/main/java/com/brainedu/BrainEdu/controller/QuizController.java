@@ -2,6 +2,7 @@ package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.common.response.PaginationMeta;
+import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.QuizRequest.QuizRequest;
 import com.brainedu.BrainEdu.dto.response.QuizResponse.QuizResponse;
 import com.brainedu.BrainEdu.service.quizService.QuizService;
@@ -9,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -27,28 +27,12 @@ public class QuizController {
             QuizRequest request
     ) {
 
-        return ApiResponse
-                .<QuizResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Quiz created successfully"
+        return ResponseFactory.success(
+                "Quiz created successfully",
+                quizService.create(
+                        request
                 )
-
-                .data(
-                        quizService.create(
-                                request
-                        )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @GetMapping
@@ -73,57 +57,15 @@ public class QuizController {
                 );
 
         PaginationMeta meta =
-                PaginationMeta.builder()
+                ResponseFactory.pagination(
+                        quizzes
+                );
 
-                        .page(
-                                quizzes.getNumber()
-                        )
-
-                        .size(
-                                quizzes.getSize()
-                        )
-
-                        .totalElements(
-                                quizzes
-                                        .getTotalElements()
-                        )
-
-                        .totalPages(
-                                quizzes
-                                        .getTotalPages()
-                        )
-
-                        .hasNext(
-                                quizzes.hasNext()
-                        )
-
-                        .hasPrevious(
-                                quizzes
-                                        .hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<QuizResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "Quizzes fetched successfully"
-                )
-
-                .data(
-                        quizzes.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Quizzes fetched successfully",
+                quizzes.getContent(),
+                meta
+        );
     }
 
     @GetMapping("/{id}")
@@ -132,26 +74,10 @@ public class QuizController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<QuizResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Quiz fetched successfully"
-                )
-
-                .data(
-                        quizService.getById(id)
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Quiz fetched successfully",
+                quizService.getById(id)
+        );
     }
 
     @GetMapping("/lesson/{lessonId}")
@@ -179,91 +105,34 @@ public class QuizController {
                 );
 
         PaginationMeta meta =
-                PaginationMeta.builder()
+                ResponseFactory.pagination(
+                        quizzes
+                );
 
-                        .page(
-                                quizzes.getNumber()
-                        )
-
-                        .size(
-                                quizzes.getSize()
-                        )
-
-                        .totalElements(
-                                quizzes
-                                        .getTotalElements()
-                        )
-
-                        .totalPages(
-                                quizzes
-                                        .getTotalPages()
-                        )
-
-                        .hasNext(
-                                quizzes.hasNext()
-                        )
-
-                        .hasPrevious(
-                                quizzes
-                                        .hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<QuizResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "Quizzes by lesson fetched successfully"
-                )
-
-                .data(
-                        quizzes.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Quizzes by lesson fetched successfully",
+                quizzes.getContent(),
+                meta
+        );
     }
 
     @PutMapping("/{id}")
     public ApiResponse<QuizResponse>
     update(
+
             @PathVariable Long id,
 
             @RequestBody
             QuizRequest request
     ) {
 
-        return ApiResponse
-                .<QuizResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Quiz updated successfully"
+        return ResponseFactory.success(
+                "Quiz updated successfully",
+                quizService.update(
+                        id,
+                        request
                 )
-
-                .data(
-                        quizService.update(
-                                id,
-                                request
-                        )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @DeleteMapping("/{id}")
@@ -272,25 +141,9 @@ public class QuizController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<String>builder()
-
-                .success(true)
-
-                .message(
-                        "Quiz deleted successfully"
-                )
-
-                .data(
-                        quizService.delete(id)
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Quiz deleted successfully",
+                quizService.delete(id)
+        );
     }
 }

@@ -1,6 +1,7 @@
 package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
+import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.AuthRequest.ForgotPasswordRequest;
 import com.brainedu.BrainEdu.dto.request.AuthRequest.LoginRequest;
 import com.brainedu.BrainEdu.dto.request.AuthRequest.LogoutRequest;
@@ -29,26 +30,10 @@ public class AuthController {
             RegisterRequest request
     ) {
 
-        return ApiResponse
-                .<AuthResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Register successful"
-                )
-
-                .data(
-                        authService.register(
-                                request
-                        )
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Register successful",
+                authService.register(request)
+        );
     }
 
     @PostMapping("/login")
@@ -58,26 +43,10 @@ public class AuthController {
             LoginRequest request
     ) {
 
-        return ApiResponse
-                .<AuthResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Login successful"
-                )
-
-                .data(
-                        authService.login(
-                                request
-                        )
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Login successful",
+                authService.login(request)
+        );
     }
 
     @PostMapping("/refresh")
@@ -87,26 +56,10 @@ public class AuthController {
             RefreshTokenRequest request
     ) {
 
-        return ApiResponse
-                .<AuthResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Token refreshed successfully"
-                )
-
-                .data(
-                        authService.refresh(
-                                request
-                        )
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Token refreshed successfully",
+                authService.refresh(request)
+        );
     }
 
     @PostMapping("/logout")
@@ -116,26 +69,10 @@ public class AuthController {
             LogoutRequest request
     ) {
 
-        return ApiResponse
-                .<String>builder()
-
-                .success(true)
-
-                .message(
-                        "Logout successful"
-                )
-
-                .data(
-                        authService.logout(
-                                request
-                        )
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Logout successful",
+                authService.logout(request)
+        );
     }
 
     @PostMapping("/forgot-password")
@@ -145,26 +82,10 @@ public class AuthController {
             ForgotPasswordRequest request
     ) {
 
-        return ApiResponse
-                .<String>builder()
-
-                .success(true)
-
-                .message(
-                        "Reset password email sent successfully"
-                )
-
-                .data(
-                        authService.forgotPassword(
-                                request
-                        )
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Reset password email sent successfully",
+                authService.forgotPassword(request)
+        );
     }
 
     @PostMapping("/reset-password")
@@ -174,25 +95,9 @@ public class AuthController {
             ResetPasswordRequest request
     ) {
 
-        return ApiResponse
-                .<String>builder()
-
-                .success(true)
-
-                .message(
-                        "Password reset successful"
-                )
-
-                .data(
-                        authService.resetPassword(
-                                request
-                        )
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Password reset successful",
+                authService.resetPassword(request)
+        );
     }
 }

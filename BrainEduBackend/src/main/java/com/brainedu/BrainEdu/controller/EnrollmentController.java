@@ -1,13 +1,13 @@
 package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
-import com.brainedu.BrainEdu.dto.request.EnrollmentRequest.*;
-import com.brainedu.BrainEdu.dto.response.EnrollmentResponse.*;
-import com.brainedu.BrainEdu.service.enrollmentService.*;
+import com.brainedu.BrainEdu.common.response.ResponseFactory;
+import com.brainedu.BrainEdu.dto.request.EnrollmentRequest.EnrollmentRequest;
+import com.brainedu.BrainEdu.dto.response.EnrollmentResponse.EnrollmentResponse;
+import com.brainedu.BrainEdu.service.enrollmentService.EnrollmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -25,50 +25,22 @@ public class EnrollmentController {
             EnrollmentRequest request
     ) {
 
-        return ApiResponse
-                .<EnrollmentResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Enrollment created successfully"
+        return ResponseFactory.success(
+                "Enrollment created successfully",
+                enrollmentService.enroll(
+                        request
                 )
-
-                .data(
-                        enrollmentService.enroll(
-                                request
-                        )
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @GetMapping("/me")
     public ApiResponse<List<EnrollmentResponse>>
     myCourses() {
 
-        return ApiResponse
-                .<List<EnrollmentResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "My enrolled courses fetched successfully"
-                )
-
-                .data(
-                        enrollmentService.myCourses()
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "My enrolled courses fetched successfully",
+                enrollmentService.myCourses()
+        );
     }
 
     @GetMapping("/{id}")
@@ -77,26 +49,10 @@ public class EnrollmentController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<EnrollmentResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Enrollment fetched successfully"
-                )
-
-                .data(
-                        enrollmentService.getById(
-                                id
-                        )
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Enrollment fetched successfully",
+                enrollmentService.getById(id)
+        );
     }
 
     @DeleteMapping("/{id}")
@@ -105,25 +61,9 @@ public class EnrollmentController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<String>builder()
-
-                .success(true)
-
-                .message(
-                        "Enrollment cancelled successfully"
-                )
-
-                .data(
-                        enrollmentService.cancel(
-                                id
-                        )
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Enrollment cancelled successfully",
+                enrollmentService.cancel(id)
+        );
     }
 }

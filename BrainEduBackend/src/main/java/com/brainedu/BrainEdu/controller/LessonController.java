@@ -2,6 +2,7 @@ package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.common.response.PaginationMeta;
+import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.LessonRequest.LessonRequest;
 import com.brainedu.BrainEdu.dto.response.LessonResponse.LessonResponse;
 import com.brainedu.BrainEdu.service.lessonService.LessonService;
@@ -9,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -27,28 +27,12 @@ public class LessonController {
             LessonRequest request
     ) {
 
-        return ApiResponse
-                .<LessonResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Lesson created successfully"
+        return ResponseFactory.success(
+                "Lesson created successfully",
+                lessonService.create(
+                        request
                 )
-
-                .data(
-                        lessonService.create(
-                                request
-                        )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @GetMapping("/course/{courseId}")
@@ -76,57 +60,15 @@ public class LessonController {
                 );
 
         PaginationMeta meta =
-                PaginationMeta.builder()
+                ResponseFactory.pagination(
+                        lessons
+                );
 
-                        .page(
-                                lessons.getNumber()
-                        )
-
-                        .size(
-                                lessons.getSize()
-                        )
-
-                        .totalElements(
-                                lessons
-                                        .getTotalElements()
-                        )
-
-                        .totalPages(
-                                lessons
-                                        .getTotalPages()
-                        )
-
-                        .hasNext(
-                                lessons.hasNext()
-                        )
-
-                        .hasPrevious(
-                                lessons
-                                        .hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<LessonResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "Lessons fetched successfully"
-                )
-
-                .data(
-                        lessons.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Lessons fetched successfully",
+                lessons.getContent(),
+                meta
+        );
     }
 
     @GetMapping("/{id}")
@@ -135,60 +77,29 @@ public class LessonController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<LessonResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Lesson fetched successfully"
-                )
-
-                .data(
-                        lessonService.getById(id)
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Lesson fetched successfully",
+                lessonService.getById(id)
+        );
     }
 
     @PutMapping("/{id}")
     public ApiResponse<LessonResponse>
     update(
+
             @PathVariable Long id,
 
             @RequestBody
             LessonRequest request
     ) {
 
-        return ApiResponse
-                .<LessonResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Lesson updated successfully"
+        return ResponseFactory.success(
+                "Lesson updated successfully",
+                lessonService.update(
+                        id,
+                        request
                 )
-
-                .data(
-                        lessonService.update(
-                                id,
-                                request
-                        )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @DeleteMapping("/{id}")
@@ -197,25 +108,9 @@ public class LessonController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<String>builder()
-
-                .success(true)
-
-                .message(
-                        "Lesson deleted successfully"
-                )
-
-                .data(
-                        lessonService.delete(id)
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Lesson deleted successfully",
+                lessonService.delete(id)
+        );
     }
 }

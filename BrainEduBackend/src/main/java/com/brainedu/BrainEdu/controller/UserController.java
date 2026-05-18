@@ -2,6 +2,7 @@ package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.common.response.PaginationMeta;
+import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateProfileRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateUserRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UserRequest;
@@ -28,28 +29,7 @@ public class UserController {
             UserRequest request
     ) {
 
-        return ApiResponse
-                .<UserResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "User created successfully"
-                )
-
-                .data(
-                        userService.createUser(
-                                request
-                        )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success("Create users successfully", userService.createUser(request));
     }
 
     @GetMapping
@@ -73,68 +53,20 @@ public class UserController {
                         size
                 );
 
-        PaginationMeta meta =
-                PaginationMeta.builder()
-                        .page(users.getNumber())
-                        .size(users.getSize())
-                        .totalElements(
-                                users.getTotalElements()
-                        )
-                        .totalPages(
-                                users.getTotalPages()
-                        )
-                        .hasNext(users.hasNext())
-                        .hasPrevious(
-                                users.hasPrevious()
-                        )
-                        .build();
+        PaginationMeta meta = ResponseFactory.pagination(users);
 
-        return ApiResponse
-                .<List<UserResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "Users fetched successfully"
-                )
-
-                .data(
-                        users.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                    "Users fetched successfully",
+                    users.getContent(),
+                    meta
+                );
     }
 
     @GetMapping("/me")
     public ApiResponse<UserResponse>
     getMe() {
 
-        return ApiResponse
-                .<UserResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Current user fetched successfully"
-                )
-
-                .data(
-                        userService.getMe()
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success("Fetched user successfully", userService.getMe());
     }
 
     @PutMapping("/me")
@@ -144,28 +76,12 @@ public class UserController {
             UpdateProfileRequest request
     ) {
 
-        return ApiResponse
-                .<UserResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Profile updated successfully"
+        return ResponseFactory.success(
+                "Profile updated successfully",
+                userService.updateMe(
+                        request
                 )
-
-                .data(
-                        userService.updateMe(
-                                request
-                        )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @GetMapping("/{id}")
@@ -175,26 +91,10 @@ public class UserController {
             Long id
     ) {
 
-        return ApiResponse
-                .<UserResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "User fetched successfully"
-                )
-
-                .data(
-                        userService.getUserById(id)
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                    "User fetched successfully",
+                    userService.getUserById(id)
+                );
     }
 
     @PutMapping("/{id}")
@@ -207,29 +107,13 @@ public class UserController {
             UpdateUserRequest request
     ) {
 
-        return ApiResponse
-                .<UserResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "User updated successfully"
-                )
-
-                .data(
+        return ResponseFactory.success(
+                "User updated successfully",
                         userService.updateUser(
                                 id,
                                 request
                         )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+                );
     }
 
     @DeleteMapping("/{id}")
@@ -239,25 +123,9 @@ public class UserController {
             Long id
     ) {
 
-        return ApiResponse
-                .<String>builder()
-
-                .success(true)
-
-                .message(
-                        "User deleted successfully"
-                )
-
-                .data(
-                        userService.deleteUser(id)
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                    "User deleted successfully",
+                    userService.deleteUser(id)
+                );
     }
 }

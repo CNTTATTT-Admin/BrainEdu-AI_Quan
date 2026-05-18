@@ -2,14 +2,16 @@ package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.common.response.PaginationMeta;
-import com.brainedu.BrainEdu.dto.request.AssignmentRequest.*;
-import com.brainedu.BrainEdu.dto.response.AssignmentResponse.*;
+import com.brainedu.BrainEdu.common.response.ResponseFactory;
+import com.brainedu.BrainEdu.dto.request.AssignmentRequest.CreateAssignmentRequest;
+import com.brainedu.BrainEdu.dto.request.AssignmentRequest.GradeSubmissionRequest;
+import com.brainedu.BrainEdu.dto.response.AssignmentResponse.AssignmentResponse;
+import com.brainedu.BrainEdu.dto.response.AssignmentResponse.AssignmentSubmissionResponse;
 import com.brainedu.BrainEdu.service.instructorService.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -27,29 +29,12 @@ public class InstructorAssignmentController {
             CreateAssignmentRequest request
     ) {
 
-        return ApiResponse
-                .<AssignmentResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Assignment created successfully"
+        return ResponseFactory.success(
+                "Assignment created successfully",
+                assignmentService.createAssignment(
+                        request
                 )
-
-                .data(
-                        assignmentService
-                                .createAssignment(
-                                        request
-                                )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @GetMapping
@@ -68,65 +53,21 @@ public class InstructorAssignmentController {
     ) {
 
         Page<AssignmentResponse> assignments =
-                assignmentService
-                        .getMyAssignments(
-                                page,
-                                size
-                        );
+                assignmentService.getMyAssignments(
+                        page,
+                        size
+                );
 
         PaginationMeta meta =
-                PaginationMeta.builder()
+                ResponseFactory.pagination(
+                        assignments
+                );
 
-                        .page(
-                                assignments.getNumber()
-                        )
-
-                        .size(
-                                assignments.getSize()
-                        )
-
-                        .totalElements(
-                                assignments
-                                        .getTotalElements()
-                        )
-
-                        .totalPages(
-                                assignments
-                                        .getTotalPages()
-                        )
-
-                        .hasNext(
-                                assignments.hasNext()
-                        )
-
-                        .hasPrevious(
-                                assignments
-                                        .hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<AssignmentResponse>>
-                        builder()
-
-                .success(true)
-
-                .message(
-                        "Assignments fetched successfully"
-                )
-
-                .data(
-                        assignments.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Assignments fetched successfully",
+                assignments.getContent(),
+                meta
+        );
     }
 
     @GetMapping("/{id}/submissions")
@@ -149,67 +90,22 @@ public class InstructorAssignmentController {
 
         Page<AssignmentSubmissionResponse>
                 submissions =
-                assignmentService
-                        .getSubmissions(
-                                id,
-                                page,
-                                size
-                        );
+                assignmentService.getSubmissions(
+                        id,
+                        page,
+                        size
+                );
 
         PaginationMeta meta =
-                PaginationMeta.builder()
+                ResponseFactory.pagination(
+                        submissions
+                );
 
-                        .page(
-                                submissions.getNumber()
-                        )
-
-                        .size(
-                                submissions.getSize()
-                        )
-
-                        .totalElements(
-                                submissions
-                                        .getTotalElements()
-                        )
-
-                        .totalPages(
-                                submissions
-                                        .getTotalPages()
-                        )
-
-                        .hasNext(
-                                submissions.hasNext()
-                        )
-
-                        .hasPrevious(
-                                submissions
-                                        .hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<
-                        AssignmentSubmissionResponse
-                        >>builder()
-
-                .success(true)
-
-                .message(
-                        "Assignment submissions fetched successfully"
-                )
-
-                .data(
-                        submissions.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Assignment submissions fetched successfully",
+                submissions.getContent(),
+                meta
+        );
     }
 
     @PutMapping(
@@ -225,30 +121,12 @@ public class InstructorAssignmentController {
             GradeSubmissionRequest request
     ) {
 
-        return ApiResponse
-                .<AssignmentSubmissionResponse>
-                        builder()
-
-                .success(true)
-
-                .message(
-                        "Submission graded successfully"
+        return ResponseFactory.success(
+                "Submission graded successfully",
+                assignmentService.gradeSubmission(
+                        id,
+                        request
                 )
-
-                .data(
-                        assignmentService
-                                .gradeSubmission(
-                                        id,
-                                        request
-                                )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 }

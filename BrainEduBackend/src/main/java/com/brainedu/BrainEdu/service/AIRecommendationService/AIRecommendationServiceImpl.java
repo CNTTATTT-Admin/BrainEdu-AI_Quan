@@ -10,6 +10,9 @@ import com.brainedu.BrainEdu.repository.AIRecommendationRepository;
 import com.brainedu.BrainEdu.repository.UserRepository;
 import com.brainedu.BrainEdu.service.AIRecommendationService.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -81,14 +84,13 @@ public class AIRecommendationServiceImpl
     }
 
     @Override
-    public List<AIRecommendationResponse> getAll() {
+    public Page<AIRecommendationResponse> getAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
 
-        return recommendationRepository.findAll()
-                .stream()
+        return recommendationRepository.findAll(pageable)
                 .map(
                         recommendationMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override
@@ -110,35 +112,39 @@ public class AIRecommendationServiceImpl
     }
 
     @Override
-    public List<AIRecommendationResponse> getByUser(
-            Long userId
+    public Page<AIRecommendationResponse> getByUser(
+            Long userId,
+            int page,
+            int size
     ) {
+        Pageable pageable = PageRequest.of(page, size);
 
         return recommendationRepository
                 .findByUserId(
-                        userId
+                        userId,
+                        pageable
                 )
-                .stream()
                 .map(
                         recommendationMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override
-    public List<AIRecommendationResponse> getByType(
-            String type
+    public Page<AIRecommendationResponse> getByType(
+            String type,
+            int page,
+            int size
     ) {
+        Pageable pageable = PageRequest.of(page, size);
 
         return recommendationRepository
                 .findByRecommendationType(
-                        type
+                        type,
+                        pageable
                 )
-                .stream()
                 .map(
                         recommendationMapper::toResponse
-                )
-                .toList();
+                );
     }
 
     @Override

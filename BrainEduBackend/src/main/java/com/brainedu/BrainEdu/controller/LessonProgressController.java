@@ -1,19 +1,17 @@
 package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
-import com.brainedu.BrainEdu.dto.request.LessonProgressRequest.*;
-import com.brainedu.BrainEdu.dto.response.LessonProgressResponse.*;
+import com.brainedu.BrainEdu.common.response.ResponseFactory;
+import com.brainedu.BrainEdu.dto.request.LessonProgressRequest.LessonProgressRequest;
+import com.brainedu.BrainEdu.dto.response.LessonProgressResponse.LessonProgressResponse;
 import com.brainedu.BrainEdu.service.lessonProgressService.LessonProgressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping(
-        "/api/v1/lesson-progress"
-)
+@RequestMapping("/api/v1/lesson-progress")
 @RequiredArgsConstructor
 public class LessonProgressController {
 
@@ -27,25 +25,12 @@ public class LessonProgressController {
             LessonProgressRequest request
     ) {
 
-        return ApiResponse
-                .<LessonProgressResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Lesson progress saved successfully"
+        return ResponseFactory.success(
+                "Lesson progress saved successfully",
+                lessonProgressService.saveProgress(
+                        request
                 )
-
-                .data(
-                        lessonProgressService
-                                .saveProgress(request)
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @GetMapping("/me")
@@ -53,26 +38,10 @@ public class LessonProgressController {
             List<LessonProgressResponse>
             > myProgress() {
 
-        return ApiResponse
-                .<List<LessonProgressResponse>>
-                        builder()
-
-                .success(true)
-
-                .message(
-                        "Lesson progress fetched successfully"
-                )
-
-                .data(
-                        lessonProgressService
-                                .myProgress()
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Lesson progress fetched successfully",
+                lessonProgressService.myProgress()
+        );
     }
 
     @GetMapping("/{lessonId}")
@@ -81,26 +50,11 @@ public class LessonProgressController {
             @PathVariable Long lessonId
     ) {
 
-        return ApiResponse
-                .<LessonProgressResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Lesson progress fetched successfully"
+        return ResponseFactory.success(
+                "Lesson progress fetched successfully",
+                lessonProgressService.getByLesson(
+                        lessonId
                 )
-
-                .data(
-                        lessonProgressService
-                                .getByLesson(
-                                        lessonId
-                                )
-                )
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 }

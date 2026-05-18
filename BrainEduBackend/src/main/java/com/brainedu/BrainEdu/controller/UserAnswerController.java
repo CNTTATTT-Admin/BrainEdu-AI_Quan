@@ -2,6 +2,7 @@ package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.common.response.PaginationMeta;
+import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.UserAnswerRequest.UserAnswerRequest;
 import com.brainedu.BrainEdu.dto.response.UserAnswerResponse.UserAnswerResponse;
 import com.brainedu.BrainEdu.service.userAnswerService.UserAnswerService;
@@ -27,28 +28,10 @@ public class UserAnswerController {
             UserAnswerRequest request
     ) {
 
-        return ApiResponse
-                .<UserAnswerResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "User answer submitted successfully"
-                )
-
-                .data(
-                        userAnswerService.submit(
-                                request
-                        )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "User answer submitted successfully",
+                userAnswerService.submit(request)
+        );
     }
 
     @GetMapping
@@ -72,58 +55,11 @@ public class UserAnswerController {
                         size
                 );
 
-        PaginationMeta meta =
-                PaginationMeta.builder()
-
-                        .page(
-                                answers.getNumber()
-                        )
-
-                        .size(
-                                answers.getSize()
-                        )
-
-                        .totalElements(
-                                answers
-                                        .getTotalElements()
-                        )
-
-                        .totalPages(
-                                answers
-                                        .getTotalPages()
-                        )
-
-                        .hasNext(
-                                answers.hasNext()
-                        )
-
-                        .hasPrevious(
-                                answers
-                                        .hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<UserAnswerResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "User answers fetched successfully"
-                )
-
-                .data(
-                        answers.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "User answers fetched successfully",
+                answers.getContent(),
+                ResponseFactory.pagination(answers)
+        );
     }
 
     @GetMapping("/{id}")
@@ -132,26 +68,10 @@ public class UserAnswerController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<UserAnswerResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "User answer fetched successfully"
-                )
-
-                .data(
-                        userAnswerService.getById(id)
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "User answer fetched successfully",
+                userAnswerService.getById(id)
+        );
     }
 
     @GetMapping("/user/{userId}")
@@ -178,58 +98,11 @@ public class UserAnswerController {
                         size
                 );
 
-        PaginationMeta meta =
-                PaginationMeta.builder()
-
-                        .page(
-                                answers.getNumber()
-                        )
-
-                        .size(
-                                answers.getSize()
-                        )
-
-                        .totalElements(
-                                answers
-                                        .getTotalElements()
-                        )
-
-                        .totalPages(
-                                answers
-                                        .getTotalPages()
-                        )
-
-                        .hasNext(
-                                answers.hasNext()
-                        )
-
-                        .hasPrevious(
-                                answers
-                                        .hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<UserAnswerResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "User answers by user fetched successfully"
-                )
-
-                .data(
-                        answers.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "User answers by user fetched successfully",
+                answers.getContent(),
+                ResponseFactory.pagination(answers)
+        );
     }
 
     @GetMapping("/question/{questionId}")
@@ -256,58 +129,11 @@ public class UserAnswerController {
                         size
                 );
 
-        PaginationMeta meta =
-                PaginationMeta.builder()
-
-                        .page(
-                                answers.getNumber()
-                        )
-
-                        .size(
-                                answers.getSize()
-                        )
-
-                        .totalElements(
-                                answers
-                                        .getTotalElements()
-                        )
-
-                        .totalPages(
-                                answers
-                                        .getTotalPages()
-                        )
-
-                        .hasNext(
-                                answers.hasNext()
-                        )
-
-                        .hasPrevious(
-                                answers
-                                        .hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<UserAnswerResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "User answers by question fetched successfully"
-                )
-
-                .data(
-                        answers.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "User answers by question fetched successfully",
+                answers.getContent(),
+                ResponseFactory.pagination(answers)
+        );
     }
 
     @DeleteMapping("/{id}")
@@ -316,25 +142,9 @@ public class UserAnswerController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<String>builder()
-
-                .success(true)
-
-                .message(
-                        "User answer deleted successfully"
-                )
-
-                .data(
-                        userAnswerService.delete(id)
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "User answer deleted successfully",
+                userAnswerService.delete(id)
+        );
     }
 }

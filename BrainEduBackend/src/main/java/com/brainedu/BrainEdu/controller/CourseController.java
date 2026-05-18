@@ -2,6 +2,7 @@ package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.common.response.PaginationMeta;
+import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.CourseRequest.CourseRequest;
 import com.brainedu.BrainEdu.dto.response.CourseResponse.CourseResponse;
 import com.brainedu.BrainEdu.service.courseService.CourseService;
@@ -9,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -27,28 +27,10 @@ public class CourseController {
             CourseRequest request
     ) {
 
-        return ApiResponse
-                .<CourseResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Course created successfully"
-                )
-
-                .data(
-                        courseService.create(
-                                request
-                        )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Course created successfully",
+                courseService.create(request)
+        );
     }
 
     @GetMapping
@@ -73,54 +55,15 @@ public class CourseController {
                 );
 
         PaginationMeta meta =
-                PaginationMeta.builder()
+                ResponseFactory.pagination(
+                        courses
+                );
 
-                        .page(
-                                courses.getNumber()
-                        )
-
-                        .size(
-                                courses.getSize()
-                        )
-
-                        .totalElements(
-                                courses.getTotalElements()
-                        )
-
-                        .totalPages(
-                                courses.getTotalPages()
-                        )
-
-                        .hasNext(
-                                courses.hasNext()
-                        )
-
-                        .hasPrevious(
-                                courses.hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<CourseResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "Courses fetched successfully"
-                )
-
-                .data(
-                        courses.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Courses fetched successfully",
+                courses.getContent(),
+                meta
+        );
     }
 
     @GetMapping("/{id}")
@@ -129,31 +72,16 @@ public class CourseController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<CourseResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Course fetched successfully"
-                )
-
-                .data(
-                        courseService.getById(id)
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Course fetched successfully",
+                courseService.getById(id)
+        );
     }
 
     @GetMapping("/category/{categoryId}")
     public ApiResponse<List<CourseResponse>>
     getByCategory(
+
             @PathVariable Long categoryId,
 
             @RequestParam(
@@ -175,88 +103,34 @@ public class CourseController {
                 );
 
         PaginationMeta meta =
-                PaginationMeta.builder()
+                ResponseFactory.pagination(
+                        courses
+                );
 
-                        .page(
-                                courses.getNumber()
-                        )
-
-                        .size(
-                                courses.getSize()
-                        )
-
-                        .totalElements(
-                                courses.getTotalElements()
-                        )
-
-                        .totalPages(
-                                courses.getTotalPages()
-                        )
-
-                        .hasNext(
-                                courses.hasNext()
-                        )
-
-                        .hasPrevious(
-                                courses.hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<CourseResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "Courses by category fetched successfully"
-                )
-
-                .data(
-                        courses.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Courses by category fetched successfully",
+                courses.getContent(),
+                meta
+        );
     }
 
     @PutMapping("/{id}")
     public ApiResponse<CourseResponse>
     update(
+
             @PathVariable Long id,
 
             @RequestBody
             CourseRequest request
     ) {
 
-        return ApiResponse
-                .<CourseResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Course updated successfully"
+        return ResponseFactory.success(
+                "Course updated successfully",
+                courseService.update(
+                        id,
+                        request
                 )
-
-                .data(
-                        courseService.update(
-                                id,
-                                request
-                        )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @DeleteMapping("/{id}")
@@ -265,25 +139,9 @@ public class CourseController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<String>builder()
-
-                .success(true)
-
-                .message(
-                        "Course deleted successfully"
-                )
-
-                .data(
-                        courseService.delete(id)
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Course deleted successfully",
+                courseService.delete(id)
+        );
     }
 }

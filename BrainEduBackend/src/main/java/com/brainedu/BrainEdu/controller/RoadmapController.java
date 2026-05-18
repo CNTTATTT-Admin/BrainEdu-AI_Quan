@@ -2,6 +2,7 @@ package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.common.response.PaginationMeta;
+import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.RoadmapRequest.RoadmapRequest;
 import com.brainedu.BrainEdu.dto.response.RoadmapResponse.RoadmapResponse;
 import com.brainedu.BrainEdu.service.roadmapService.RoadmapService;
@@ -9,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -27,28 +27,12 @@ public class RoadmapController {
             RoadmapRequest request
     ) {
 
-        return ApiResponse
-                .<RoadmapResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Roadmap created successfully"
+        return ResponseFactory.success(
+                "Roadmap created successfully",
+                roadmapService.create(
+                        request
                 )
-
-                .data(
-                        roadmapService.create(
-                                request
-                        )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @GetMapping
@@ -73,57 +57,15 @@ public class RoadmapController {
                 );
 
         PaginationMeta meta =
-                PaginationMeta.builder()
+                ResponseFactory.pagination(
+                        roadmaps
+                );
 
-                        .page(
-                                roadmaps.getNumber()
-                        )
-
-                        .size(
-                                roadmaps.getSize()
-                        )
-
-                        .totalElements(
-                                roadmaps
-                                        .getTotalElements()
-                        )
-
-                        .totalPages(
-                                roadmaps
-                                        .getTotalPages()
-                        )
-
-                        .hasNext(
-                                roadmaps.hasNext()
-                        )
-
-                        .hasPrevious(
-                                roadmaps
-                                        .hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<RoadmapResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "Roadmaps fetched successfully"
-                )
-
-                .data(
-                        roadmaps.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Roadmaps fetched successfully",
+                roadmaps.getContent(),
+                meta
+        );
     }
 
     @GetMapping("/{id}")
@@ -132,26 +74,10 @@ public class RoadmapController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<RoadmapResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Roadmap fetched successfully"
-                )
-
-                .data(
-                        roadmapService.getById(id)
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Roadmap fetched successfully",
+                roadmapService.getById(id)
+        );
     }
 
     @GetMapping("/category/{categoryId}")
@@ -179,57 +105,15 @@ public class RoadmapController {
                 );
 
         PaginationMeta meta =
-                PaginationMeta.builder()
+                ResponseFactory.pagination(
+                        roadmaps
+                );
 
-                        .page(
-                                roadmaps.getNumber()
-                        )
-
-                        .size(
-                                roadmaps.getSize()
-                        )
-
-                        .totalElements(
-                                roadmaps
-                                        .getTotalElements()
-                        )
-
-                        .totalPages(
-                                roadmaps
-                                        .getTotalPages()
-                        )
-
-                        .hasNext(
-                                roadmaps.hasNext()
-                        )
-
-                        .hasPrevious(
-                                roadmaps
-                                        .hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<RoadmapResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "Roadmaps by category fetched successfully"
-                )
-
-                .data(
-                        roadmaps.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Roadmaps by category fetched successfully",
+                roadmaps.getContent(),
+                meta
+        );
     }
 
     @GetMapping("/level/{level}")
@@ -257,91 +141,34 @@ public class RoadmapController {
                 );
 
         PaginationMeta meta =
-                PaginationMeta.builder()
+                ResponseFactory.pagination(
+                        roadmaps
+                );
 
-                        .page(
-                                roadmaps.getNumber()
-                        )
-
-                        .size(
-                                roadmaps.getSize()
-                        )
-
-                        .totalElements(
-                                roadmaps
-                                        .getTotalElements()
-                        )
-
-                        .totalPages(
-                                roadmaps
-                                        .getTotalPages()
-                        )
-
-                        .hasNext(
-                                roadmaps.hasNext()
-                        )
-
-                        .hasPrevious(
-                                roadmaps
-                                        .hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<RoadmapResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "Roadmaps by level fetched successfully"
-                )
-
-                .data(
-                        roadmaps.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Roadmaps by level fetched successfully",
+                roadmaps.getContent(),
+                meta
+        );
     }
 
     @PutMapping("/{id}")
     public ApiResponse<RoadmapResponse>
     update(
+
             @PathVariable Long id,
 
             @RequestBody
             RoadmapRequest request
     ) {
 
-        return ApiResponse
-                .<RoadmapResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Roadmap updated successfully"
+        return ResponseFactory.success(
+                "Roadmap updated successfully",
+                roadmapService.update(
+                        id,
+                        request
                 )
-
-                .data(
-                        roadmapService.update(
-                                id,
-                                request
-                        )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @DeleteMapping("/{id}")
@@ -350,25 +177,9 @@ public class RoadmapController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<String>builder()
-
-                .success(true)
-
-                .message(
-                        "Roadmap deleted successfully"
-                )
-
-                .data(
-                        roadmapService.delete(id)
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Roadmap deleted successfully",
+                roadmapService.delete(id)
+        );
     }
 }

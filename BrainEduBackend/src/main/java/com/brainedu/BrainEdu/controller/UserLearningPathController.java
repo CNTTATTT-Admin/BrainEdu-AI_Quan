@@ -2,6 +2,7 @@ package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.common.response.PaginationMeta;
+import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.UserLearningPathRequest.UserLearningPathRequest;
 import com.brainedu.BrainEdu.dto.response.UserLearningPathResponse.UserLearningPathResponse;
 import com.brainedu.BrainEdu.service.userLearningPathService.UserLearningPathService;
@@ -27,28 +28,10 @@ public class UserLearningPathController {
             UserLearningPathRequest request
     ) {
 
-        return ApiResponse
-                .<UserLearningPathResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "User learning path created successfully"
-                )
-
-                .data(
-                        learningPathService.create(
-                                request
-                        )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "User learning path created successfully",
+                learningPathService.create(request)
+        );
     }
 
     @GetMapping
@@ -72,58 +55,13 @@ public class UserLearningPathController {
                         size
                 );
 
-        PaginationMeta meta =
-                PaginationMeta.builder()
-
-                        .page(
-                                learningPaths.getNumber()
-                        )
-
-                        .size(
-                                learningPaths.getSize()
-                        )
-
-                        .totalElements(
-                                learningPaths
-                                        .getTotalElements()
-                        )
-
-                        .totalPages(
-                                learningPaths
-                                        .getTotalPages()
-                        )
-
-                        .hasNext(
-                                learningPaths.hasNext()
-                        )
-
-                        .hasPrevious(
-                                learningPaths
-                                        .hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<UserLearningPathResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "User learning paths fetched successfully"
+        return ResponseFactory.success(
+                "User learning paths fetched successfully",
+                learningPaths.getContent(),
+                ResponseFactory.pagination(
+                        learningPaths
                 )
-
-                .data(
-                        learningPaths.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @GetMapping("/{id}")
@@ -132,26 +70,10 @@ public class UserLearningPathController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<UserLearningPathResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "User learning path fetched successfully"
-                )
-
-                .data(
-                        learningPathService.getById(id)
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "User learning path fetched successfully",
+                learningPathService.getById(id)
+        );
     }
 
     @GetMapping("/user/{userId}")
@@ -178,58 +100,13 @@ public class UserLearningPathController {
                         size
                 );
 
-        PaginationMeta meta =
-                PaginationMeta.builder()
-
-                        .page(
-                                learningPaths.getNumber()
-                        )
-
-                        .size(
-                                learningPaths.getSize()
-                        )
-
-                        .totalElements(
-                                learningPaths
-                                        .getTotalElements()
-                        )
-
-                        .totalPages(
-                                learningPaths
-                                        .getTotalPages()
-                        )
-
-                        .hasNext(
-                                learningPaths.hasNext()
-                        )
-
-                        .hasPrevious(
-                                learningPaths
-                                        .hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<UserLearningPathResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "User learning paths by user fetched successfully"
+        return ResponseFactory.success(
+                "User learning paths by user fetched successfully",
+                learningPaths.getContent(),
+                ResponseFactory.pagination(
+                        learningPaths
                 )
-
-                .data(
-                        learningPaths.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @GetMapping("/roadmap/{roadmapId}")
@@ -256,58 +133,13 @@ public class UserLearningPathController {
                         size
                 );
 
-        PaginationMeta meta =
-                PaginationMeta.builder()
-
-                        .page(
-                                learningPaths.getNumber()
-                        )
-
-                        .size(
-                                learningPaths.getSize()
-                        )
-
-                        .totalElements(
-                                learningPaths
-                                        .getTotalElements()
-                        )
-
-                        .totalPages(
-                                learningPaths
-                                        .getTotalPages()
-                        )
-
-                        .hasNext(
-                                learningPaths.hasNext()
-                        )
-
-                        .hasPrevious(
-                                learningPaths
-                                        .hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<UserLearningPathResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "User learning paths by roadmap fetched successfully"
+        return ResponseFactory.success(
+                "User learning paths by roadmap fetched successfully",
+                learningPaths.getContent(),
+                ResponseFactory.pagination(
+                        learningPaths
                 )
-
-                .data(
-                        learningPaths.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @GetMapping("/course/{courseId}")
@@ -334,58 +166,13 @@ public class UserLearningPathController {
                         size
                 );
 
-        PaginationMeta meta =
-                PaginationMeta.builder()
-
-                        .page(
-                                learningPaths.getNumber()
-                        )
-
-                        .size(
-                                learningPaths.getSize()
-                        )
-
-                        .totalElements(
-                                learningPaths
-                                        .getTotalElements()
-                        )
-
-                        .totalPages(
-                                learningPaths
-                                        .getTotalPages()
-                        )
-
-                        .hasNext(
-                                learningPaths.hasNext()
-                        )
-
-                        .hasPrevious(
-                                learningPaths
-                                        .hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<UserLearningPathResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "User learning paths by course fetched successfully"
+        return ResponseFactory.success(
+                "User learning paths by course fetched successfully",
+                learningPaths.getContent(),
+                ResponseFactory.pagination(
+                        learningPaths
                 )
-
-                .data(
-                        learningPaths.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @PutMapping("/{id}")
@@ -397,29 +184,13 @@ public class UserLearningPathController {
             UserLearningPathRequest request
     ) {
 
-        return ApiResponse
-                .<UserLearningPathResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "User learning path updated successfully"
+        return ResponseFactory.success(
+                "User learning path updated successfully",
+                learningPathService.update(
+                        id,
+                        request
                 )
-
-                .data(
-                        learningPathService.update(
-                                id,
-                                request
-                        )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @DeleteMapping("/{id}")
@@ -428,25 +199,9 @@ public class UserLearningPathController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<String>builder()
-
-                .success(true)
-
-                .message(
-                        "User learning path deleted successfully"
-                )
-
-                .data(
-                        learningPathService.delete(id)
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "User learning path deleted successfully",
+                learningPathService.delete(id)
+        );
     }
 }

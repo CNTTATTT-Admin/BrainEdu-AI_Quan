@@ -2,14 +2,14 @@ package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.common.response.PaginationMeta;
-import com.brainedu.BrainEdu.dto.request.AnswerRequest.*;
-import com.brainedu.BrainEdu.dto.response.AnswerResponse.*;
+import com.brainedu.BrainEdu.common.response.ResponseFactory;
+import com.brainedu.BrainEdu.dto.request.AnswerRequest.AnswerRequest;
+import com.brainedu.BrainEdu.dto.response.AnswerResponse.AnswerResponse;
 import com.brainedu.BrainEdu.service.answerService.AnswerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -27,28 +27,10 @@ public class AnswerController {
             AnswerRequest request
     ) {
 
-        return ApiResponse
-                .<AnswerResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Answer created successfully"
-                )
-
-                .data(
-                        answerService.create(
-                                request
-                        )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Answer created successfully",
+                answerService.create(request)
+        );
     }
 
     @GetMapping
@@ -73,54 +55,15 @@ public class AnswerController {
                 );
 
         PaginationMeta meta =
-                PaginationMeta.builder()
+                ResponseFactory.pagination(
+                        answers
+                );
 
-                        .page(
-                                answers.getNumber()
-                        )
-
-                        .size(
-                                answers.getSize()
-                        )
-
-                        .totalElements(
-                                answers.getTotalElements()
-                        )
-
-                        .totalPages(
-                                answers.getTotalPages()
-                        )
-
-                        .hasNext(
-                                answers.hasNext()
-                        )
-
-                        .hasPrevious(
-                                answers.hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<AnswerResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "Answers fetched successfully"
-                )
-
-                .data(
-                        answers.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Answers fetched successfully",
+                answers.getContent(),
+                meta
+        );
     }
 
     @GetMapping("/{id}")
@@ -129,31 +72,16 @@ public class AnswerController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<AnswerResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Answer fetched successfully"
-                )
-
-                .data(
-                        answerService.getById(id)
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Answer fetched successfully",
+                answerService.getById(id)
+        );
     }
 
     @GetMapping("/question/{questionId}")
     public ApiResponse<List<AnswerResponse>>
     getByQuestion(
+
             @PathVariable Long questionId,
 
             @RequestParam(
@@ -175,88 +103,34 @@ public class AnswerController {
                 );
 
         PaginationMeta meta =
-                PaginationMeta.builder()
+                ResponseFactory.pagination(
+                        answers
+                );
 
-                        .page(
-                                answers.getNumber()
-                        )
-
-                        .size(
-                                answers.getSize()
-                        )
-
-                        .totalElements(
-                                answers.getTotalElements()
-                        )
-
-                        .totalPages(
-                                answers.getTotalPages()
-                        )
-
-                        .hasNext(
-                                answers.hasNext()
-                        )
-
-                        .hasPrevious(
-                                answers.hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<AnswerResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "Answers by question fetched successfully"
-                )
-
-                .data(
-                        answers.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Answers by question fetched successfully",
+                answers.getContent(),
+                meta
+        );
     }
 
     @PutMapping("/{id}")
     public ApiResponse<AnswerResponse>
     update(
+
             @PathVariable Long id,
 
             @RequestBody
             AnswerRequest request
     ) {
 
-        return ApiResponse
-                .<AnswerResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Answer updated successfully"
+        return ResponseFactory.success(
+                "Answer updated successfully",
+                answerService.update(
+                        id,
+                        request
                 )
-
-                .data(
-                        answerService.update(
-                                id,
-                                request
-                        )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @DeleteMapping("/{id}")
@@ -265,25 +139,9 @@ public class AnswerController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<String>builder()
-
-                .success(true)
-
-                .message(
-                        "Answer deleted successfully"
-                )
-
-                .data(
-                        answerService.delete(id)
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Answer deleted successfully",
+                answerService.delete(id)
+        );
     }
 }

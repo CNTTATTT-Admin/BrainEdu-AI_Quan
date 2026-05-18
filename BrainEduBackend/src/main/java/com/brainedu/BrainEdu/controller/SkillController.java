@@ -2,6 +2,7 @@ package com.brainedu.BrainEdu.controller;
 
 import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.common.response.PaginationMeta;
+import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.SkillRequest.SkillRequest;
 import com.brainedu.BrainEdu.dto.response.SkillResponse.SkillResponse;
 import com.brainedu.BrainEdu.service.skillService.SkillService;
@@ -9,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -27,28 +27,12 @@ public class SkillController {
             SkillRequest request
     ) {
 
-        return ApiResponse
-                .<SkillResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Skill created successfully"
+        return ResponseFactory.success(
+                "Skill created successfully",
+                skillService.create(
+                        request
                 )
-
-                .data(
-                        skillService.create(
-                                request
-                        )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @GetMapping
@@ -73,57 +57,15 @@ public class SkillController {
                 );
 
         PaginationMeta meta =
-                PaginationMeta.builder()
+                ResponseFactory.pagination(
+                        skills
+                );
 
-                        .page(
-                                skills.getNumber()
-                        )
-
-                        .size(
-                                skills.getSize()
-                        )
-
-                        .totalElements(
-                                skills
-                                        .getTotalElements()
-                        )
-
-                        .totalPages(
-                                skills
-                                        .getTotalPages()
-                        )
-
-                        .hasNext(
-                                skills.hasNext()
-                        )
-
-                        .hasPrevious(
-                                skills
-                                        .hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<SkillResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "Skills fetched successfully"
-                )
-
-                .data(
-                        skills.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Skills fetched successfully",
+                skills.getContent(),
+                meta
+        );
     }
 
     @GetMapping("/{id}")
@@ -132,26 +74,10 @@ public class SkillController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<SkillResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Skill fetched successfully"
-                )
-
-                .data(
-                        skillService.getById(id)
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Skill fetched successfully",
+                skillService.getById(id)
+        );
     }
 
     @GetMapping("/category/{categoryId}")
@@ -179,91 +105,34 @@ public class SkillController {
                 );
 
         PaginationMeta meta =
-                PaginationMeta.builder()
+                ResponseFactory.pagination(
+                        skills
+                );
 
-                        .page(
-                                skills.getNumber()
-                        )
-
-                        .size(
-                                skills.getSize()
-                        )
-
-                        .totalElements(
-                                skills
-                                        .getTotalElements()
-                        )
-
-                        .totalPages(
-                                skills
-                                        .getTotalPages()
-                        )
-
-                        .hasNext(
-                                skills.hasNext()
-                        )
-
-                        .hasPrevious(
-                                skills
-                                        .hasPrevious()
-                        )
-
-                        .build();
-
-        return ApiResponse
-                .<List<SkillResponse>>builder()
-
-                .success(true)
-
-                .message(
-                        "Skills by category fetched successfully"
-                )
-
-                .data(
-                        skills.getContent()
-                )
-
-                .meta(meta)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Skills by category fetched successfully",
+                skills.getContent(),
+                meta
+        );
     }
 
     @PutMapping("/{id}")
     public ApiResponse<SkillResponse>
     update(
+
             @PathVariable Long id,
 
             @RequestBody
             SkillRequest request
     ) {
 
-        return ApiResponse
-                .<SkillResponse>builder()
-
-                .success(true)
-
-                .message(
-                        "Skill updated successfully"
+        return ResponseFactory.success(
+                "Skill updated successfully",
+                skillService.update(
+                        id,
+                        request
                 )
-
-                .data(
-                        skillService.update(
-                                id,
-                                request
-                        )
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        );
     }
 
     @DeleteMapping("/{id}")
@@ -272,25 +141,9 @@ public class SkillController {
             @PathVariable Long id
     ) {
 
-        return ApiResponse
-                .<String>builder()
-
-                .success(true)
-
-                .message(
-                        "Skill deleted successfully"
-                )
-
-                .data(
-                        skillService.delete(id)
-                )
-
-                .meta(null)
-
-                .timestamp(
-                        LocalDateTime.now()
-                )
-
-                .build();
+        return ResponseFactory.success(
+                "Skill deleted successfully",
+                skillService.delete(id)
+        );
     }
 }
