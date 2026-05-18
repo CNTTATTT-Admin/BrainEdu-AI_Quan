@@ -1,55 +1,20 @@
 package com.brainedu.BrainEdu.mapper;
 
-import com.brainedu.BrainEdu.dto.response.LessonProgressResponse.*;
+import com.brainedu.BrainEdu.dto.response.LessonProgressResponse.LessonProgressResponse;
 import com.brainedu.BrainEdu.entity.LessonProgress;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class LessonProgressMapper {
+@Mapper(componentModel = "spring")
+public interface LessonProgressMapper {
 
-    public LessonProgressResponse toResponse(
+    @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "userName", source = "user.name")
+
+    @Mapping(target = "lessonId", source = "lesson.id")
+    @Mapping(target = "lessonTitle", source = "lesson.title")
+
+    LessonProgressResponse toResponse(
             LessonProgress progress
-    ) {
-
-        return LessonProgressResponse.builder()
-
-                .id(progress.getId())
-
-                .userId(
-                        progress.getUser().getId()
-                )
-
-                .userName(
-                        progress.getUser()
-                                .getName()
-                )
-
-                .lessonId(
-                        progress.getLesson()
-                                .getId()
-                )
-
-                .lessonTitle(
-                        progress.getLesson()
-                                .getTitle()
-                )
-
-                .progressPercent(
-                        progress.getProgressPercent()
-                )
-
-                .learningTime(
-                        progress.getLearningTime()
-                )
-
-                .completed(
-                        progress.getCompleted()
-                )
-
-                .lastAccessed(
-                        progress.getLastAccessed()
-                )
-
-                .build();
-    }
+    );
 }

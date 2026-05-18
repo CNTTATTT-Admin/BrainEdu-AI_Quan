@@ -1,42 +1,30 @@
 package com.brainedu.BrainEdu.mapper;
 
-import com.brainedu.BrainEdu.dto.response.CourseSkillResponse.*;
+import com.brainedu.BrainEdu.dto.response.CourseSkillResponse.CourseSkillResponse;
 import com.brainedu.BrainEdu.entity.CourseSkill;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class CourseSkillMapper {
+@Mapper(componentModel = "spring")
+public interface CourseSkillMapper {
 
-    public CourseSkillResponse toResponse(
+    @Mapping(
+            target = "courseId",
+            source = "course.id"
+    )
+    @Mapping(
+            target = "courseTitle",
+            source = "course.title"
+    )
+    @Mapping(
+            target = "skillId",
+            source = "skill.id"
+    )
+    @Mapping(
+            target = "skillName",
+            source = "skill.skillName"
+    )
+    CourseSkillResponse toResponse(
             CourseSkill courseSkill
-    ) {
-
-        return CourseSkillResponse.builder()
-
-                .id(
-                        courseSkill.getId()
-                )
-
-                .courseId(
-                        courseSkill.getCourse()
-                                .getId()
-                )
-
-                .courseTitle(
-                        courseSkill.getCourse()
-                                .getTitle()
-                )
-
-                .skillId(
-                        courseSkill.getSkill()
-                                .getId()
-                )
-
-                .skillName(
-                        courseSkill.getSkill()
-                                .getSkillName()
-                )
-
-                .build();
-    }
+    );
 }

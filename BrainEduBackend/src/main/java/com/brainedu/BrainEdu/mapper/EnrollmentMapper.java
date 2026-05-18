@@ -1,55 +1,30 @@
 package com.brainedu.BrainEdu.mapper;
 
-import com.brainedu.BrainEdu.dto.response.EnrollmentResponse.*;
+import com.brainedu.BrainEdu.dto.response.EnrollmentResponse.EnrollmentResponse;
 import com.brainedu.BrainEdu.entity.Enrollment;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class EnrollmentMapper {
+@Mapper(componentModel = "spring")
+public interface EnrollmentMapper {
 
-    public EnrollmentResponse toResponse(
+    @Mapping(
+            target = "userId",
+            source = "user.id"
+    )
+    @Mapping(
+            target = "userName",
+            source = "user.name"
+    )
+    @Mapping(
+            target = "courseId",
+            source = "course.id"
+    )
+    @Mapping(
+            target = "courseTitle",
+            source = "course.title"
+    )
+    EnrollmentResponse toResponse(
             Enrollment enrollment
-    ) {
-
-        return EnrollmentResponse.builder()
-
-                .id(
-                        enrollment.getId()
-                )
-
-                .userId(
-                        enrollment.getUser()
-                                .getId()
-                )
-
-                .userName(
-                        enrollment.getUser()
-                                .getName()
-                )
-
-                .courseId(
-                        enrollment.getCourse()
-                                .getId()
-                )
-
-                .courseTitle(
-                        enrollment.getCourse()
-                                .getTitle()
-                )
-
-                .completionPercent(
-                        enrollment
-                                .getCompletionPercent()
-                )
-
-                .status(
-                        enrollment.getStatus()
-                )
-
-                .enrolledAt(
-                        enrollment.getEnrolledAt()
-                )
-
-                .build();
-    }
+    );
 }

@@ -1,52 +1,24 @@
 package com.brainedu.BrainEdu.mapper;
 
-import com.brainedu.BrainEdu.dto.response.AIRecommendationResponse.*;
+import com.brainedu.BrainEdu.dto.response.AIRecommendationResponse.AIRecommendationResponse;
 import com.brainedu.BrainEdu.entity.AIRecommendation;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class AIRecommendationMapper {
+@Mapper(componentModel = "spring")
+public interface AIRecommendationMapper {
 
-    public AIRecommendationResponse toResponse(
+    @Mapping(
+            target = "userId",
+            source = "user.id"
+    )
+
+    @Mapping(
+            target = "userName",
+            source = "user.name"
+    )
+
+    AIRecommendationResponse toResponse(
             AIRecommendation recommendation
-    ) {
-
-        return AIRecommendationResponse.builder()
-
-                .id(
-                        recommendation.getId()
-                )
-
-                .userId(
-                        recommendation.getUser()
-                                .getId()
-                )
-
-                .userName(
-                        recommendation.getUser()
-                                .getName()
-                )
-
-                .recommendationType(
-                        recommendation.getRecommendationType()
-                )
-
-                .targetId(
-                        recommendation.getTargetId()
-                )
-
-                .score(
-                        recommendation.getScore()
-                )
-
-                .reason(
-                        recommendation.getReason()
-                )
-
-                .createdAt(
-                        recommendation.getCreatedAt()
-                )
-
-                .build();
-    }
+    );
 }

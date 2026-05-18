@@ -1,58 +1,32 @@
 package com.brainedu.BrainEdu.mapper;
 
-import com.brainedu.BrainEdu.dto.response.QuestionResponse.*;
+import com.brainedu.BrainEdu.dto.response.QuestionResponse.QuestionResponse;
 import com.brainedu.BrainEdu.entity.Question;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class QuestionMapper {
+@Mapper(componentModel = "spring")
+public interface QuestionMapper {
 
-    public QuestionResponse toResponse(
+    @Mapping(
+            target = "quizId",
+            source = "quiz.id"
+    )
+    @Mapping(
+            target = "quizTitle",
+            source = "quiz.title"
+    )
+
+    @Mapping(
+            target = "skillId",
+            source = "skill.id"
+    )
+    @Mapping(
+            target = "skillName",
+            source = "skill.skillName"
+    )
+
+    QuestionResponse toResponse(
             Question question
-    ) {
-
-        return QuestionResponse.builder()
-
-                .id(
-                        question.getId()
-                )
-
-                .quizId(
-                        question.getQuiz()
-                                .getId()
-                )
-
-                .quizTitle(
-                        question.getQuiz()
-                                .getTitle()
-                )
-
-                .skillId(
-                        question.getSkill()
-                                .getId()
-                )
-
-                .skillName(
-                        question.getSkill()
-                                .getSkillName()
-                )
-
-                .questionText(
-                        question.getQuestionText()
-                )
-
-                .difficultyLevel(
-                        question.getDifficultyLevel()
-                )
-
-                .questionType(
-                        question.getQuestionType()
-                )
-
-                .weightScore(
-                        question.getWeightScore()
-                )
-
-                .build();
-    }
+    );
 }

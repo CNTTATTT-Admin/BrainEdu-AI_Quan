@@ -1,44 +1,23 @@
 package com.brainedu.BrainEdu.mapper;
 
-import com.brainedu.BrainEdu.dto.response.RoadmapResponse.*;
+import com.brainedu.BrainEdu.dto.response.RoadmapResponse.RoadmapResponse;
 import com.brainedu.BrainEdu.entity.Roadmap;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class RoadmapMapper {
+@Mapper(componentModel = "spring")
+public interface RoadmapMapper {
 
-    public RoadmapResponse toResponse(
+    @Mapping(
+            target = "categoryId",
+            source = "category.id"
+    )
+    @Mapping(
+            target = "categoryName",
+            source = "category.categoryName"
+    )
+
+    RoadmapResponse toResponse(
             Roadmap roadmap
-    ) {
-
-        return RoadmapResponse.builder()
-
-                .id(
-                        roadmap.getId()
-                )
-
-                .categoryId(
-                        roadmap.getCategory()
-                                .getId()
-                )
-
-                .categoryName(
-                        roadmap.getCategory()
-                                .getCategoryName()
-                )
-
-                .roadmapName(
-                        roadmap.getRoadmapName()
-                )
-
-                .level(
-                        roadmap.getLevel()
-                )
-
-                .description(
-                        roadmap.getDescription()
-                )
-
-                .build();
-    }
+    );
 }

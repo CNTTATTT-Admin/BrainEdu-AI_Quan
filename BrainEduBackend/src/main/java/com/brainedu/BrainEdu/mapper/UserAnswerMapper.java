@@ -1,64 +1,41 @@
 package com.brainedu.BrainEdu.mapper;
 
-import com.brainedu.BrainEdu.dto.response.UserAnswerResponse.*;
+import com.brainedu.BrainEdu.dto.response.UserAnswerResponse.UserAnswerResponse;
 import com.brainedu.BrainEdu.entity.UserAnswer;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class UserAnswerMapper {
+@Mapper(componentModel = "spring")
+public interface UserAnswerMapper {
 
-    public UserAnswerResponse toResponse(
+    @Mapping(
+            target = "userId",
+            source = "user.id"
+    )
+    @Mapping(
+            target = "userName",
+            source = "user.name"
+    )
+
+    @Mapping(
+            target = "questionId",
+            source = "question.id"
+    )
+    @Mapping(
+            target = "questionText",
+            source = "question.questionText"
+    )
+
+    @Mapping(
+            target = "selectedAnswerId",
+            source = "selectedAnswer.id"
+    )
+    @Mapping(
+            target = "selectedAnswerText",
+            source = "selectedAnswer.answerText"
+    )
+
+    UserAnswerResponse toResponse(
             UserAnswer userAnswer
-    ) {
-
-        return UserAnswerResponse.builder()
-
-                .id(
-                        userAnswer.getId()
-                )
-
-                .userId(
-                        userAnswer.getUser()
-                                .getId()
-                )
-
-                .userName(
-                        userAnswer.getUser()
-                                .getName()
-                )
-
-                .questionId(
-                        userAnswer.getQuestion()
-                                .getId()
-                )
-
-                .questionText(
-                        userAnswer.getQuestion()
-                                .getQuestionText()
-                )
-
-                .selectedAnswerId(
-                        userAnswer.getSelectedAnswer()
-                                .getId()
-                )
-
-                .selectedAnswerText(
-                        userAnswer.getSelectedAnswer()
-                                .getAnswerText()
-                )
-
-                .isCorrect(
-                        userAnswer.getIsCorrect()
-                )
-
-                .responseTime(
-                        userAnswer.getResponseTime()
-                )
-
-                .submittedAt(
-                        userAnswer.getSubmittedAt()
-                )
-
-                .build();
-    }
+    );
 }

@@ -1,49 +1,22 @@
 package com.brainedu.BrainEdu.mapper;
 
-import com.brainedu.BrainEdu.dto.response.LessonResponse.*;
+import com.brainedu.BrainEdu.dto.response.LessonResponse.LessonResponse;
 import com.brainedu.BrainEdu.entity.Lesson;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class LessonMapper {
+@Mapper(componentModel = "spring")
+public interface LessonMapper {
 
-    public LessonResponse toResponse(
+    @Mapping(
+            target = "courseId",
+            source = "course.id"
+    )
+    @Mapping(
+            target = "courseTitle",
+            source = "course.title"
+    )
+    LessonResponse toResponse(
             Lesson lesson
-    ) {
-
-        return LessonResponse.builder()
-                .id(lesson.getId())
-
-                .courseId(
-                        lesson.getCourse().getId()
-                )
-
-                .courseTitle(
-                        lesson.getCourse().getTitle()
-                )
-
-                .title(lesson.getTitle())
-
-                .content(
-                        lesson.getContent()
-                )
-
-                .videoUrl(
-                        lesson.getVideoUrl()
-                )
-
-                .lessonOrder(
-                        lesson.getLessonOrder()
-                )
-
-                .estimatedTime(
-                        lesson.getEstimatedTime()
-                )
-
-                .difficulty(
-                        lesson.getDifficulty()
-                )
-
-                .build();
-    }
+    );
 }

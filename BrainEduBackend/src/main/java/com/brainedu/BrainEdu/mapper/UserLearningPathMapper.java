@@ -1,72 +1,41 @@
 package com.brainedu.BrainEdu.mapper;
 
-import com.brainedu.BrainEdu.dto.response.UserLearningPathResponse.*;
+import com.brainedu.BrainEdu.dto.response.UserLearningPathResponse.UserLearningPathResponse;
 import com.brainedu.BrainEdu.entity.UserLearningPath;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class UserLearningPathMapper {
+@Mapper(componentModel = "spring")
+public interface UserLearningPathMapper {
 
-    public UserLearningPathResponse toResponse(
+    @Mapping(
+            target = "userId",
+            source = "user.id"
+    )
+    @Mapping(
+            target = "userName",
+            source = "user.name"
+    )
+
+    @Mapping(
+            target = "courseId",
+            source = "course.id"
+    )
+    @Mapping(
+            target = "courseTitle",
+            source = "course.title"
+    )
+
+    @Mapping(
+            target = "roadmapId",
+            source = "roadmap.id"
+    )
+    @Mapping(
+            target = "roadmapName",
+            source = "roadmap.roadmapName"
+    )
+
+    UserLearningPathResponse toResponse(
             UserLearningPath learningPath
-    ) {
-
-        return UserLearningPathResponse.builder()
-
-                .id(
-                        learningPath.getId()
-                )
-
-                .userId(
-                        learningPath.getUser()
-                                .getId()
-                )
-
-                .userName(
-                        learningPath.getUser()
-                                .getName()
-                )
-
-                .courseId(
-                        learningPath.getCourse()
-                                .getId()
-                )
-
-                .courseTitle(
-                        learningPath.getCourse()
-                                .getTitle()
-                )
-
-                .roadmapId(
-                        learningPath.getRoadmap()
-                                .getId()
-                )
-
-                .roadmapName(
-                        learningPath.getRoadmap()
-                                .getRoadmapName()
-                )
-
-                .recommendationScore(
-                        learningPath.getRecommendationScore()
-                )
-
-                .status(
-                        learningPath.getStatus()
-                )
-
-                .recommendedReason(
-                        learningPath.getRecommendedReason()
-                )
-
-                .aiGenerated(
-                        learningPath.getAiGenerated()
-                )
-
-                .createdAt(
-                        learningPath.getCreatedAt()
-                )
-
-                .build();
-    }
+    );
 }

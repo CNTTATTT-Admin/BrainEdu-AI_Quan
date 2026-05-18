@@ -3,9 +3,11 @@ package com.brainedu.BrainEdu.dto.response.UserResponse;
 import lombok.*;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @Setter
-@Builder
 public class UserResponse {
 
     private Long id;

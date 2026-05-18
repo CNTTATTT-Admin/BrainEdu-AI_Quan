@@ -1,53 +1,26 @@
 package com.brainedu.BrainEdu.mapper;
 
-import com.brainedu.BrainEdu.dto.request.CategoryRequest.*;
-import com.brainedu.BrainEdu.dto.response.CategoryResponse.*;
+import com.brainedu.BrainEdu.dto.request.CategoryRequest.CategoryRequest;
+import com.brainedu.BrainEdu.dto.response.CategoryResponse.CategoryResponse;
 import com.brainedu.BrainEdu.entity.Category;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 
-@Component
-public class CategoryMapper {
+@Mapper(componentModel = "spring")
+public interface CategoryMapper {
 
-    public Category toEntity(
+    Category toEntity(
             CategoryRequest request
-    ) {
+    );
 
-        return Category.builder()
-                .categoryName(
-                        request.getCategoryName()
-                )
-                .description(
-                        request.getDescription()
-                )
-                .build();
-    }
-
-    public CategoryResponse toResponse(
+    CategoryResponse toResponse(
             Category category
-    ) {
+    );
 
-        return CategoryResponse.builder()
-                .id(category.getId())
-                .categoryName(
-                        category.getCategoryName()
-                )
-                .description(
-                        category.getDescription()
-                )
-                .build();
-    }
-
-    public void updateEntity(
+    void updateEntity(
+            @MappingTarget
             Category category,
+
             CategoryRequest request
-    ) {
-
-        category.setCategoryName(
-                request.getCategoryName()
-        );
-
-        category.setDescription(
-                request.getDescription()
-        );
-    }
+    );
 }

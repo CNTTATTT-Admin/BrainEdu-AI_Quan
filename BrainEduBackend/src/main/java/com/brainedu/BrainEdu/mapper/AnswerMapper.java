@@ -1,40 +1,24 @@
 package com.brainedu.BrainEdu.mapper;
 
-import com.brainedu.BrainEdu.dto.response.AnswerResponse.*;
+import com.brainedu.BrainEdu.dto.response.AnswerResponse.AnswerResponse;
 import com.brainedu.BrainEdu.entity.Answer;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class AnswerMapper {
+@Mapper(componentModel = "spring")
+public interface AnswerMapper {
 
-    public AnswerResponse toResponse(
+    @Mapping(
+            target = "questionId",
+            source = "question.id"
+    )
+
+    @Mapping(
+            target = "questionText",
+            source = "question.questionText"
+    )
+
+    AnswerResponse toResponse(
             Answer answer
-    ) {
-
-        return AnswerResponse.builder()
-
-                .id(
-                        answer.getId()
-                )
-
-                .questionId(
-                        answer.getQuestion()
-                                .getId()
-                )
-
-                .questionText(
-                        answer.getQuestion()
-                                .getQuestionText()
-                )
-
-                .answerText(
-                        answer.getAnswerText()
-                )
-
-                .isCorrect(
-                        answer.getIsCorrect()
-                )
-
-                .build();
-    }
+    );
 }

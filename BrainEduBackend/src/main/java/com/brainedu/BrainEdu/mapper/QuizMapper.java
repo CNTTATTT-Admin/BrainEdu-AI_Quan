@@ -1,52 +1,23 @@
 package com.brainedu.BrainEdu.mapper;
 
-import com.brainedu.BrainEdu.dto.response.QuizResponse.*;
+import com.brainedu.BrainEdu.dto.response.QuizResponse.QuizResponse;
 import com.brainedu.BrainEdu.entity.Quiz;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class QuizMapper {
+@Mapper(componentModel = "spring")
+public interface QuizMapper {
 
-    public QuizResponse toResponse(
+    @Mapping(
+            target = "lessonId",
+            source = "lesson.id"
+    )
+    @Mapping(
+            target = "lessonTitle",
+            source = "lesson.title"
+    )
+
+    QuizResponse toResponse(
             Quiz quiz
-    ) {
-
-        return QuizResponse.builder()
-
-                .id(
-                        quiz.getId()
-                )
-
-                .lessonId(
-                        quiz.getLesson()
-                                .getId()
-                )
-
-                .lessonTitle(
-                        quiz.getLesson()
-                                .getTitle()
-                )
-
-                .title(
-                        quiz.getTitle()
-                )
-
-                .quizType(
-                        quiz.getQuizType()
-                )
-
-                .totalQuestions(
-                        quiz.getTotalQuestions()
-                )
-
-                .duration(
-                        quiz.getDuration()
-                )
-
-                .passingScore(
-                        quiz.getPassingScore()
-                )
-
-                .build();
-    }
+    );
 }

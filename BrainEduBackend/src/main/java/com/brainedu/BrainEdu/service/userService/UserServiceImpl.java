@@ -30,6 +30,7 @@ public class UserServiceImpl
 
     private final PasswordEncoder
             passwordEncoder;
+    private final UserMapper userMapper;
 
     @Override
     public Page<UserResponse> getAllUsers(
@@ -45,7 +46,7 @@ public class UserServiceImpl
 
         return userRepository
                 .findAll(pageable)
-                .map(UserMapper::toResponse);
+                .map(userMapper::toResponse);
     }
 
     @Override
@@ -54,7 +55,7 @@ public class UserServiceImpl
     ) {
 
         User user =
-                UserMapper.toEntity(request);
+                userMapper.toEntity(request);
 
         user.setPassword(
                 passwordEncoder.encode(
@@ -70,7 +71,7 @@ public class UserServiceImpl
         User savedUser =
                 userRepository.save(user);
 
-        return UserMapper.toResponse(
+        return userMapper.toResponse(
                 savedUser
         );
     }
@@ -89,7 +90,7 @@ public class UserServiceImpl
                                 )
                         );
 
-        return UserMapper.toResponse(
+        return userMapper.toResponse(
                 user
         );
     }
@@ -117,7 +118,7 @@ public class UserServiceImpl
         User user =
                 getCurrentUser();
 
-        return UserMapper.toResponse(
+        return userMapper.toResponse(
                 user
         );
     }
@@ -137,7 +138,7 @@ public class UserServiceImpl
         User updatedUser =
                 userRepository.save(user);
 
-        return UserMapper.toResponse(
+        return userMapper.toResponse(
                 updatedUser
         );
     }
@@ -156,7 +157,7 @@ public class UserServiceImpl
                                 )
                         );
 
-        return UserMapper.toResponse(
+        return userMapper.toResponse(
                 user
         );
     }
@@ -183,7 +184,7 @@ public class UserServiceImpl
         User updatedUser =
                 userRepository.save(user);
 
-        return UserMapper.toResponse(
+        return userMapper.toResponse(
                 updatedUser
         );
     }
