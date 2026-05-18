@@ -1,0 +1,11 @@
+id,title,category,level,tags,prerequisites,career_track
+1,Java Core,Backend,Beginner,"java,oops,basic","",Backend
+2,OOP Java,Backend,Beginner,"java,oop","1",Backend
+3,Spring Boot,Backend,Intermediate,"java,spring,api","1,2",Backend
+4,SQL Basics,Database,Beginner,"sql,database","",Backend
+5,Docker Essentials,DevOps,Intermediate,"docker,container","3",Backend
+6,System Design,Architecture,Advanced,"system,scalability","3,5",Backend
+7,ReactJS,Frontend,Beginner,"react,javascript,frontend","",Frontend
+8,NodeJS API,Backend,Intermediate,"nodejs,api,backend","",Backend
+9,Kubernetes,DevOps,Advanced,"k8s,devops,container","5",Backend
+10,Microservices,Architecture,Advanced,"microservices,distributed","3,5",Backend

@@ -1,0 +1,6 @@
+id,title,content,category
+1,Spring Boot Intro,"Spring Boot is a Java framework used for building REST APIs and backend services quickly.",Backend
+2,Docker Basics,"Docker is a containerization platform used to package and deploy applications.",DevOps
+3,SQL Introduction,"SQL is used to manage relational databases using queries.",Database
+4,ReactJS Fundamentals,"ReactJS is a frontend JavaScript library for building user interfaces.",Frontend
+5,System Design Basics,"System Design focuses on scalability, load balancing, caching, and distributed systems.",Architecture

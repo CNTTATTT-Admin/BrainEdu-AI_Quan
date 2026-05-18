@@ -1,0 +1,22 @@
+{
+  "Backend Developer": [
+    "Java Core",
+    "Spring Boot",
+    "SQL Basics",
+    "Docker Essentials",
+    "System Design"
+  ],
+
+  "Frontend Developer": [
+    "HTML CSS",
+    "JavaScript",
+    "ReactJS"
+  ],
+
+  "DevOps Engineer": [
+    "Linux",
+    "Docker Essentials",
+    "Kubernetes",
+    "CI/CD"
+  ]
+}
