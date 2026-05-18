@@ -68,7 +68,7 @@ public class QuizServiceImpl
                         )
 
                         .passingScore(
-                                request.getPassingScore()
+                                request.getPassingScore().floatValue()
                         )
 
                         .build();
@@ -168,7 +168,7 @@ public class QuizServiceImpl
         );
 
         quiz.setPassingScore(
-                request.getPassingScore()
+                request.getPassingScore().floatValue()
         );
 
         quizRepository.save(quiz);

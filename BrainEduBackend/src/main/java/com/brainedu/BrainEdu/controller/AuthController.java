@@ -10,6 +10,7 @@ import com.brainedu.BrainEdu.dto.request.AuthRequest.RegisterRequest;
 import com.brainedu.BrainEdu.dto.request.AuthRequest.ResetPasswordRequest;
 import com.brainedu.BrainEdu.dto.response.AuthResponse.AuthResponse;
 import com.brainedu.BrainEdu.service.authService.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,6 +40,7 @@ public class AuthController {
     @PostMapping("/login")
     public ApiResponse<AuthResponse>
     login(
+            @Valid
             @RequestBody
             LoginRequest request
     ) {
@@ -52,6 +54,7 @@ public class AuthController {
     @PostMapping("/refresh")
     public ApiResponse<AuthResponse>
     refresh(
+            @Valid
             @RequestBody
             RefreshTokenRequest request
     ) {
@@ -78,6 +81,7 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public ApiResponse<String>
     forgotPassword(
+            @Valid
             @RequestBody
             ForgotPasswordRequest request
     ) {
@@ -91,6 +95,7 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ApiResponse<String>
     resetPassword(
+            @Valid
             @RequestBody
             ResetPasswordRequest request
     ) {

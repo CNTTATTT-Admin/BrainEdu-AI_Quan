@@ -81,7 +81,7 @@ public class QuestionServiceImpl
                         )
 
                         .weightScore(
-                                request.getWeightScore()
+                                request.getWeightScore().floatValue()
                         )
 
                         .build();
@@ -208,7 +208,7 @@ public class QuestionServiceImpl
         );
 
         question.setWeightScore(
-                request.getWeightScore()
+                request.getWeightScore().floatValue()
         );
 
         questionRepository.save(question);

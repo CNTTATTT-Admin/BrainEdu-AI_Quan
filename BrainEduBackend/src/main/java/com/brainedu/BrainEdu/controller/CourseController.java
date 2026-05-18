@@ -6,6 +6,7 @@ import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.CourseRequest.CourseRequest;
 import com.brainedu.BrainEdu.dto.response.CourseResponse.CourseResponse;
 import com.brainedu.BrainEdu.service.courseService.CourseService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ public class CourseController {
     @PostMapping
     public ApiResponse<CourseResponse>
     create(
+            @Valid
             @RequestBody
             CourseRequest request
     ) {
@@ -117,9 +119,8 @@ public class CourseController {
     @PutMapping("/{id}")
     public ApiResponse<CourseResponse>
     update(
-
+            @Valid
             @PathVariable Long id,
-
             @RequestBody
             CourseRequest request
     ) {

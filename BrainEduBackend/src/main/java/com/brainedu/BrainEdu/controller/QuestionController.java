@@ -6,6 +6,7 @@ import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.QuestionRequest.QuestionRequest;
 import com.brainedu.BrainEdu.dto.response.QuestionResponse.QuestionResponse;
 import com.brainedu.BrainEdu.service.questionService.QuestionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ public class QuestionController {
     @PostMapping
     public ApiResponse<QuestionResponse>
     create(
+            @Valid
             @RequestBody
             QuestionRequest request
     ) {
@@ -155,7 +157,7 @@ public class QuestionController {
     @PutMapping("/{id}")
     public ApiResponse<QuestionResponse>
     update(
-
+            @Valid
             @PathVariable Long id,
 
             @RequestBody

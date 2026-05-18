@@ -6,6 +6,7 @@ import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.CategoryRequest.CategoryRequest;
 import com.brainedu.BrainEdu.dto.response.CategoryResponse.CategoryResponse;
 import com.brainedu.BrainEdu.service.categoryService.CategoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ public class CategoryController {
     @PostMapping
     public ApiResponse<CategoryResponse>
     create(
+            @Valid
             @RequestBody
             CategoryRequest request
     ) {
@@ -81,9 +83,8 @@ public class CategoryController {
     @PutMapping("/{id}")
     public ApiResponse<CategoryResponse>
     update(
-
+            @Valid
             @PathVariable Long id,
-
             @RequestBody
             CategoryRequest request
     ) {

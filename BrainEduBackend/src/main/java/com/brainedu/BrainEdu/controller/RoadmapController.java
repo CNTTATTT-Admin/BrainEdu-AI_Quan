@@ -6,6 +6,7 @@ import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.RoadmapRequest.RoadmapRequest;
 import com.brainedu.BrainEdu.dto.response.RoadmapResponse.RoadmapResponse;
 import com.brainedu.BrainEdu.service.roadmapService.RoadmapService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ public class RoadmapController {
     @PostMapping
     public ApiResponse<RoadmapResponse>
     create(
+            @Valid
             @RequestBody
             RoadmapRequest request
     ) {
@@ -119,7 +121,7 @@ public class RoadmapController {
     @GetMapping("/level/{level}")
     public ApiResponse<List<RoadmapResponse>>
     getByLevel(
-
+            @Valid
             @PathVariable String level,
 
             @RequestParam(
@@ -155,9 +157,8 @@ public class RoadmapController {
     @PutMapping("/{id}")
     public ApiResponse<RoadmapResponse>
     update(
-
+            @Valid
             @PathVariable Long id,
-
             @RequestBody
             RoadmapRequest request
     ) {
