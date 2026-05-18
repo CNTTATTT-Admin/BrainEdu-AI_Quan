@@ -1,6 +1,7 @@
 package com.brainedu.BrainEdu.service.userService;
 
 import com.brainedu.BrainEdu.config.ApiException;
+import com.brainedu.BrainEdu.constant.CacheNames;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateProfileRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateUserRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UserRequest;
@@ -8,7 +9,11 @@ import com.brainedu.BrainEdu.dto.response.UserResponse.UserResponse;
 import com.brainedu.BrainEdu.entity.User;
 import com.brainedu.BrainEdu.mapper.UserMapper;
 import com.brainedu.BrainEdu.repository.UserRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +38,10 @@ public class UserServiceImpl
     private final UserMapper userMapper;
 
     @Override
+    @Cacheable(
+            value = CacheNames.USERS,
+            key = "'all:' + #page + ':' + #size"
+    )
     public Page<UserResponse> getAllUsers(
             int page,
             int size
@@ -49,6 +58,10 @@ public class UserServiceImpl
                 .map(userMapper::toResponse);
     }
 
+    @CacheEvict(
+            value = CacheNames.USERS,
+            allEntries = true
+    )
     @Override
     public UserResponse createUser(
             UserRequest request
@@ -73,25 +86,6 @@ public class UserServiceImpl
 
         return userMapper.toResponse(
                 savedUser
-        );
-    }
-
-    @Override
-    public UserResponse getUser(
-            Long id
-    ) {
-
-        User user =
-                userRepository
-                        .findById(id)
-                        .orElseThrow(
-                                () -> new ApiException(
-                                        "User not found"
-                                )
-                        );
-
-        return userMapper.toResponse(
-                user
         );
     }
 
@@ -123,6 +117,20 @@ public class UserServiceImpl
         );
     }
 
+    @Caching(
+            put = {
+                    @CachePut(
+                            value = CacheNames.USERS,
+                            key = "'id:' + #result.id"
+                    )
+            },
+            evict = {
+                    @CacheEvict(
+                            value = CacheNames.USERS,
+                            allEntries = true
+                    )
+            }
+    )
     @Override
     public UserResponse updateMe(
             UpdateProfileRequest request
@@ -143,6 +151,10 @@ public class UserServiceImpl
         );
     }
 
+    @Cacheable(
+            value = CacheNames.USERS,
+            key = "'all:' + #page + ':' + #size"
+    )
     @Override
     public UserResponse getUserById(
             Long id
@@ -162,6 +174,20 @@ public class UserServiceImpl
         );
     }
 
+    @Caching(
+            put = {
+                    @CachePut(
+                            value = CacheNames.USERS,
+                            key = "'id:' + #id"
+                    )
+            },
+            evict = {
+                    @CacheEvict(
+                            value = CacheNames.USERS,
+                            allEntries = true
+                    )
+            }
+    )
     @Override
     public UserResponse updateUser(
             Long id,
@@ -189,6 +215,10 @@ public class UserServiceImpl
         );
     }
 
+    @CacheEvict(
+            value = CacheNames.USERS,
+            allEntries = true
+    )
     @Override
     public String deleteUser(
             Long id

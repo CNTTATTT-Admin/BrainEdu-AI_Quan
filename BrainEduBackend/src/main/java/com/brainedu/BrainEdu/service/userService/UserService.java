@@ -11,7 +11,6 @@ public interface UserService {
 
     Page<UserResponse> getAllUsers(int page, int size);
     UserResponse createUser(UserRequest request);
-    UserResponse getUser(Long id);
     UserResponse getMe();
 
     UserResponse updateMe(

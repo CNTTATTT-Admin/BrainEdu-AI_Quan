@@ -20,7 +20,7 @@ import org.hibernate.annotations.Where;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Roadmap {
+public class Roadmap extends BaseEntity {
 
     @Id
     @GeneratedValue(

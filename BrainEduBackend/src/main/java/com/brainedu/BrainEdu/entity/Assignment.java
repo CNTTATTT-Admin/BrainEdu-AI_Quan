@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Assignment {
+public class Assignment extends BaseEntity {
 
     @Id
     @GeneratedValue(

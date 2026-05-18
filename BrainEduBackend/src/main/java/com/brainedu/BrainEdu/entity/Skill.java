@@ -20,7 +20,7 @@ import org.hibernate.annotations.Where;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Skill {
+public class Skill extends BaseEntity {
 
     @Id
     @GeneratedValue(

@@ -10,6 +10,7 @@ import com.brainedu.BrainEdu.repository.CategoryRepository;
 import com.brainedu.BrainEdu.repository.SkillRepository;
 import com.brainedu.BrainEdu.service.skillService.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -70,7 +71,11 @@ public class SkillServiceImpl
     }
 
     @Override
+    @Cacheable(
+            value = "skills"
+    )
     public Page<SkillResponse> getAll(int page, int size) {
+        System.out.println("DB HIT");
         Pageable pageable = PageRequest.of(page, size);
         return skillRepository.findAll(pageable)
                 .map(
