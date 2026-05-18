@@ -4,15 +4,28 @@ import com.brainedu.BrainEdu.dto.request.AuthRequest.*;
 import com.brainedu.BrainEdu.dto.response.AuthResponse.*;
 
 public interface AuthService {
-    AuthResponse register(RegisterRequest request);
 
-    AuthResponse login(LoginRequest request);
+    AuthResponse register(
+            RegisterRequest request
+    );
 
-    AuthResponse refresh(RefreshTokenRequest request);
+    AuthResponse login(
+            LoginRequest request
+    );
 
-    String logout(LogoutRequest request);
+    AuthResponse refresh(
+            RefreshTokenRequest request
+    );
 
-    String forgotPassword(ForgotPasswordRequest request);
+    String logout(
+            LogoutRequest request
+    );
 
-    String resetPassword(ResetPasswordRequest request);
+    String forgotPassword(
+            ForgotPasswordRequest request
+    );
+
+    String resetPassword(
+            ResetPasswordRequest request
+    );
 }
