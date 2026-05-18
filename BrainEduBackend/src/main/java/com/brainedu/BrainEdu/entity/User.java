@@ -3,6 +3,8 @@ package com.brainedu.BrainEdu.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,12 +15,20 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
+@SQLDelete(sql = """
+    UPDATE users
+    SET deleted = true,
+        deleted_at = NOW()
+    WHERE id = ?
+""")
+
+@Where(clause = "deleted = false")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements UserDetails {
+public class User extends BaseEntity implements UserDetails  {
 
     @Id
     @GeneratedValue(

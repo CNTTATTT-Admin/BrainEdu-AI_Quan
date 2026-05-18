@@ -73,7 +73,7 @@ public class InstructorAssignmentServiceImpl
                                 request.getDueDate()
                         )
                         .maxScore(
-                                request.getMaxScore()
+                                request.getMaxScore().floatValue()
                         )
                         .createdAt(
                                 LocalDateTime.now()

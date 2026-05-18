@@ -2,11 +2,21 @@ package com.brainedu.BrainEdu.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "courses")
+@SQLDelete(sql = """
+    UPDATE courses
+    SET deleted = true,
+        deleted_at = NOW()
+    WHERE id = ?
+""")
+
+@Where(clause = "deleted = false")
 @Getter
 @Setter
 @Builder
