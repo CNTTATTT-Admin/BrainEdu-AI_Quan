@@ -1,42 +1,143 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import QuizContent from '../component/QuizzContent';
 import QuizSidebar from '../component/QuizSidebar';
+import { useLocation, useNavigate } from 'react-router-dom';
+import useGetQuizz from '../hooks/useGetQuizz';
+import useGetQuestion from '../hooks/useGetQuestion';
+// import useSubmitQuiz from '../hooks/useSubmitQuiz';
 
 const QuizPage: React.FC = () => {
-  const totalQuestions = 40;
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>('A');
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { lessonId } = location.state || {};
+  
+  const { data: quizzData, isPending: isQuizzPending } = useGetQuizz(lessonId, !!lessonId);
+  const quizzDataAvailable = quizzData?.data?.[0];
+  const quizId = quizzDataAvailable?.id;
 
-  const questionData = {
-    id: 12,
-    text: 'Trong một tam giác vuông, bình phương cạnh huyền bằng...',
-    options: [
-      { key: 'A', text: 'Tổng bình phương của hai cạnh góc vuông.' },
-      { key: 'B', text: 'Hiệu bình phương của hai cạnh góc vuông.' },
-      { key: 'C', text: 'Tổng của hai cạnh góc vuông.' },
-      { key: 'D', text: 'Tích của hai cạnh góc vuông.' },
-    ],
+  const { data: questionDatas, isPending: isQuestionPending } = useGetQuestion(quizId, !!quizId);
+  const questionsList = questionDatas?.data || [];
+  const totalQuestions = quizzDataAvailable?.totalQuestions || questionsList.length || 0;
+
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [answersMap, setAnswersMap] = useState<Record<number, number>>({});
+
+//   const { mutate: submitQuiz, isPending: isSubmitting } = useSubmitQuiz();
+
+  useEffect(() => {
+    if (quizId) {
+      const saved = localStorage.getItem(`quiz_progress_${quizId}`);
+      if (saved) {
+        setAnswersMap(JSON.parse(saved));
+      }
+    }
+  }, [quizId]);
+
+  if (isQuizzPending || isQuestionPending) {
+    return (
+      <div className="min-h-screen bg-[#f4f7fc] flex items-center justify-center font-sans">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-[#0052cc] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-sm font-semibold text-gray-500">Đang tải bài kiểm tra...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!lessonId || !quizzDataAvailable || questionsList.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#f4f7fc] flex items-center justify-center font-sans">
+        <div className="text-center p-8 bg-white rounded-2xl shadow-sm border border-gray-100">
+          <p className="text-gray-500 font-medium">Không tìm thấy dữ liệu bài kiểm tra.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const currentQuestion = questionsList[currentIndex];
+
+  const handleSelectAnswer = (answerId: number) => {
+    if (!currentQuestion) return;
+
+    setAnswersMap((prev) => {
+      const updated = { ...prev, [currentQuestion.id]: answerId };
+      localStorage.setItem(`quiz_progress_${quizId}`, JSON.stringify(updated));
+      return updated;
+    });
   };
 
-  const questionStatuses: Record<number, 'completed' | 'current' | 'unassigned'> = {
-    1: 'completed', 2: 'completed', 3: 'completed', 4: 'completed', 5: 'completed',
-    6: 'completed', 7: 'completed', 8: 'completed', 9: 'completed', 10: 'completed',
-    11: 'completed', 12: 'current',
+  const handlePrevQuestion = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex((prev) => prev - 1);
+    }
   };
+
+  const handleNextQuestion = () => {
+    if (currentIndex < questionsList.length - 1) {
+      setCurrentIndex((prev) => prev - 1 + 2);
+    }
+  };
+
+  const handleSubmitQuiz = () => {
+    if (!quizId) return;
+
+    const payload = {
+      quizzId: quizId,
+      lessonId: lessonId,
+      answers: Object.entries(answersMap).map(([questionId, selectedOptionId]) => ({
+        questionId: Number(questionId),
+        selectedOptionId: Number(selectedOptionId),
+      })),
+    };
+
+    console.log(payload);
+
+    // submitQuiz(payload, {
+    //   onSuccess: (response) => {
+    //     localStorage.removeItem(`quiz_progress_${quizId}`);
+    //     navigate('/quiz-result', { state: { result: response.data } });
+    //   },
+    // });
+  };
+
+  const questionStatuses: Record<number, 'completed' | 'current' | 'unassigned'> = {};
+  questionsList.forEach((q: any, idx: number) => {
+    const qNum = idx + 1;
+    if (idx === currentIndex) {
+      questionStatuses[qNum] = 'current';
+    } else if (answersMap[q.id]) {
+      questionStatuses[qNum] = 'completed';
+    } else {
+      questionStatuses[qNum] = 'unassigned';
+    }
+  });
 
   return (
     <div className="min-h-screen bg-[#f4f7fc] p-6 antialiased font-sans">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         <QuizContent
-          questionData={questionData}
-          selectedAnswer={selectedAnswer}
-          onSelectAnswer={setSelectedAnswer}
+          questionData={{
+            id: currentQuestion?.id,
+            displayIndex: currentIndex + 1,
+            text: currentQuestion?.questionText || '',
+          }}
+          selectedAnswerId={answersMap[currentQuestion?.id] || null}
+          onSelectAnswer={handleSelectAnswer}
+          onPrev={handlePrevQuestion}
+          onNext={handleNextQuestion}
+          isFirst={currentIndex === 0}
+          isLast={currentIndex === questionsList.length - 1}
         />
 
         <QuizSidebar
           totalQuestions={totalQuestions}
-          currentQuestionId={questionData.id}
+          currentQuestionId={currentIndex + 1}
           questionStatuses={questionStatuses}
+          duration={quizzDataAvailable?.duration || 0}
+          onSelectQuestion={(index) => setCurrentIndex(index)}
+          onSubmit={handleSubmitQuiz}
+          isSubmitting={false}
         />
 
       </div>

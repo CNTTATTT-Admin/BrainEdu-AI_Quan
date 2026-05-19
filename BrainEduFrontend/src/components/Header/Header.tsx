@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Search, LogOut, User, Settings, ChevronDown } from 'lucide-react';
 import useGetMe from '../../hooks/useGetMe';
 import useLogout from '../../hooks/useLogOut';
@@ -45,15 +45,10 @@ const Header = () => {
             Khóa học
 
           </NavLink>
-          <a href="#" className="hover:text-gray-900 transition-colors py-5">
-            Lộ trình
-          </a>
-          <a href="#" className="hover:text-gray-900 transition-colors py-5">
-            Cộng đồng
-          </a>
-          <a href="#" className="hover:text-gray-900 transition-colors py-5">
-            Hỗ trợ
-          </a>
+
+          <NavLink to="/pathways">Lộ trình</NavLink>
+          <NavLink to="/community">Cộng đồng</NavLink>
+          <NavLink to="/support">Hỗ trợ</NavLink>
         </nav>
       </div>
 
@@ -92,10 +87,10 @@ const Header = () => {
                   <p className="text-xs text-gray-500 truncate">{currentUser?.data.email || 'user@example.com'}</p>
                 </div>
 
-                <a href="#" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                <NavLink to="/profile" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                   <User size={16} className="text-gray-400" />
                   Trang cá nhân
-                </a>
+                </NavLink>
                 <a href="#" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                   <Settings size={16} className="text-gray-400" />
                   Cài đặt tài khoản

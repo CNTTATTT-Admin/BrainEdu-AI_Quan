@@ -50,7 +50,7 @@ const SidebarCourse: React.FC<SidebarCourseProps> = ({
       <div className="space-y-2">
         <h2 className="text-sm font-bold text-gray-900">Nội dung khóa học</h2>
         <div className="flex items-center justify-between text-xs font-semibold text-gray-500">
-          <div className="w-3/4 bg-gray-100 h-2 rounded-full overflow-hidden">
+          <div className="w-5/7 bg-gray-100 h-2 rounded-full overflow-hidden">
             <div 
               className="bg-[#0052cc] h-full transition-all duration-500" 
               style={{ width: `${progressPercentage}%` }}
