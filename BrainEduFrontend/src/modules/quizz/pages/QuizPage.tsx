@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import QuizContent from '../component/QuizzContent';
 import QuizSidebar from '../component/QuizSidebar';
 import { useLocation, useNavigate } from 'react-router-dom';
 import useGetQuizz from '../hooks/useGetQuizz';
 import useGetQuestion from '../hooks/useGetQuestion';
-// import useSubmitQuiz from '../hooks/useSubmitQuiz';
+import useSubmitQuiz from '../hooks/useSubmitQuiz';
 
 const QuizPage: React.FC = () => {
   const location = useLocation();
@@ -22,7 +22,25 @@ const QuizPage: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [answersMap, setAnswersMap] = useState<Record<number, number>>({});
 
-//   const { mutate: submitQuiz, isPending: isSubmitting } = useSubmitQuiz();
+  const quizDurationLimit = quizzDataAvailable?.duration || 0;
+  const [timeSpent, setTimeSpent] = useState<number>(0);
+  const timeSpentRef = useRef<number>(0);
+
+  const { mutate, isPending: isSubmitting } = useSubmitQuiz();
+
+  useEffect(() => {
+    if (isQuizzPending || isQuestionPending || !quizId) return;
+
+    const timer = setInterval(() => {
+      setTimeSpent((prev) => {
+        const nextTime = prev + 1;
+        timeSpentRef.current = nextTime;
+        return nextTime;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isQuizzPending, isQuestionPending, quizId]);
 
   useEffect(() => {
     if (quizId) {
@@ -74,7 +92,7 @@ const QuizPage: React.FC = () => {
 
   const handleNextQuestion = () => {
     if (currentIndex < questionsList.length - 1) {
-      setCurrentIndex((prev) => prev - 1 + 2);
+      setCurrentIndex((prev) => prev + 1);
     }
   };
 
@@ -82,22 +100,25 @@ const QuizPage: React.FC = () => {
     if (!quizId) return;
 
     const payload = {
-      quizzId: quizId,
-      lessonId: lessonId,
+      quizId: quizId,
+      durationSeconds: timeSpentRef.current,
       answers: Object.entries(answersMap).map(([questionId, selectedOptionId]) => ({
         questionId: Number(questionId),
-        selectedOptionId: Number(selectedOptionId),
+        answerId: Number(selectedOptionId),
       })),
     };
 
     console.log(payload);
-
-    // submitQuiz(payload, {
-    //   onSuccess: (response) => {
-    //     localStorage.removeItem(`quiz_progress_${quizId}`);
-    //     navigate('/quiz-result', { state: { result: response.data } });
-    //   },
-    // });
+    
+    mutate(payload, {
+      onSuccess: (response) => {
+        localStorage.removeItem(`quiz_progress_${quizId}`);
+        navigate('/quiz-result', { state: { result: response.data } });
+      },
+      onError: (err) => {
+        console.error("Lỗi khi nộp bài:", err);
+      }
+    });
   };
 
   const questionStatuses: Record<number, 'completed' | 'current' | 'unassigned'> = {};
@@ -134,10 +155,10 @@ const QuizPage: React.FC = () => {
           totalQuestions={totalQuestions}
           currentQuestionId={currentIndex + 1}
           questionStatuses={questionStatuses}
-          duration={quizzDataAvailable?.duration || 0}
+          duration={quizDurationLimit}
           onSelectQuestion={(index) => setCurrentIndex(index)}
           onSubmit={handleSubmitQuiz}
-          isSubmitting={false}
+          isSubmitting={isSubmitting}
         />
 
       </div>

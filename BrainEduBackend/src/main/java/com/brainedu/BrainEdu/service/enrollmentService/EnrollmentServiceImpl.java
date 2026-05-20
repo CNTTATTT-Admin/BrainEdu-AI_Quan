@@ -11,6 +11,7 @@ import com.brainedu.BrainEdu.repository.CourseRepository;
 import com.brainedu.BrainEdu.repository.EnrollmentRepository;
 import com.brainedu.BrainEdu.repository.UserRepository;
 import com.brainedu.BrainEdu.service.enrollmentService.*;
+import com.brainedu.BrainEdu.ultils.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,26 +37,15 @@ public class EnrollmentServiceImpl
     private final EnrollmentMapper
             enrollmentMapper;
 
+    private final CurrentUserService
+            currentUserService;
+
     @Override
     public EnrollmentResponse enroll(
             EnrollmentRequest request
     ) {
 
-        Authentication authentication =
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication();
-
-        String email =
-                authentication.getName();
-
-        User user =
-                userRepository.findByEmail(email)
-                        .orElseThrow(
-                                () -> new ApiException(
-                                        "User not found"
-                                )
-                        );
+        User user = currentUserService.getCurrentUser();
 
         Course course =
                 courseRepository.findById(

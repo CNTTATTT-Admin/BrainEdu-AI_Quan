@@ -40,4 +40,8 @@ public class UserAnswer {
 
     @Column(name = "submitted_at")
     private LocalDateTime submittedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "quiz_submission_id")
+    private QuizSubmission quizSubmission;
 }

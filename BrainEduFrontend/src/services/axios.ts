@@ -48,15 +48,18 @@ api.interceptors.response.use(
                     delete originnalRequest.headers["Authorization"]
 
                     const response = await axios.post(
-                        `${ApiUrls.apiBaseUrl}/auth/refresh`, {token: refreshToken}
+                        `${ApiUrls.apiBaseUrl}/auth/refresh`, {refreshToken: refreshToken}
                     )
 
                     if(response.status === 200 && response.data?.data?.access_token) {
-                        const {access_token, refresh_token} = response.data.data
-                        setToken(access_token)
-                        setRefreshToken(refresh_token)
+                        const {
+                            accessToken,
+                            refreshToken: newRefreshToken
+                        } = response.data.data
+                        setToken(accessToken)
+                        setRefreshToken(newRefreshToken)
 
-                        originnalRequest.headers["Authorization"] = "Bearer " + access_token
+                        originnalRequest.headers["Authorization"] = "Bearer " + accessToken
                         return axios(originnalRequest)
                     }
                 } catch (refreshError: any) {

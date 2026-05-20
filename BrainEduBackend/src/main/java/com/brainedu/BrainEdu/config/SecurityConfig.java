@@ -101,6 +101,16 @@ public class SecurityConfig {
                         ).hasAnyRole("ADMIN", "INSTRUCTOR")
 
                         .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/v1/quiz-submissions/submit"
+                        ).hasRole("USER")
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/quiz-submissions/**"
+                        ).hasAnyRole("ADMIN", "INSTRUCTOR", "USER")
+
+                        .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/v1/course-skills/**"
                         ).permitAll()

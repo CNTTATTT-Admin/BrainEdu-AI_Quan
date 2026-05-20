@@ -110,9 +110,9 @@ const Header = () => {
           </div>
         ) : (
           <div className="flex items-center gap-4 text-sm font-medium">
-            <button className="text-[#0052cc] hover:underline px-4 py-2">
+            <NavLink to="/account/login" className="text-[#0052cc] hover:underline px-4 py-2">
               Đăng nhập
-            </button>
+            </NavLink>
             <button className="bg-[#0052cc] text-white px-6 py-2 rounded-full hover:bg-[#0043a8] transition-colors shadow-sm">
               Đăng ký
             </button>

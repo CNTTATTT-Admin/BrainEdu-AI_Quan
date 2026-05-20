@@ -28,3 +28,15 @@ export type AnswerResponse = {
     answerText: String,
     isCorrect: Boolean
 }
+
+export type QuizSubmissionResponse = {
+    id: Number,
+    quizId: Number,
+    quizTitle: String,
+    totalQuestions: Number,
+    correctAnswers: Number,
+    score: Number,
+    passed: Boolean,
+    durationSeconds: Number,
+    submittedAt: String
+}
