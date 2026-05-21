@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { CheckCircle2, XCircle, AlertCircle, Clock, Award, Star, BookOpen, Lightbulb, MessageSquare } from 'lucide-react';
 
 const QuizResultPage: React.FC = () => {
@@ -22,20 +22,21 @@ const QuizResultPage: React.FC = () => {
       </div>
     );
   }
+  console.log(result);
 
   const {
     correctAnswers = 0,
     durationSeconds = 0,
     passed = false,
     quizTitle = "Bài kiểm tra",
+    answeredQuestions = 0,
+    skippedQuestions = 0,
     score = 0,
     totalQuestions = 0
   } = result;
-  console.log(result);
   
 
-  const wrongAnswers = totalQuestions - correctAnswers; 
-  const skippedAnswers = Math.max(0, totalQuestions - (correctAnswers + wrongAnswers)); 
+  const wrongAnswers = totalQuestions - correctAnswers - skippedQuestions; 
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
@@ -49,16 +50,10 @@ const QuizResultPage: React.FC = () => {
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (score / 100) * circumference;
 
-  console.log("Total: ", totalQuestions);
-  console.log("Correct: ", correctAnswers);
-  console.log("Wrong: ", wrongAnswers);
-  console.log("Skipped: ", skippedAnswers);
-  
-
   const stats = [
     { label: 'Câu đúng', value: `${correctAnswers}/${totalQuestions}`, icon: <CheckCircle2 className="text-green-500" size={16} /> },
     { label: 'Câu sai', value: `${wrongAnswers}`, icon: <XCircle className="text-red-500" size={16} /> },
-    { label: 'Bỏ qua', value: `${skippedAnswers}`, icon: <AlertCircle className="text-gray-400" size={16} /> },
+    { label: 'Bỏ qua', value: `${skippedQuestions}`, icon: <AlertCircle className="text-gray-400" size={16} /> },
     { label: 'Thời gian', value: formatTime(durationSeconds), icon: <Clock className="text-purple-500" size={16} /> },
   ];
 
@@ -95,9 +90,9 @@ const QuizResultPage: React.FC = () => {
               <button className="bg-[#0052cc] text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-blue-700 transition">
                 Học tiếp lộ trình
               </button>
-              <button className="bg-gray-100 text-gray-700 text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-gray-200 transition">
-                Xem lại đáp án
-              </button>
+              <NavLink to="/quiz-review" state={{ submissionId: result.id }} className="bg-gray-100 text-gray-700 text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-gray-200 transition">
+                  Xem lại đáp án
+              </NavLink>
             </div>
           </div>
           

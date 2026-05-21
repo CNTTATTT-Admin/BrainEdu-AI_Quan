@@ -4,9 +4,11 @@ import com.brainedu.BrainEdu.config.ApiException;
 import com.brainedu.BrainEdu.dto.request.QuizRequest.*;
 import com.brainedu.BrainEdu.dto.response.QuizResponse.*;
 import com.brainedu.BrainEdu.entity.Lesson;
+import com.brainedu.BrainEdu.entity.Question;
 import com.brainedu.BrainEdu.entity.Quiz;
 import com.brainedu.BrainEdu.mapper.QuizMapper;
 import com.brainedu.BrainEdu.repository.LessonRepository;
+import com.brainedu.BrainEdu.repository.QuestionRepository;
 import com.brainedu.BrainEdu.repository.QuizRepository;
 import com.brainedu.BrainEdu.service.quizService.*;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,8 @@ public class QuizServiceImpl
 
     private final LessonRepository
             lessonRepository;
+    private final QuestionRepository
+            questionRepository;
 
     private final QuizMapper
             quizMapper;
@@ -123,6 +127,81 @@ public class QuizServiceImpl
                 .map(
                         quizMapper::toResponse
                 );
+    }
+
+    @Override
+    public List<QuizQuestionAnswerResponse>
+    getQuizQuestions(
+            Long quizId
+    ) {
+
+        Quiz quiz =
+                quizRepository.findById(
+                                quizId
+                        )
+                        .orElseThrow(
+                                () -> new ApiException(
+                                        "Quiz not found"
+                                )
+                        );
+
+        List<Question> questions =
+                questionRepository
+                        .findByQuizId(
+                                quiz.getId()
+                        );
+
+        return questions.stream()
+                .map(question ->
+
+                        QuizQuestionAnswerResponse
+                                .builder()
+
+                                .id(
+                                        question.getId()
+                                )
+
+                                .questionText(
+                                        question.getQuestionText()
+                                )
+
+                                .difficultyLevel(
+                                        question.getDifficultyLevel()
+                                )
+
+                                .questionType(
+                                        question.getQuestionType()
+                                )
+
+                                .answers(
+                                        question.getAnswers()
+                                                .stream()
+                                                .map(answer ->
+
+                                                        QuizQuestionAnswerResponse
+                                                                .AnswerItem
+                                                                .builder()
+
+                                                                .id(
+                                                                        answer.getId()
+                                                                )
+
+                                                                .answerText(
+                                                                        answer.getAnswerText()
+                                                                )
+
+                                                                .isCorrect(
+                                                                        answer.getIsCorrect()
+                                                                )
+
+                                                                .build()
+                                                )
+                                                .toList()
+                                )
+
+                                .build()
+                )
+                .toList();
     }
 
     @Override

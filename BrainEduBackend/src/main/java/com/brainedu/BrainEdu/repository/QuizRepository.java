@@ -14,4 +14,6 @@ public interface QuizRepository
             Long lessonId,
             Pageable pageable
     );
+
+
 }

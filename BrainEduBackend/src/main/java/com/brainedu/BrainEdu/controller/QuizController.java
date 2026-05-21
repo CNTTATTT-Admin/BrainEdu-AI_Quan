@@ -4,6 +4,7 @@ import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.common.response.PaginationMeta;
 import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.QuizRequest.QuizRequest;
+import com.brainedu.BrainEdu.dto.response.QuizResponse.QuizQuestionAnswerResponse;
 import com.brainedu.BrainEdu.dto.response.QuizResponse.QuizResponse;
 import com.brainedu.BrainEdu.service.quizService.QuizService;
 import jakarta.validation.Valid;
@@ -115,6 +116,22 @@ public class QuizController {
                 "Quizzes by lesson fetched successfully",
                 quizzes.getContent(),
                 meta
+        );
+    }
+
+    @GetMapping("/{quizId}/questions")
+    public ApiResponse<
+            List<QuizQuestionAnswerResponse>
+            > getQuizQuestions(
+
+            @PathVariable Long quizId
+    ) {
+
+        return ResponseFactory.success(
+                "Quiz questions fetched successfully",
+                quizService.getQuizQuestions(
+                        quizId
+                )
         );
     }
 

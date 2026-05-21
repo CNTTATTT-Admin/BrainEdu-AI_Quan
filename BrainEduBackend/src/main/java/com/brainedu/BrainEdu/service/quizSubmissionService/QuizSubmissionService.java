@@ -1,6 +1,7 @@
 package com.brainedu.BrainEdu.service.quizSubmissionService;
 
 import com.brainedu.BrainEdu.dto.request.QuizRequest.SubmitQuizRequest;
+import com.brainedu.BrainEdu.dto.response.QuizResponse.QuizReviewResponse;
 import com.brainedu.BrainEdu.dto.response.QuizSubmissionResponse.QuizSubmissionResponse;
 import org.springframework.data.domain.Page;
 
@@ -17,5 +18,9 @@ public interface QuizSubmissionService {
 
     QuizSubmissionResponse getResult(
             Long id
+    );
+
+    QuizReviewResponse getReview(
+          Long submissionId
     );
 }

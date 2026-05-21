@@ -27,4 +27,12 @@ public interface QuestionRepository
             Long quizId
     );
 
+    int countByQuizId(
+            Long quizId
+    );
+
+    List<Question> findByQuizId(
+            Long quizId
+    );
+
 }

@@ -3,6 +3,7 @@ package com.brainedu.BrainEdu.service.quizSubmissionService;
 import com.brainedu.BrainEdu.config.ApiException;
 import com.brainedu.BrainEdu.dto.request.QuizRequest.SubmitQuizRequest;
 import com.brainedu.BrainEdu.dto.request.SubmitQuizRequest.java.QuizAnswerRequest;
+import com.brainedu.BrainEdu.dto.response.QuizResponse.QuizReviewResponse;
 import com.brainedu.BrainEdu.dto.response.QuizSubmissionResponse.*;
 import com.brainedu.BrainEdu.entity.*;
 import com.brainedu.BrainEdu.mapper.QuizSubmissionMapper;
@@ -148,7 +149,9 @@ public class QuizSubmissionServiceImpl
             userAnswers.add(userAnswer);
         }
 
-        int totalQuestions = quiz.getTotalQuestions();
+        int totalQuestions = questionRepository.countByQuizId(quiz.getId());
+        int answeredQuestions = request.getAnswers().size();
+        int skippedQuestions = totalQuestions - answeredQuestions;
 
         double score =
                 ((double) correctCount
@@ -167,6 +170,14 @@ public class QuizSubmissionServiceImpl
 
         submission.setCorrectAnswers(
                 correctCount
+        );
+
+        submission.setAnsweredQuestions(
+                answeredQuestions
+        );
+
+        submission.setSkippedQuestions(
+                skippedQuestions
         );
 
         submission.setScore(score);
@@ -188,6 +199,185 @@ public class QuizSubmissionServiceImpl
                 .toResponse(
                         savedSubmission
                 );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public QuizReviewResponse getReview(
+            Long submissionId
+    ) {
+
+        User currentUser =
+                currentUserService
+                        .getCurrentUser();
+
+        QuizSubmission submission =
+                quizSubmissionRepository
+                        .findReviewByIdAndUserId(
+                                submissionId,
+                                currentUser.getId()
+                        )
+                        .orElseThrow(
+                                () -> new ApiException(
+                                        "Quiz review not found"
+                                )
+                        );
+
+        List<QuizReviewResponse.QuestionReviewItem>
+                questionItems =
+                submission.getAnswers()
+                        .stream()
+                        .map(userAnswer -> {
+
+                            Question question =
+                                    userAnswer.getQuestion();
+
+                            Answer selectedAnswer =
+                                    userAnswer
+                                            .getSelectedAnswer();
+
+                            Long correctAnswerId =
+                                    question.getAnswers()
+                                            .stream()
+                                            .filter(
+                                                    Answer::getIsCorrect
+                                            )
+                                            .findFirst()
+                                            .map(
+                                                    Answer::getId
+                                            )
+                                            .orElse(null);
+
+                            List<QuizReviewResponse.AnswerItem>
+                                    answerItems =
+                                    question.getAnswers()
+                                            .stream()
+                                            .map(answer ->
+
+                                                    QuizReviewResponse
+                                                            .AnswerItem
+                                                            .builder()
+
+                                                            .id(
+                                                                    answer.getId()
+                                                            )
+
+                                                            .answerText(
+                                                                    answer.getAnswerText()
+                                                            )
+
+                                                            .correct(
+                                                                    answer.getIsCorrect()
+                                                            )
+
+                                                            .selected(
+                                                                    selectedAnswer != null
+                                                                            && answer.getId()
+                                                                            .equals(
+                                                                                    selectedAnswer.getId()
+                                                                            )
+                                                            )
+
+                                                            .build()
+                                            )
+                                            .toList();
+
+                            return QuizReviewResponse
+                                    .QuestionReviewItem
+                                    .builder()
+
+                                    .questionId(
+                                            question.getId()
+                                    )
+
+                                    .questionNumber(
+                                            question.getQuestionOrder()
+                                    )
+
+                                    .questionText(
+                                            question.getQuestionText()
+                                    )
+
+                                    .questionType(
+                                            question.getQuestionType()
+                                    )
+
+                                    .difficultyLevel(
+                                            question.getDifficultyLevel()
+                                    )
+
+                                    .selectedAnswerId(
+                                            selectedAnswer != null
+                                                    ? selectedAnswer.getId()
+                                                    : null
+                                    )
+
+                                    .correctAnswerId(
+                                            correctAnswerId
+                                    )
+
+                                    .isCorrect(
+                                            userAnswer.getIsCorrect()
+                                    )
+
+                                    .answers(
+                                            answerItems
+                                    )
+
+                                    .build();
+                        })
+                        .toList();
+
+        return QuizReviewResponse
+                .builder()
+
+                .submissionId(
+                        submission.getId()
+                )
+
+                .quizId(
+                        submission.getQuiz()
+                                .getId()
+                )
+
+                .quizTitle(
+                        submission.getQuiz()
+                                .getTitle()
+                )
+
+                .score(
+                        submission.getScore()
+                )
+
+                .passed(
+                        submission.getPassed()
+                )
+
+                .totalQuestions(
+                        submission.getTotalQuestions()
+                )
+
+                .correctAnswers(
+                        submission.getCorrectAnswers()
+                )
+
+                .answeredQuestions(
+                        submission.getAnsweredQuestions()
+                )
+
+                .skippedQuestions(
+                        submission.getSkippedQuestions()
+                )
+
+                .submittedAt(
+                        submission.getSubmittedAt()
+                )
+
+                .questions(
+                        questionItems
+                )
+
+                .build();
     }
 
     @Override

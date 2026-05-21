@@ -20,9 +20,11 @@ public class QuizSubmission {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
+    @JoinColumn(name = "quiz_id")
     private Quiz quiz;
 
     private Integer totalQuestions;
@@ -39,7 +41,13 @@ public class QuizSubmission {
 
     @OneToMany(
             mappedBy = "quizSubmission",
-            cascade = CascadeType.ALL
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     private List<UserAnswer> answers;
+
+    private Integer answeredQuestions;
+
+    private Integer skippedQuestions;
+
 }

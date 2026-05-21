@@ -24,6 +24,11 @@ public interface QuizService {
             int size
     );
 
+    List<QuizQuestionAnswerResponse>
+    getQuizQuestions(
+            Long quizId
+    );
+
     QuizResponse update(
             Long id,
             QuizRequest request

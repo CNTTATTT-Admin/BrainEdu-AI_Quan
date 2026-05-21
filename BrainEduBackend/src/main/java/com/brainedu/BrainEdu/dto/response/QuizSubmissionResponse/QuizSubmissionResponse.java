@@ -21,6 +21,10 @@ public class QuizSubmissionResponse {
 
     private Double score;
 
+    private Integer answeredQuestions;
+
+    private Integer skippedQuestions;
+
     private Boolean passed;
 
     private Long durationSeconds;

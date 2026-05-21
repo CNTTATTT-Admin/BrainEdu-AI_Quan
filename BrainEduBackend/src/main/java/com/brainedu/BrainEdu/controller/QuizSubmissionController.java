@@ -4,6 +4,7 @@ import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.common.response.PaginationMeta;
 import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.QuizRequest.SubmitQuizRequest;
+import com.brainedu.BrainEdu.dto.response.QuizResponse.QuizReviewResponse;
 import com.brainedu.BrainEdu.dto.response.QuizSubmissionResponse.*;
 import com.brainedu.BrainEdu.service.quizSubmissionService.*;
 import jakarta.validation.Valid;
@@ -85,4 +86,18 @@ public class QuizSubmissionController {
                 )
         );
     }
+
+    @GetMapping("/{id}/review")
+    public ApiResponse<QuizReviewResponse>
+    getReview(
+            @PathVariable Long id
+    ) {
+        return ResponseFactory.success(
+                "Quiz review fetched successfully",
+                quizSubmissionService .getReview(
+                        id
+                )
+        );
+    }
 }
+

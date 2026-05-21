@@ -5,6 +5,9 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.util.List;
+import java.util.Set;
+
 @Entity
 @Table(name = "questions")
 @SQLDelete(sql = """
@@ -45,9 +48,21 @@ public class Question extends BaseEntity{
     @Column(name = "difficulty_level")
     private String difficultyLevel;
 
+    private Integer questionOrder;
+
     @Column(name = "question_type")
     private String questionType;
 
     @Column(name = "weight_score")
     private Float weightScore;
+
+
+    @OneToMany(
+            mappedBy = "question",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY
+    )
+    @OrderBy("id ASC")
+    private Set<Answer> answers;
+
 }

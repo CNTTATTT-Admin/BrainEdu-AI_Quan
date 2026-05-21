@@ -36,7 +36,34 @@ export type QuizSubmissionResponse = {
     totalQuestions: Number,
     correctAnswers: Number,
     score: Number,
+    answeredQuestions: Number,
+    skippedQuestions: Number,
     passed: Boolean,
     durationSeconds: Number,
     submittedAt: String
+}
+
+export type QuestionQuizReviewResponse = {
+    questionId: Number,
+    questionNumber: Number,
+    questionText: String,
+    questionType: String,
+    difficultyLevel: String,
+    selectedAnswerId: Number | null,
+    correctAnswerId: Number,
+    isCorrect: Boolean,
+    answers: AnswerResponse[]
+}
+
+
+export type QuizReviewResponse = {
+    submissionId: Number,
+    quizId: Number,
+    quizTitle: String,
+    score: Number,
+    passed: Boolean,
+    totalQuestions: Number,
+    correctAnswers: Number,
+    skippedQuestions: Number,
+    questions: QuestionQuizReviewResponse[]
 }
