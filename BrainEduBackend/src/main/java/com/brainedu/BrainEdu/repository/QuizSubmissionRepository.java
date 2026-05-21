@@ -29,6 +29,7 @@ public interface QuizSubmissionRepository
     @Query("""
         SELECT DISTINCT qs
         FROM QuizSubmission qs
+        LEFT JOIN FETCH qs.quiz qz
         LEFT JOIN FETCH qs.answers ua
         LEFT JOIN FETCH ua.question q
         LEFT JOIN FETCH ua.selectedAnswer sa

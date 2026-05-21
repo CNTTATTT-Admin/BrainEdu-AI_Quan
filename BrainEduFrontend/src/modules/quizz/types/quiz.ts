@@ -17,5 +17,6 @@ export interface ReviewQuestionType {
 
 export interface SidebarQuestion {
   id: number;
+  isCorrect: Boolean,
   status: 'correct' | 'wrong' | 'skipped' | 'current';
 }

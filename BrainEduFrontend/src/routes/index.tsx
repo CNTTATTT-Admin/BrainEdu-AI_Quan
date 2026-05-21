@@ -8,6 +8,7 @@ import { ProtectedRoute } from "../services/middeware";
 import { rootRouter } from "../modules/root/routes";
 import { courseRouter } from "../modules/course/routes";
 import { quizzRouter } from "../modules/quizz/routes";
+import { pathwayRouter } from "../modules/roadmap/routes";
 // eslint-disable-next-line react-refresh/only-export-components
 const AuthLayoutWithSuspense = () => (
   <Suspense fallback={<Fallback />}>
@@ -25,7 +26,8 @@ const router = createBrowserRouter([
         children: [
           ...rootRouter,
           ...courseRouter,
-          ...quizzRouter
+          ...quizzRouter,
+          ...pathwayRouter
         ]
       }
     ]

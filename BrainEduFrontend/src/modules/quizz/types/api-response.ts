@@ -55,6 +55,11 @@ export type QuestionQuizReviewResponse = {
     answers: AnswerResponse[]
 }
 
+export type QuestionStatus = {
+    id: Number,
+    status: 'correct' | 'wrong' | 'skipped';
+}
+
 
 export type QuizReviewResponse = {
     submissionId: Number,

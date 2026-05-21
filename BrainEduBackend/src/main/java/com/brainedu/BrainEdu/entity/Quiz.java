@@ -5,6 +5,8 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.util.List;
+
 @Entity
 @Table(name = "quizzes")
 @SQLDelete(sql = """
@@ -44,4 +46,12 @@ public class Quiz extends BaseEntity{
 
     @Column(name = "passing_score")
     private Float passingScore;
+
+    @OneToMany(
+            mappedBy = "quiz",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY
+    )
+    @OrderBy("questionOrder ASC")
+    private List<Question> questions;
 }

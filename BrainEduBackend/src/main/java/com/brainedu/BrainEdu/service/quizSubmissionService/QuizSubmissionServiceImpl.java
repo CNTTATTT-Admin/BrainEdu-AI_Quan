@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -223,18 +224,35 @@ public class QuizSubmissionServiceImpl
                                 )
                         );
 
-        List<QuizReviewResponse.QuestionReviewItem>
-                questionItems =
+        Quiz quiz =
+                submission.getQuiz();
+
+        Map<Long, UserAnswer> userAnswerMap =
                 submission.getAnswers()
                         .stream()
-                        .map(userAnswer -> {
+                        .collect(
+                                Collectors.toMap(
+                                        ua -> ua.getQuestion()
+                                                .getId(),
+                                        ua -> ua
+                                )
+                        );
 
-                            Question question =
-                                    userAnswer.getQuestion();
+        List<QuizReviewResponse.QuestionReviewItem>
+                questionItems =
+                quiz.getQuestions()
+                        .stream()
+                        .map(question -> {
+
+                            UserAnswer userAnswer =
+                                    userAnswerMap.get(
+                                            question.getId()
+                                    );
 
                             Answer selectedAnswer =
-                                    userAnswer
-                                            .getSelectedAnswer();
+                                    userAnswer != null
+                                            ? userAnswer.getSelectedAnswer()
+                                            : null;
 
                             Long correctAnswerId =
                                     question.getAnswers()
@@ -317,7 +335,9 @@ public class QuizSubmissionServiceImpl
                                     )
 
                                     .isCorrect(
-                                            userAnswer.getIsCorrect()
+                                            userAnswer != null
+                                                    ? userAnswer.getIsCorrect()
+                                                    : false
                                     )
 
                                     .answers(
@@ -336,13 +356,11 @@ public class QuizSubmissionServiceImpl
                 )
 
                 .quizId(
-                        submission.getQuiz()
-                                .getId()
+                        quiz.getId()
                 )
 
                 .quizTitle(
-                        submission.getQuiz()
-                                .getTitle()
+                        quiz.getTitle()
                 )
 
                 .score(

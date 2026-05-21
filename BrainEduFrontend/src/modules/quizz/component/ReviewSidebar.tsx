@@ -1,14 +1,14 @@
 import React from 'react';
 import { Share2, ArrowRight, RefreshCw, ChevronRight } from 'lucide-react';
-import type { SidebarQuestion } from '../types/quiz';
 import StatSummary from './StatSummary';
+import type { QuestionStatus } from '../types/api-response';
 
 interface ReviewSidebarProps {
   score: number;
   correctCount: number;
   wrongCount: number;
   skippedCount: number;
-  questions: SidebarQuestion[];
+  questions: QuestionStatus[];
   activeId: number;
   onSelectQuestion: (id: number) => void;
 }
@@ -18,12 +18,11 @@ const ReviewSidebar: React.FC<ReviewSidebarProps> = ({
   correctCount,
   wrongCount,
   skippedCount,
-  questions,
+  questions = [],
   activeId,
   onSelectQuestion,
 }) => {
-  const scoreOutOfTen = (score / 100) * 10;
-
+  const scoreOutOfTen = score ? (score / 100) * 10 : 0;
   return (
     <div className="lg:col-span-4 space-y-6">
       
@@ -49,26 +48,28 @@ const ReviewSidebar: React.FC<ReviewSidebarProps> = ({
         </div>
 
         <div className="grid grid-cols-5 gap-2.5">
-          {questions.map((item) => {
-            let btnClass = 'bg-white border-gray-200 text-gray-400';
-            
-            if (item.status === 'correct') {
-              btnClass = 'bg-green-500 border-green-500 text-white font-medium';
-            } else if (item.status === 'wrong') {
-              btnClass = 'bg-red-600 border-red-600 text-white font-medium';
-            } else if (item.status === 'skipped') {
-              btnClass = 'bg-gray-300 border-gray-300 text-white font-medium';
-            } else if (item.id === activeId) {
-              btnClass = 'bg-col-indigo border-[#0052cc] text-[#0052cc] font-black ring-1 ring-[#0052cc]';
+          {questions.map((item, index) => {
+            let bgClass = '';
+            if (item.status === 'skipped') {
+              bgClass = 'bg-gray-300 border-gray-300 text-white font-medium';
+            } else if (item.status === 'correct') {
+              bgClass = 'bg-green-500 border-green-500 text-white font-medium';
+            } else {
+              bgClass = 'bg-red-600 border-red-600 text-white font-medium';
             }
+
+            const isActive = index + 1 === activeId;
+            const activeClass = isActive 
+              ? 'ring-2 ring-offset-2 ring-[#0052cc] border-[#0052cc] scale-105 z-10 font-black' 
+              : '';
 
             return (
               <button
-                key={item.id}
-                onClick={() => onSelectQuestion(item.id)}
-                className={`aspect-square w-full rounded-xl flex items-center justify-center text-xs border transition-all ${btnClass}`}
+                key={item.questionId || index}
+                onClick={() => onSelectQuestion(index + 1)}
+                className={`aspect-square w-full rounded-xl flex items-center justify-center text-xs border transition-all duration-200 ${bgClass} ${activeClass}`}
               >
-                {item.id}
+                {index + 1}
               </button>
             );
           })}
@@ -88,7 +89,7 @@ const ReviewSidebar: React.FC<ReviewSidebarProps> = ({
         <div className="space-y-1 relative z-10">
           <h4 className="text-base font-bold">Cải thiện điểm số?</h4>
           <p className="text-xs text-indigo-100 leading-relaxed">
-            Dựa trên kết quả này, AI Tutor đã chuẩn bị một bài tập riêng cho bạn về phần Tích phân.
+            Dựa trên kết quả này, AI Tutor đã chuẩn bị một bài tập riêng cho bạn về phần kiến thức này.
           </p>
         </div>
         <button className="bg-white text-indigo-700 text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-indigo-50 transition shadow-sm flex items-center gap-1">
