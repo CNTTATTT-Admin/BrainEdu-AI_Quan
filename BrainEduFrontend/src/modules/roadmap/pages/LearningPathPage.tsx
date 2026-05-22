@@ -2,9 +2,60 @@ import React, { useState } from 'react';
 import FilterTabs from '../component/FilterTabs';
 import CourseSection from '../component/CourseSection';
 import CourseCard from '../component/CourseCard';
+import { useNavigate } from 'react-router-dom';
+import useGetRoadmap from '../hooks/useGetRoadmap';
+
+interface RoadmapItem {
+  id: number;
+  roadmapName: string;
+  description: string;
+  level: string;
+  categoryId: number;
+  categoryName: string;
+}
 
 const LearningPathPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('all');
+  const navigate = useNavigate();
+
+  const { data: roadmapData, isPending: roadmapPending } = useGetRoadmap();
+  const roadmaps: RoadmapItem[] = roadmapData?.data || [];
+
+  const mapLevel = (level: string): 'Cơ bản' | 'Trung cấp' | 'Chuyên nghiệp' => {
+    switch (level?.toUpperCase()) {
+      case 'BEGINNER':
+        return 'Cơ bản';
+      case 'INTERMEDIATE':
+        return 'Trung cấp';
+      case 'ADVANCED':
+      case 'PROFESSIONAL':
+        return 'Chuyên nghiệp';
+      default:
+        return 'Trung cấp';
+    }
+  };
+
+  const getFallbackImage = (categoryName: string) => {
+    const name = categoryName?.toLowerCase() || '';
+    if (name.includes('java') || name.includes('backend') || name.includes('lập trình')) {
+      return 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500';
+    }
+    return 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=500';
+  };
+
+  const filteredRoadmaps = roadmaps.filter((item) => {
+    if (activeTab === 'all') return true;
+    return item.categoryName?.toLowerCase() === activeTab?.toLowerCase();
+  });
+
+  const groupedRoadmaps = filteredRoadmaps.reduce<Record<string, RoadmapItem[]>>((acc, item) => {
+    const groupName = item.categoryName || 'Khác';
+    if (!acc[groupName]) {
+      acc[groupName] = [];
+    }
+    acc[groupName].push(item);
+    return acc;
+  }, {});
 
   return (
     <div className="min-h-screen bg-[#f8fafc] font-sans antialiased flex flex-col">
@@ -21,57 +72,37 @@ const LearningPathPage: React.FC = () => {
 
         <FilterTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
-        <CourseSection title="Phát triển Phần mềm" type="software">
-          <CourseCard
-            image="https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=500"
-            level="Cơ bản"
-            title="Trở thành Web Developer từ con số 0"
-            description="Lộ trình toàn diện từ HTML/CSS đến các framework hiện đại như React và Node.js ch..."
-            totalCourses={12}
-            totalHours={45}
-            onAction={() => console.log('Explore Web')}
-          />
-          <CourseCard
-            image="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500"
-            level="Trung cấp"
-            title="Chuyên gia Backend với Python & Django"
-            description="Xây dựng hệ thống quy mô lớn, tối ưu cơ sở dữ liệu và triển khai API chuyên nghiệp với..."
-            totalCourses={4}
-            totalHours={10}
-            progress={{ percentage: 35, completedCount: 4, totalCount: 10 }}
-            onAction={() => console.log('Continue Backend')}
-          />
-          <CourseCard
-            image="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=500"
-            level="Chuyên nghiệp"
-            title="Phát triển Mobile App đa nền tảng"
-            description="Làm chủ Flutter và React Native để tạo ra các ứng dụng mượt mà trên cả iOS và Android."
-            totalCourses={15}
-            totalHours={60}
-            onAction={() => console.log('Explore Mobile')}
-          />
-        </CourseSection>
-
-        <CourseSection title="Kỹ năng Thiết kế & Sáng tạo" type="design">
-          <CourseCard
-            image="https://images.unsplash.com/photo-1561070791-26c113006238?w=500"
-            level="Chuyên nghiệp"
-            title="UI/UX Design Professional"
-            description="Làm chủ quy trình thiết kế sản phẩm từ nghiên cứu người dùng đến tạo mẫu thử tương tác..."
-            totalCourses={10}
-            totalHours={50}
-            onAction={() => console.log('Explore UIUX')}
-          />
-          <CourseCard
-            image="https://images.unsplash.com/photo-1626785774573-4b799315345d?w=500"
-            level="Cơ bản"
-            title="Graphic Design Essentials"
-            description="Xây dựng nền tảng vững chắc về tư duy thẩm mỹ, màu sắc, bố cục và sử dụng thành thạo ..."
-            totalCourses={8}
-            totalHours={32}
-            onAction={() => console.log('Explore Graphic')}
-          />
-        </CourseSection>
+        {roadmapPending ? (
+          <div className="flex flex-col items-center justify-center py-20 gap-3">
+            <div className="w-10 h-10 border-4 border-[#0052cc] border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-sm font-semibold text-gray-500">Đang tải danh sách lộ trình...</p>
+          </div>
+        ) : Object.keys(groupedRoadmaps).length === 0 ? (
+          <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
+            <p className="text-gray-500 font-medium">Không tìm thấy lộ trình học tập nào.</p>
+          </div>
+        ) : (
+          Object.entries(groupedRoadmaps).map(([categoryName, items]) => (
+            <CourseSection 
+              key={categoryName} 
+              title={categoryName} 
+              type={categoryName.toLowerCase().includes('thiết kế') ? 'design' : 'software'}
+            >
+              {items.map((item) => (
+                <CourseCard
+                  key={item.id}
+                  image={getFallbackImage(item.categoryName)}
+                  level={mapLevel(item.level)}
+                  title={item.roadmapName}
+                  description={item.description}
+                  totalCourses={0}
+                  totalHours={0}
+                  onAction={() => navigate(`/roadmap/detail`, { state: { roadmapId: item.id } })}
+                />
+              ))}
+            </CourseSection>
+          ))
+        )}
 
       </main>
 

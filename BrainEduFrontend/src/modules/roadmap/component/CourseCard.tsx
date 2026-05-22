@@ -1,5 +1,6 @@
 import React from 'react';
 import { BookOpen, Clock } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface CourseCardProps {
   image: string;
@@ -31,7 +32,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
     'Trung cấp': 'bg-amber-600 text-white',
     'Chuyên nghiệp': 'bg-indigo-600 text-white',
   };
-
+  
   return (
     <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col h-full">
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-gray-900">

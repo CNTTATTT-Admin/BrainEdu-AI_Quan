@@ -8,6 +8,7 @@ const Header = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { data: currentUser, isPending } = useGetMe();
+  
   const { mutate: logout } = useLogout()
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

@@ -1,28 +1,25 @@
-import {AsyncStorageUtils} from './AsyncStorageUtils'
-import env from "../config/envConfig";
-
 export const setToken = (token: string) => {
-    AsyncStorageUtils.save(env.tokenKey, token)
-}
+    localStorage.setItem(import.meta.env.VITE_TOKEN_KEY || "access_token", token);
+};
 
 export const getToken = () => {
-    const token =  AsyncStorageUtils.get(env?.tokenKey)
-    return token
-}
+    const token = localStorage.getItem(import.meta.env.VITE_TOKEN_KEY || "access_token");
+    return token;
+};
 
 export const setRefreshToken = (refreshToken: string) => {
-    AsyncStorageUtils.save(env.refreshTokenKey, refreshToken)
-}
+    localStorage.setItem(import.meta.env.VITE_REFRESH_TOKEN_KEY || "refresh_token", refreshToken);
+};
 
 export const getRefreshToken = () => {
-    const refreshToken =  AsyncStorageUtils.get(env?.refreshTokenKey)
-    return refreshToken
-}
+    const refreshToken = localStorage.getItem(import.meta.env.VITE_REFRESH_TOKEN_KEY || "refresh_token");
+    return refreshToken;
+};
 
 export const removeToken = () => {
-    AsyncStorageUtils.remove(env.tokenKey)
-}
+    localStorage.removeItem(import.meta.env.VITE_TOKEN_KEY || "access_token");
+};
 
 export const removeRefreshToken = () => {
-    AsyncStorageUtils.remove(env.refreshTokenKey)
-}
+    localStorage.removeItem(import.meta.env.VITE_REFRESH_TOKEN_KEY || "refresh_token");
+};

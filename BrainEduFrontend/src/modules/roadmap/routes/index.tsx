@@ -5,5 +5,9 @@ export const pathwayRouter: RouteObject[] = [
   {
     path: "/pathways",
     lazy: lazyLoad(() => import("../pages/LearningPathPage"))
+  },
+  {
+    path: "roadmap/detail",
+    lazy: lazyLoad(() => import("../pages/RoadmapDetailPage"))
   }
 ];
