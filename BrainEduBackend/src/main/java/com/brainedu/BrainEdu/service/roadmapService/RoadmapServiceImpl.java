@@ -109,12 +109,12 @@ public class RoadmapServiceImpl
     }
 
     @Override
-    @Transactional(readOnly = true)
-    @Cacheable(
-            value = CacheNames.ROADMAPS,
-            key = "'id:' + #id",
-            sync = true
-    )
+//     @Transactional(readOnly = true)
+//     @Cacheable(
+//             value = CacheNames.ROADMAPS,
+//             key = "'id:' + #id",
+//             sync = true
+//     )
     public RoadmapResponse getById(
             Long id
     ) {
