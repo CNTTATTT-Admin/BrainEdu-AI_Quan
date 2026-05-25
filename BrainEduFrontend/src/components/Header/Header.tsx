@@ -44,10 +44,9 @@ const Header = () => {
         <nav className="flex items-center gap-6 text-sm font-medium text-gray-600">
           <NavLink to="/quizz" className={({ isActive }) => isActive ? "text-[#0052cc] relative py-5 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-[#0052cc]" : "hover:text-gray-900 transition-colors py-5"}>
             Khóa học
-
           </NavLink>
-
           <NavLink to="/pathways">Lộ trình</NavLink>
+          <NavLink to="/personal-roadmap">Lộ trình cá nhân</NavLink>
           <NavLink to="/community">Cộng đồng</NavLink>
           <NavLink to="/support">Hỗ trợ</NavLink>
         </nav>

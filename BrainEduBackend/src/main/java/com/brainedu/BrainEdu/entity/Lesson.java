@@ -42,11 +42,13 @@ public class Lesson extends BaseEntity {
     @Column(name = "video_url")
     private String videoUrl;
 
+    private String lessonType;
+
     @Column(name = "lesson_order")
     private Integer lessonOrder;
 
     @Column(name = "estimated_time")
     private Integer estimatedTime;
 
-    private String difficulty;
+    private Float difficultyScore;
 }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import FilterTabs from '../component/FilterTabs';
-import CourseSection from '../component/CourseSection';
-import CourseCard from '../component/CourseCard';
+import FilterTabs from '../component/Normal/FilterTabs';
+import CourseSection from '../component/Normal/CourseSection';
+import CourseCard from '../component/Normal/CourseCard';
 import { useNavigate } from 'react-router-dom';
 import useGetRoadmap from '../hooks/useGetRoadmap';
 

@@ -9,5 +9,9 @@ export const pathwayRouter: RouteObject[] = [
   {
     path: "roadmap/detail",
     lazy: lazyLoad(() => import("../pages/RoadmapDetailPage"))
+  },
+  {
+    path: "personal-roadmap",
+    lazy: lazyLoad(() => import("../pages/PersonalRoadmapPage"))
   }
 ];

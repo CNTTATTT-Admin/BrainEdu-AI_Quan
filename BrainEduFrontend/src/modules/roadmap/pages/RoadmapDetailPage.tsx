@@ -1,11 +1,11 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import RoadmapHeader from '../component/RoadmapHeader';
-import ProgressCard from '../component/ProgressCard';
-import LessonItem from '../component/LessonItem';
-import ProgressWidget from '../component/ProgressWidget';
-import AiMentorWidget from '../component/AIMentorWidget';
-import StatsWidget from '../component/StatsWidget';
+import RoadmapHeader from '../component/Normal/RoadmapHeader';
+import ProgressCard from '../component/Normal/ProgressCard';
+import LessonItem from '../component/Normal/LessonItem';
+import ProgressWidget from '../component/Normal/ProgressWidget';
+import AiMentorWidget from '../component/Normal/AIMentorWidget';
+import StatsWidget from '../component/Normal/StatsWidget';
 import useGetRoadmapDetail from '../hooks/useGetRoadmapDetail';
 
 // const useGetRoadmapDetail = (id: number) => {

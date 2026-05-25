@@ -80,6 +80,12 @@ public class User extends BaseEntity implements UserDetails  {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    private String careerGoal;
+
+    private String preferredLevel;
+
+    private String interests;
+
     // =========================
     // SPRING SECURITY
     // =========================

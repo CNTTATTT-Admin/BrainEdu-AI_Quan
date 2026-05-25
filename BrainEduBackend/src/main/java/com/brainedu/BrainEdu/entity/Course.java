@@ -59,6 +59,12 @@ public class Course extends BaseEntity {
     @JoinColumn(name = "instructor_id")
     private User instructor;
 
+    @Column(name = "short_description")
+    private String shortDescription;
+
+    @Column(name = "tags")
+    private String tags;
+
     // thêm price nếu muốn bán course
     private Float price;
 
