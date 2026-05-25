@@ -9,7 +9,7 @@ import java.util.List;
 public interface CourseService {
 
     CourseResponse create(
-            CourseRequest request
+            CreateCourseRequest request
     );
 
     Page<CourseResponse> getAll(int page, int size);

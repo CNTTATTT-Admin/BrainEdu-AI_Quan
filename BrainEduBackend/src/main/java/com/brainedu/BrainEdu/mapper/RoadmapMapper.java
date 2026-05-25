@@ -1,5 +1,6 @@
 package com.brainedu.BrainEdu.mapper;
 
+import com.brainedu.BrainEdu.dto.response.RoadmapResponse.RoadmapDetailResponse;
 import com.brainedu.BrainEdu.dto.response.RoadmapResponse.RoadmapResponse;
 import com.brainedu.BrainEdu.entity.Roadmap;
 import org.mapstruct.Mapper;
@@ -20,4 +21,8 @@ public interface RoadmapMapper {
     RoadmapResponse toResponse(
             Roadmap roadmap
     );
+    RoadmapDetailResponse toDetailResponse(
+        Roadmap roadmap
+    );
+
 }

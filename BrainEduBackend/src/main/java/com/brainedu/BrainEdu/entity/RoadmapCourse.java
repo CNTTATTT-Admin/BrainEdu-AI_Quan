@@ -26,9 +26,12 @@ public class RoadmapCourse {
     @JoinColumn(name = "course_id")
     private Course course;
 
-    @Column(name = "course_order")
-    private Integer courseOrder;
+    @Column(name = "order_index")
+    private Integer orderIndex;
 
-    @Column(name = "is_required")
-    private Boolean isRequired;
+    @Column(name = "required_course")
+    private Boolean requiredCourse;
+
+    @Column(name = "estimated_week")
+    private Integer estimatedWeek;
 }

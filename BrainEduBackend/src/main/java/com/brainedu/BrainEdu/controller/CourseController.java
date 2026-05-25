@@ -4,6 +4,7 @@ import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.common.response.PaginationMeta;
 import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.CourseRequest.CourseRequest;
+import com.brainedu.BrainEdu.dto.request.CourseRequest.CreateCourseRequest;
 import com.brainedu.BrainEdu.dto.response.CourseResponse.CourseResponse;
 import com.brainedu.BrainEdu.service.courseService.CourseService;
 import jakarta.validation.Valid;
@@ -26,7 +27,7 @@ public class CourseController {
     create(
             @Valid
             @RequestBody
-            CourseRequest request
+            CreateCourseRequest request
     ) {
 
         return ResponseFactory.success(

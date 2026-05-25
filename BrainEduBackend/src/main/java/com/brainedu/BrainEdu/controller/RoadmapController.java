@@ -3,7 +3,10 @@ package com.brainedu.BrainEdu.controller;
 import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.common.response.PaginationMeta;
 import com.brainedu.BrainEdu.common.response.ResponseFactory;
+import com.brainedu.BrainEdu.dto.request.RoadmapRequest.*;
 import com.brainedu.BrainEdu.dto.request.RoadmapRequest.RoadmapRequest;
+import com.brainedu.BrainEdu.dto.response.PagedResponse;
+import com.brainedu.BrainEdu.dto.response.RoadmapResponse.*;
 import com.brainedu.BrainEdu.dto.response.RoadmapResponse.RoadmapResponse;
 import com.brainedu.BrainEdu.service.roadmapService.RoadmapService;
 import jakarta.validation.Valid;
@@ -71,35 +74,52 @@ public class RoadmapController {
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<RoadmapResponse>
-    getById(
-            @PathVariable Long id
-    ) {
+        public ApiResponse<RoadmapDetailResponse>
+        getDetail(
+
+                @PathVariable Long id
+        ) {
 
         return ResponseFactory.success(
-                "Roadmap fetched successfully",
+                "Roadmap detail fetched successfully",
                 roadmapService.getById(id)
         );
     }
 
+        @PostMapping("/{roadmapId}/courses")
+        public ApiResponse<RoadmapDetailResponse>
+        addCourse(
+
+                @PathVariable
+                Long roadmapId,
+
+                @RequestBody
+                AddRoadmapCourseRequest request
+        ) {
+
+        return ResponseFactory.success(
+                "Course added to roadmap successfully",
+                roadmapService.addCourse(
+                        roadmapId,
+                        request
+                )
+        );
+        }
+
+
     @GetMapping("/category/{categoryId}")
-    public ApiResponse<List<RoadmapResponse>>
-    getByCategory(
+    public ApiResponse<List<RoadmapResponse>> getByCategory(
 
             @PathVariable Long categoryId,
 
-            @RequestParam(
-                    defaultValue = "0"
-            )
+            @RequestParam(defaultValue = "0")
             int page,
 
-            @RequestParam(
-                    defaultValue = "10"
-            )
+            @RequestParam(defaultValue = "10")
             int size
     ) {
 
-        Page<RoadmapResponse> roadmaps =
+        PagedResponse<RoadmapResponse> roadmaps =
                 roadmapService.getByCategory(
                         categoryId,
                         page,
@@ -107,9 +127,12 @@ public class RoadmapController {
                 );
 
         PaginationMeta meta =
-                ResponseFactory.pagination(
-                        roadmaps
-                );
+                PaginationMeta.builder()
+                        .page(roadmaps.getPage())
+                        .size(roadmaps.getSize())
+                        .totalElements(roadmaps.getTotalElements())
+                        .totalPages(roadmaps.getTotalPages())
+                        .build();
 
         return ResponseFactory.success(
                 "Roadmaps by category fetched successfully",

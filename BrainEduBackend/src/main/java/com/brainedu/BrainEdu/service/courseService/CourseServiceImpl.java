@@ -40,7 +40,7 @@ public class CourseServiceImpl
 
     @Override
     public CourseResponse create(
-            CourseRequest request
+            CreateCourseRequest request
     ) {
 
         Authentication authentication =

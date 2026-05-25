@@ -3,11 +3,15 @@ package com.brainedu.BrainEdu.service.roadmapService;
 import com.brainedu.BrainEdu.config.ApiException;
 import com.brainedu.BrainEdu.constant.CacheNames;
 import com.brainedu.BrainEdu.dto.request.RoadmapRequest.*;
+import com.brainedu.BrainEdu.dto.response.PagedResponse;
 import com.brainedu.BrainEdu.dto.response.RoadmapResponse.*;
 import com.brainedu.BrainEdu.entity.Category;
+import com.brainedu.BrainEdu.entity.Course;
 import com.brainedu.BrainEdu.entity.Roadmap;
+import com.brainedu.BrainEdu.entity.RoadmapCourse;
 import com.brainedu.BrainEdu.mapper.RoadmapMapper;
 import com.brainedu.BrainEdu.repository.CategoryRepository;
+import com.brainedu.BrainEdu.repository.CourseRepository;
 import com.brainedu.BrainEdu.repository.RoadmapRepository;
 import com.brainedu.BrainEdu.service.roadmapService.*;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +38,8 @@ public class RoadmapServiceImpl
 
     private final CategoryRepository
             categoryRepository;
+    private final CourseRepository
+                courseRepository;
 
     private final RoadmapMapper
             roadmapMapper;
@@ -108,29 +114,96 @@ public class RoadmapServiceImpl
                 );
     }
 
-    @Override
-//     @Transactional(readOnly = true)
-//     @Cacheable(
-//             value = CacheNames.ROADMAPS,
-//             key = "'id:' + #id",
-//             sync = true
-//     )
-    public RoadmapResponse getById(
-            Long id
-    ) {
+        @Override
+        @Transactional(readOnly = true)
+        @Cacheable(
+                value = CacheNames.ROADMAPS,
+                key = "'id:' + #id",
+                sync = true
+        )
+        public RoadmapDetailResponse getById(
+                Long id
+        ) {
 
-        Roadmap roadmap =
-                roadmapRepository.findById(id)
-                        .orElseThrow(
-                                () -> new ApiException(
-                                        "Roadmap not found"
-                                )
-                        );
+    Roadmap roadmap =
+            roadmapRepository
+                    .findDetailById(id)
+                    .orElseThrow(
+                            () -> new ApiException(
+                                    "Roadmap not found"
+                            )
+                    );
 
-        return roadmapMapper.toResponse(
-                roadmap
-        );
-    }
+        List<RoadmapDetailResponse.CourseItem>
+        courses =
+
+        roadmap.getRoadmapCourses()
+                .stream()
+
+                .map((RoadmapCourse roadmapCourse) -> {
+
+                    Course course =
+                            roadmapCourse.getCourse();
+
+                    return RoadmapDetailResponse
+                            .CourseItem
+                            .builder()
+
+                            .id(course.getId())
+
+                            .title(course.getTitle())
+
+                            .description(
+                                    course.getDescription()
+                            )
+
+                            .build();
+                })
+
+                .toList();
+
+
+    return RoadmapDetailResponse
+            .builder()
+
+            .id(
+                    roadmap.getId()
+            )
+
+            .roadmapName(
+                    roadmap.getRoadmapName()
+            )
+
+            .level(
+                    roadmap.getLevel()
+            )
+
+            .description(
+                    roadmap.getDescription()
+            )
+
+            .categoryId(
+                    roadmap.getCategory()
+                            .getId()
+            )
+
+            .categoryName(
+                    roadmap.getCategory()
+                            .getCategoryName()
+            )
+
+            .totalCourses(
+                    courses.size()
+            )
+
+            .courses(
+                    courses
+            )
+
+            .build();
+}
+
+
 
     @Override
     @Transactional(readOnly = true)
@@ -139,23 +212,26 @@ public class RoadmapServiceImpl
             key = "'category:' + #categoryId + ':' + #page + ':' + #size",
             sync = true
     )
-    public Page<RoadmapResponse> getByCategory(
+    public PagedResponse<RoadmapResponse> getByCategory(
             Long categoryId,
             int page,
             int size
     ) {
 
-        Pageable pageable =
-                PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size);
 
-        return roadmapRepository
-                .findByCategoryId(
-                        categoryId,
-                        pageable
-                )
-                .map(
-                        roadmapMapper::toResponse
-                );
+        Page<RoadmapResponse> result =
+                roadmapRepository
+                        .findByCategoryId(categoryId, pageable)
+                        .map(roadmapMapper::toResponse);
+
+        return new PagedResponse<>(
+                result.getContent(),
+                result.getNumber(),
+                result.getSize(),
+                result.getTotalElements(),
+                result.getTotalPages()
+        );
     }
 
     @Override
@@ -183,6 +259,102 @@ public class RoadmapServiceImpl
                         roadmapMapper::toResponse
                 );
     }
+
+        @Override
+        @CacheEvict(
+                value = CacheNames.ROADMAPS,
+                allEntries = true
+        )
+        public RoadmapDetailResponse addCourse(
+
+                Long roadmapId,
+
+                AddRoadmapCourseRequest request
+        ) {
+
+        Roadmap roadmap =
+                roadmapRepository
+                        .findDetailById(
+                                roadmapId
+                        )
+                        .orElseThrow(
+                                () -> new ApiException(
+                                        "Roadmap not found"
+                                )
+                        );
+
+        Course course =
+                courseRepository
+                        .findById(
+                                request.getCourseId()
+                        )
+                        .orElseThrow(
+                                () -> new ApiException(
+                                        "Course not found"
+                                )
+                        );
+
+        boolean exists =
+                roadmap.getRoadmapCourses()
+                        .stream()
+                        .anyMatch(rc ->
+
+                                rc.getCourse()
+                                        .getId()
+                                        .equals(
+                                                request.getCourseId()
+                                        )
+                        );
+
+        if (exists) {
+
+                throw new ApiException(
+                        "Course already exists in roadmap"
+                );
+        }
+
+        RoadmapCourse roadmapCourse =
+                RoadmapCourse
+                        .builder()
+
+                        .roadmap(
+                                roadmap
+                        )
+
+                        .course(
+                                course
+                        )
+
+                        .orderIndex(
+                                request.getOrderIndex()
+                        )
+
+                        .requiredCourse(
+                                request.getRequiredCourse()
+                        )
+
+                        .estimatedWeek(
+                                request.getEstimatedWeek()
+                        )
+
+                        .build();
+
+        roadmap.getRoadmapCourses()
+                .add(
+                        roadmapCourse
+                );
+
+        Roadmap savedRoadmap =
+                roadmapRepository.save(
+                        roadmap
+                );
+
+        return roadmapMapper
+                .toDetailResponse(
+                        savedRoadmap
+                );
+        }
+
 
     @Override
     @Caching(

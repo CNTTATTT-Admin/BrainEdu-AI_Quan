@@ -2,6 +2,9 @@ package com.brainedu.BrainEdu.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -41,4 +44,13 @@ public class Roadmap extends BaseEntity {
             columnDefinition = "TEXT"
     )
     private String description;
+
+    @OneToMany(
+            mappedBy = "roadmap",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @OrderBy("orderIndex ASC")
+    private List<RoadmapCourse> roadmapCourses;
+
 }

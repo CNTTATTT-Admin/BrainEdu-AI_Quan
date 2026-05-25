@@ -1,6 +1,7 @@
 package com.brainedu.BrainEdu.service.roadmapService;
 
 import com.brainedu.BrainEdu.dto.request.RoadmapRequest.*;
+import com.brainedu.BrainEdu.dto.response.PagedResponse;
 import com.brainedu.BrainEdu.dto.response.RoadmapResponse.*;
 import org.springframework.data.domain.Page;
 
@@ -14,11 +15,11 @@ public interface RoadmapService {
 
     Page<RoadmapResponse> getAll(int page, int size);
 
-    RoadmapResponse getById(
+    RoadmapDetailResponse getById(
             Long id
     );
 
-    Page<RoadmapResponse> getByCategory(
+    PagedResponse<RoadmapResponse> getByCategory(
             Long categoryId,
             int page,
             int size
@@ -34,6 +35,15 @@ public interface RoadmapService {
             Long id,
             RoadmapRequest request
     );
+
+        RoadmapDetailResponse addCourse(
+
+                Long roadmapId,
+
+                AddRoadmapCourseRequest request
+        );
+
+
 
     String delete(
             Long id
