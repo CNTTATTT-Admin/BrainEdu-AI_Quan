@@ -21,12 +21,12 @@ def recommend_roadmap(data: dict):
     return generate_roadmap(data)
 
 
-@router.post("/tutor")
-def tutor(data: dict):
+# @router.post("/tutor")
+# def tutor(data: dict):
 
-    question = data.get(
-        "question",
-        ""
-    )
+#     question = data.get(
+#         "question",
+#         ""
+#     )
 
-    return ai_tutor(question)
+#     return ai_tutor(question)

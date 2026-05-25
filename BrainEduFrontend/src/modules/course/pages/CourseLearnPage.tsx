@@ -24,6 +24,7 @@ const CourseLearnPage = () => {
   const { data: progressData } = useGetLessonProgressMe();
 
   const lessonList: LessonResponse[] = lessonData?.data || [];
+  console.log(courseId);
   
   const progressList = Array.isArray(progressData?.data) 
     ? progressData.data 

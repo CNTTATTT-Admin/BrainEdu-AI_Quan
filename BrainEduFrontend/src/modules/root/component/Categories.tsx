@@ -1,12 +1,11 @@
 import React from 'react';
 import { Code, Brain, Database, Languages, PenTool, ShieldCheck } from 'lucide-react';
 import useGetCategory from '../hooks/useGetCategory';
+import { NavLink } from 'react-router';
 
 const Categories = () => {
     const { data, isPending } = useGetCategory();
         const categoriesList = data?.data || [];
-    
-    console.log(categoriesList);
   return (
     <section className="w-full py-16 px-8 max-w-7xl mx-auto text-center">
       <h2 className="text-2xl font-bold text-gray-900">Danh mục khóa học</h2>
@@ -16,15 +15,23 @@ const Categories = () => {
         {categoriesList.map((item: any) => {
           const IconComponent = Code;
           return (
-            <div 
-              key={item.id} 
-              className="border border-gray-100 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 bg-white hover:shadow-md transition-shadow cursor-pointer group"
+            <NavLink
+              to="/list-course"
+              state={{
+                categoryId: item.id,
+                categoryName: item.categoryName
+              }}
             >
-              <div className={`w-12 h-12 rounded-xl bg-blue-50! text-blue-600 flex items-center justify-center group-hover:scale-105 transition-transform`}>
-                <IconComponent size={22} />
+              <div 
+                key={item.id} 
+                className="border border-gray-100 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 bg-white hover:shadow-md transition-shadow cursor-pointer group"
+              >
+                <div className={`w-12 h-12 rounded-xl bg-blue-50! text-blue-600 flex items-center justify-center group-hover:scale-105 transition-transform`}>
+                  <IconComponent size={22} />
+                </div>
+                <span className="text-xs font-semibold text-gray-700">{item?.categoryName}</span>
               </div>
-              <span className="text-xs font-semibold text-gray-700">{item?.categoryName}</span>
-            </div>
+            </NavLink>
           );
         })}
       </div>

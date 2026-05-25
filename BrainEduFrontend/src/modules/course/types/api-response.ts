@@ -19,3 +19,16 @@ export type ProgressItem = {
   completed: boolean;
   lastAccessed: string;
 };
+
+export type CourseCategoryResponse = {
+  id: Number,
+  title: String,
+  description: String,
+  level: String,
+  estimatedDuration: Number,
+  thumbnail: String,
+  difficultyScore: Number,
+  price: Number,
+  instructorId: Number,
+  instructorName: String,
+}

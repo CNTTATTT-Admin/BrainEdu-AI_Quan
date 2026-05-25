@@ -8,40 +8,68 @@ from sklearn.metrics.pairwise import (
     cosine_similarity
 )
 
+from app.repositories.course_repository import (
+    get_all_courses
+)
+
 
 model = SentenceTransformer(
     "all-MiniLM-L6-v2"
 )
 
 
-courses_df = pd.read_csv(
-    "datasets/courses.csv"
-)
+cached_courses_df = None
+
+cached_course_embeddings = None
 
 
-course_texts = []
+def load_course_data():
 
-for _, course in courses_df.iterrows():
+    global cached_courses_df
+    global cached_course_embeddings
 
-    text = (
+    if (
 
-        str(course["title"]) + " " +
+        cached_courses_df is None or
 
-        str(course["category"]) + " " +
+        cached_course_embeddings is None
+    ):
 
-        str(course["tags"]) + " " +
+        courses_df = get_all_courses()
 
-        str(course["career_track"]) + " " +
+        course_texts = []
 
-        str(course["level"])
+        for _, course in courses_df.iterrows():
+
+            text = (
+
+                str(course["title"]) + " " +
+
+                str(course["description"]) + " " +
+
+                str(course["category"]) + " " +
+
+                str(course["skills"]) + " " +
+
+                str(course["level"])
+            )
+
+            course_texts.append(text)
+
+        course_embeddings = model.encode(
+            course_texts
+        )
+
+        cached_courses_df = courses_df
+
+        cached_course_embeddings = (
+            course_embeddings
+        )
+
+    return (
+        cached_courses_df,
+        cached_course_embeddings
     )
-
-    course_texts.append(text)
-
-
-course_embeddings = model.encode(
-    course_texts
-)
 
 
 def build_user_profile(data):
@@ -86,7 +114,14 @@ def build_user_profile(data):
     return " ".join(profile)
 
 
-def score_courses(user_profile):
+def score_courses(
+
+    user_profile,
+
+    courses_df,
+
+    course_embeddings
+):
 
     user_embedding = model.encode(
         [user_profile]
@@ -99,9 +134,98 @@ def score_courses(user_profile):
 
     scored_courses = []
 
-    for idx, score in enumerate(similarities):
+    user_profile_lower = (
+        user_profile.lower()
+    )
+
+    for idx, similarity_score in enumerate(similarities):
 
         course = courses_df.iloc[idx]
+
+        final_score = float(
+            similarity_score
+        )
+
+        skills_text = str(
+            course.get("skills", "")
+        ).lower()
+
+        category_text = str(
+            course.get("category", "")
+        ).lower()
+
+        title_text = str(
+            course.get("title", "")
+        ).lower()
+
+        description_text = str(
+            course.get("description", "")
+        ).lower()
+
+        user_keywords = (
+            user_profile_lower.split()
+        )
+
+        # Skill boosting
+
+        skill_matches = 0
+
+        for keyword in user_keywords:
+
+            if keyword in skills_text:
+
+                skill_matches += 1
+
+        final_score += (
+            skill_matches * 0.08
+        )
+
+        # Category boosting
+
+        if any(
+
+            keyword in category_text
+
+            for keyword in user_keywords
+        ):
+
+            final_score += 0.15
+
+        # Title boosting
+
+        if any(
+
+            keyword in title_text
+
+            for keyword in user_keywords
+        ):
+
+            final_score += 0.1
+
+        # Description boosting
+
+        if any(
+
+            keyword in description_text
+
+            for keyword in user_keywords
+        ):
+
+            final_score += 0.05
+
+        # Beginner friendly boost
+
+        if (
+
+            "beginner" in user_profile_lower
+
+            and
+
+            str(course["level"]).lower()
+            == "beginner"
+        ):
+
+            final_score += 0.1
 
         scored_courses.append({
 
@@ -111,42 +235,59 @@ def score_courses(user_profile):
             "title":
                 course["title"],
 
+            "description":
+                course["description"],
+
             "category":
                 course["category"],
+
+            "skills":
+                course.get("skills", ""),
 
             "level":
                 course["level"],
 
-            "career_track":
-                course["career_track"],
+            "difficulty_score":
+                course["difficulty_score"],
 
-            "tags":
-                course["tags"],
+            "estimated_duration":
+                course["estimated_duration"],
 
-            "prerequisites":
-                str(course["prerequisites"]),
+            "semantic_score":
+                round(
+                    float(similarity_score),
+                    4
+                ),
 
-            "score":
-                float(score)
+            "final_score":
+                round(
+                    final_score,
+                    4
+                )
         })
 
     scored_courses.sort(
-        key=lambda x: x["score"],
+
+        key=lambda x: x["final_score"],
+
         reverse=True
     )
 
     return scored_courses
 
-
 def filter_completed_courses(
+
     scored_courses,
+
     completed_courses
 ):
 
     filtered = []
 
     completed_set = {
+
         course.lower()
+
         for course in completed_courses
     }
 
@@ -160,13 +301,18 @@ def filter_completed_courses(
 
 
 def filter_by_level(
+
     courses,
+
     user_level
 ):
 
     level_order = {
+
         "Beginner": 1,
+
         "Intermediate": 2,
+
         "Advanced": 3
     }
 
@@ -191,74 +337,11 @@ def filter_by_level(
     return filtered
 
 
-def resolve_prerequisites(
-    selected_courses
-):
+def build_roadmap(selected_courses):
 
     roadmap = []
 
-    added = set()
-
-    id_to_course = {
-        int(row["id"]): row
-        for _, row in courses_df.iterrows()
-    }
-
-    def add_course(course):
-
-        if course["title"] in added:
-            return
-
-        prerequisites = str(
-            course["prerequisites"]
-        )
-
-        if prerequisites != "nan" and prerequisites != "":
-
-            prerequisite_ids = prerequisites.split(",")
-
-            for prerequisite_id in prerequisite_ids:
-
-                prerequisite_course = id_to_course.get(
-                    int(prerequisite_id)
-                )
-
-                if prerequisite_course is not None:
-
-                    prerequisite_data = {
-
-                        "id":
-                            int(prerequisite_course["id"]),
-
-                        "title":
-                            prerequisite_course["title"],
-
-                        "category":
-                            prerequisite_course["category"],
-
-                        "level":
-                            prerequisite_course["level"],
-
-                        "career_track":
-                            prerequisite_course["career_track"],
-
-                        "tags":
-                            prerequisite_course["tags"],
-
-                        "prerequisites":
-                            str(
-                                prerequisite_course[
-                                    "prerequisites"
-                                ]
-                            ),
-
-                        "score":
-                            1.0
-                    }
-
-                    add_course(
-                        prerequisite_data
-                    )
+    for course in selected_courses:
 
         roadmap.append({
 
@@ -273,23 +356,17 @@ def resolve_prerequisites(
 
             "score":
                 round(
-                    course["score"],
+                    course["final_score"],
                     4
                 )
         })
 
-        added.add(
-            course["title"]
-        )
-
-    for course in selected_courses:
-
-        add_course(course)
-
     return roadmap
-
-
 def generate_roadmap(data):
+
+    courses_df, course_embeddings = (
+        load_course_data()
+    )
 
     user_profile = build_user_profile(
         data
@@ -306,23 +383,34 @@ def generate_roadmap(data):
     )
 
     scored_courses = score_courses(
-        user_profile
+
+        user_profile,
+
+        courses_df,
+
+        course_embeddings
     )
 
     scored_courses = filter_completed_courses(
+
         scored_courses,
+
         completed_courses
     )
 
     scored_courses = filter_by_level(
+
         scored_courses,
+
         user_level
     )
 
     top_courses = scored_courses[:5]
 
-    roadmap = resolve_prerequisites(
-        top_courses
+    roadmap = build_roadmap(
+
+        top_courses,
+
     )
 
     final_roadmap = []

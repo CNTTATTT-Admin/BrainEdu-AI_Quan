@@ -5,5 +5,9 @@ export const courseRouter: RouteObject[] = [
   {
     path: "course",
     lazy: lazyLoad(() => import("../pages/CourseLearnPage"))
+  },
+  {
+    path: "list-course",
+    lazy: lazyLoad(() => import("../pages/CourseByCategory"))
   }
 ];
