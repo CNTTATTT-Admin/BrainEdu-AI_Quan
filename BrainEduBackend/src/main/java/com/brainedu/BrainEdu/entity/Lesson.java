@@ -50,5 +50,8 @@ public class Lesson extends BaseEntity {
     @Column(name = "estimated_time")
     private Integer estimatedTime;
 
+    @Column(name = "difficulty")
+    private String difficulty;
+
     private Float difficultyScore;
 }

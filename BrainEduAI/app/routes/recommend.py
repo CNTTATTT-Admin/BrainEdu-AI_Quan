@@ -1,32 +1,36 @@
-from fastapi import APIRouter
+# app/routes/recommend.py
 
-from app.recommend.roadmap_engine import (
-    generate_roadmap
+from fastapi import (
+    APIRouter,
+    Depends
 )
 
-from app.recommend.tutor_engine import (
-    ai_tutor
+from sqlalchemy.orm import Session
+
+from app.database import get_db
+
+from app.models.request_models import (
+    RoadmapRecommendRequest
 )
 
-
-router = APIRouter(
-    prefix="/recommend",
-    tags=["Recommendation"]
+from app.services.recommendation_service import (
+    RecommendationService
 )
 
-
-@router.post("/roadmap")
-def recommend_roadmap(data: dict):
-
-    return generate_roadmap(data)
+router = APIRouter()
 
 
-# @router.post("/tutor")
-# def tutor(data: dict):
+@router.post("/recommend/roadmap")
+def recommend_roadmap(
+    request: RoadmapRecommendRequest,
+    db: Session = Depends(get_db)
+):
 
-#     question = data.get(
-#         "question",
-#         ""
-#     )
+    result = (
+        RecommendationService
+        .recommend(
+            request.dict()
+        )
+    )
 
-#     return ai_tutor(question)
+    return result

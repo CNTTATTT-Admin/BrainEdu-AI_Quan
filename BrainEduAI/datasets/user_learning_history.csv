@@ -1,5 +1,0 @@
-user_id,course,completion_percent,quiz_score,time_spent_hours,last_activity_days
-1,Java Core,100,85,40,1
-1,SQL Basics,30,40,5,10
-1,Docker Essentials,10,20,2,15
-1,Spring Boot,60,70,20,2

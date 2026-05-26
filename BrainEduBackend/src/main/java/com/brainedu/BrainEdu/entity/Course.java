@@ -65,6 +65,18 @@ public class Course extends BaseEntity {
     @Column(name = "tags")
     private String tags;
 
+    @Column(name = "career_paths")
+    private String careerPaths;
+
+    @Column(name = "domain_keywords")
+    private String domainKeywords;
+
+    @Column(name = "learning_outcomes")
+    private String learningOutcomes;
+
+    @Column(name = "industries")
+    private String industries;
+
     // thêm price nếu muốn bán course
     private Float price;
 
