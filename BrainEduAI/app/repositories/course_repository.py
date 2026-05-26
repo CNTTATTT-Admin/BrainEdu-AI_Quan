@@ -10,28 +10,14 @@ def get_all_courses():
         SELECT
 
             c.id,
-
             c.title,
-
             c.description,
-
-            c.level,
-
-            c.difficulty_score,
-
-            c.estimated_duration,
-
-            c.tags,
-
             c.short_description,
-
-            c.career_paths,
-
-            c.domain_keywords,
-
-            c.learning_outcomes,
-
-            c.industries,
+            c.tags,
+            c.level,
+            c.difficulty_score,
+            c.estimated_duration,
+            c.price,
 
             cat.category_name AS category,
 
@@ -53,23 +39,24 @@ def get_all_courses():
         FROM courses c
 
         LEFT JOIN categories cat
-        ON c.category_id = cat.id
+            ON cat.id = c.category_id
+
+        LEFT JOIN course_skills cs
+            ON cs.course_id = c.id
 
         LEFT JOIN skills s
-        ON s.category_id = c.category_id
+            ON s.id = cs.skill_id
 
         LEFT JOIN lessons l
-        ON l.course_id = c.id
+            ON l.course_id = c.id
 
         LEFT JOIN quizzes q
-        ON q.course_id = c.id
+            ON q.course_id = c.id
 
         WHERE c.deleted = 0
 
         GROUP BY c.id
+
     """
 
-    return pd.read_sql(
-        query,
-        con=engine
-    )
+    return pd.read_sql(query, con=engine)

@@ -1,5 +1,24 @@
 class LearningStyleEngine:
 
+    STYLE_MAPPING = {
+
+        "hands_on": [
+            "project",
+            "lab",
+            "practice"
+        ],
+
+        "video_based": [
+            "video",
+            "visual"
+        ],
+
+        "reading": [
+            "article",
+            "documentation"
+        ]
+    }
+
     @staticmethod
     def calculate_learning_style_bonus(
         preferred_style,
@@ -13,26 +32,18 @@ class LearningStyleEngine:
             )
         ).lower()
 
-        if (
-            preferred_style
-            == "hands_on"
-        ):
+        keywords = (
+            LearningStyleEngine
+            .STYLE_MAPPING
+            .get(
+                preferred_style,
+                []
+            )
+        )
 
-            if (
-                "project" in tags
-                or
-                "lab" in tags
-            ):
-                return 0.15
+        for keyword in keywords:
 
-        if (
-            preferred_style
-            == "theory"
-        ):
-
-            if (
-                "theory" in tags
-            ):
-                return 0.15
+            if keyword in tags:
+                return 0.08
 
         return 0

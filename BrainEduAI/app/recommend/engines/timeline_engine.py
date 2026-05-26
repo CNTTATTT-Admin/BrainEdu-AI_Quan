@@ -6,13 +6,17 @@ class TimelineEngine:
         course_duration
     ):
 
-        if course_duration is None:
+        if (
+            course_duration is None
+            or target_months is None
+        ):
             return 0
 
-        if (
-            target_months <= 3
-            and course_duration < 20
-        ):
-            return 0.10
+        estimated_per_month = (
+            course_duration / 4
+        )
+
+        if estimated_per_month <= target_months:
+            return 0.05
 
         return 0

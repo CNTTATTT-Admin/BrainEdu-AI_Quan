@@ -1,38 +1,22 @@
 class DiversityEngine:
 
     @staticmethod
-    def apply_diversity_penalty(
-        ranked_courses
+    def calculate_diversity_bonus(
+        ranked,
+        course
     ):
 
-        category_count = {}
+        categories = [
 
-        for course in ranked_courses:
+            item["category"]
 
-            category = course[
-                "category"
-            ]
+            for item in ranked
+        ]
 
-            if (
-                category
-                not in category_count
-            ):
-                category_count[
-                    category
-                ] = 0
+        if (
+            course["category"]
+            not in categories
+        ):
+            return 0.015
 
-            category_count[
-                category
-            ] += 1
-
-            if (
-                category_count[
-                    category
-                ] > 3
-            ):
-
-                course[
-                    "match_score"
-                ] -= 0.10
-
-        return ranked_courses
+        return 0

@@ -1,9 +1,3 @@
-from sklearn.metrics.pairwise import cosine_similarity
-
-from app.recommend.embedding_service import (
-    EmbeddingService
-)
-
 class SkillGapEngine:
 
     @staticmethod
@@ -15,21 +9,18 @@ class SkillGapEngine:
         if not course_skills:
             return 0
 
-        bonus = 0
+        weak_skills = []
 
-        for skill in course_skills:
+        for skill, score in user_skills.items():
 
-            skill_lower = (
-                skill.lower()
-            )
+            if score <= 4:
+                weak_skills.append(skill.lower())
 
-            if skill_lower in user_skills:
+        matched = 0
 
-                level = user_skills[
-                    skill_lower
-                ]
+        for skill in weak_skills:
 
-                if level <= 4:
-                    bonus += 0.05
+            if skill in " ".join(course_skills).lower():
+                matched += 1
 
-        return bonus
+        return matched * 0.1

@@ -1,5 +1,3 @@
-# app/repositories/roadmap_repository.py
-
 import pandas as pd
 
 from app.database import engine
@@ -12,11 +10,8 @@ def get_all_roadmaps():
         SELECT
 
             r.id,
-
             r.roadmap_name,
-
             r.description,
-
             r.level,
 
             cat.category_name AS category,
@@ -29,7 +24,7 @@ def get_all_roadmaps():
         FROM roadmaps r
 
         LEFT JOIN categories cat
-            ON r.category_id = cat.id
+            ON cat.id = r.category_id
 
         LEFT JOIN roadmap_courses rc
             ON rc.roadmap_id = r.id
@@ -43,7 +38,4 @@ def get_all_roadmaps():
 
     """
 
-    return pd.read_sql(
-        query,
-        con=engine
-    )
+    return pd.read_sql(query, con=engine)

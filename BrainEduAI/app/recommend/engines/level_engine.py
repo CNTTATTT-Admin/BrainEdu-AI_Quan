@@ -1,8 +1,12 @@
 LEVEL_MAPPING = {
+
     "BEGINNER": 1,
+
     "INTERMEDIATE": 2,
+
     "ADVANCED": 3
 }
+
 
 class LevelEngine:
 
@@ -22,8 +26,12 @@ class LevelEngine:
             1
         )
 
-        diff = abs(
-            course_score - user_score
+        diff = (
+            course_score
+            - user_score
         )
 
-        return diff * 0.15
+        if diff <= 0:
+            return 0
+
+        return diff * 0.03

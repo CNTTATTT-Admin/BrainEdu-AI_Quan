@@ -1,33 +1,20 @@
-# app/utils/cache_utils.py
-
 import pickle
 import os
 
-CACHE_FILE = "embedding_cache.pkl"
+CACHE_PATH = "embedding_cache.pkl"
 
 
 def load_embedding_cache():
 
-    if os.path.exists(CACHE_FILE):
+    if not os.path.exists(CACHE_PATH):
+        return {}
 
-        with open(
-            CACHE_FILE,
-            "rb"
-        ) as file:
+    with open(CACHE_PATH, "rb") as f:
+        return pickle.load(f)
 
-            return pickle.load(file)
-
-    return {}
 
 
 def save_embedding_cache(cache):
 
-    with open(
-        CACHE_FILE,
-        "wb"
-    ) as file:
-
-        pickle.dump(
-            cache,
-            file
-        )
+    with open(CACHE_PATH, "wb") as f:
+        pickle.dump(cache, f)

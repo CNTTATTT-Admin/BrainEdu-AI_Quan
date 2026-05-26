@@ -2,9 +2,7 @@ from pydantic import BaseModel
 from typing import List, Dict
 
 
-class RoadmapRecommendRequest(
-    BaseModel
-):
+class RoadmapRecommendRequest(BaseModel):
 
     career_goal: str
 

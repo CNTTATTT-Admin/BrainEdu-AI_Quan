@@ -2,10 +2,6 @@ from app.recommend.engines.semantic_engine import (
     SemanticEngine
 )
 
-from app.recommend.engines.domain_engine import (
-    DomainEngine
-)
-
 from app.recommend.engines.level_engine import (
     LevelEngine
 )
@@ -22,6 +18,10 @@ from app.recommend.engines.learning_style_engine import (
     LearningStyleEngine
 )
 
+from app.recommend.engines.diversity_engine import (
+    DiversityEngine
+)
+
 from app.recommend.engines.timeline_engine import (
     TimelineEngine
 )
@@ -32,10 +32,6 @@ from app.recommend.engines.workload_engine import (
 
 from app.recommend.engines.semantic_weight_engine import (
     SemanticWeightEngine
-)
-
-from app.utils.text_utils import (
-    build_course_text
 )
 
 
@@ -68,48 +64,85 @@ class RankingEngine:
             ]
         ]
 
+        interests = [
+
+            interest.lower()
+
+            for interest in profile[
+                "interests"
+            ]
+        ]
+
+        career_goal = (
+            profile[
+                "career_goal"
+            ]
+            .lower()
+        )
+
         for course in courses:
 
-            if (
+            course_title = (
                 course["title"]
                 .lower()
                 .strip()
+            )
+
+            if (
+                course_title
                 in completed_courses
             ):
                 continue
-
-            course_text = (
-                build_course_text(
-                    course
-                )
-            )
 
             semantic_score = (
                 SemanticEngine
                 .calculate_similarity(
                     user_embedding,
-                    course[
-                        "embedding"
-                    ]
+                    course["embedding"]
                 )
             )
 
-            domain_score = (
-                DomainEngine
-                .calculate_domain_score(
-                    profile[
-                        "career_goal"
-                    ],
-                    course_text
-                )
-            )
+            if semantic_score < 0.20:
+                continue
+
+            keyword_bonus = 0
+
+            for keyword in interests:
+
+                if keyword in course_title:
+                    keyword_bonus += 0.12
+
+            if "ai" in career_goal:
+
+                ai_keywords = [
+
+                    "machine learning",
+
+                    "deep learning",
+
+                    "tensorflow",
+
+                    "neural",
+
+                    "ai",
+
+                    "computer vision",
+
+                    "nlp"
+                ]
+
+                if any(
+                    keyword in course_title
+
+                    for keyword
+                    in ai_keywords
+                ):
+                    keyword_bonus += 0.18
 
             skill_gap_score = (
                 SkillGapEngine
                 .calculate_skill_gap_bonus(
-                    profile[
-                        "skills"
-                    ],
+                    profile["skills"],
                     course.get(
                         "skills",
                         []
@@ -123,6 +156,14 @@ class RankingEngine:
                     profile[
                         "preferred_learning_style"
                     ],
+                    course
+                )
+            )
+
+            diversity_bonus = (
+                DiversityEngine
+                .calculate_diversity_bonus(
+                    ranked,
                     course
                 )
             )
@@ -181,7 +222,7 @@ class RankingEngine:
 
                 +
 
-                domain_score
+                keyword_bonus
 
                 +
 
@@ -190,6 +231,10 @@ class RankingEngine:
                 +
 
                 learning_style_bonus
+
+                +
+
+                diversity_bonus
 
                 +
 

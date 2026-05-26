@@ -1,3 +1,19 @@
+ROADMAP_PREREQUISITES = {
+
+    "deep learning with tensorflow": [
+
+        "machine learning fundamentals"
+    ],
+
+    "mlops and model deployment": [
+
+        "machine learning fundamentals",
+
+        "deep learning with tensorflow"
+    ]
+}
+
+
 class PrerequisiteEngine:
 
     @staticmethod
@@ -6,19 +22,24 @@ class PrerequisiteEngine:
         prerequisites
     ):
 
+        completed = [
+
+            course.lower().strip()
+
+            for course in completed_courses
+        ]
+
         if not prerequisites:
             return 0
 
-        missing = []
+        missing = 0
 
         for prerequisite in prerequisites:
 
-            if prerequisite not in completed_courses:
-                missing.append(
-                    prerequisite
-                )
+            if prerequisite.lower() not in completed:
+                missing += 1
 
-        if len(missing) == 0:
-            return 0
-
-        return len(missing) * 0.15
+        return min(
+            missing * 0.08,
+            0.20
+        )

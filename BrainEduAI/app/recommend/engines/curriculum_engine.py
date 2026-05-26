@@ -4,12 +4,17 @@ class CurriculumEngine:
     def sort_courses(courses):
 
         beginner = []
+
         intermediate = []
+
         advanced = []
 
         for course in courses:
 
-            level = course["level"]
+            level = (
+                course["level"]
+                .upper()
+            )
 
             if level == "BEGINNER":
                 beginner.append(course)

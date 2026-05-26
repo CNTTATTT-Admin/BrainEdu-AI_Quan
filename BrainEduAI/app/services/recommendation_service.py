@@ -22,6 +22,20 @@ from app.utils.text_utils import (
     build_course_text
 )
 
+ROADMAP_PREREQUISITES = {
+
+    "deep learning with tensorflow": [
+
+        "machine learning fundamentals"
+    ],
+
+    "mlops and model deployment": [
+
+        "machine learning fundamentals",
+
+        "deep learning with tensorflow"
+    ]
+}
 
 class RecommendationService:
 
@@ -61,7 +75,7 @@ class RecommendationService:
                 )
             )
 
-            embedding = (
+            course_embedding = (
                 EmbeddingService
                 .create_embedding(
                     course_text
@@ -72,7 +86,7 @@ class RecommendationService:
 
                 **course,
 
-                "embedding": embedding,
+                "embedding": course_embedding,
 
                 "skills": str(
                     course.get(
@@ -81,7 +95,10 @@ class RecommendationService:
                     )
                 ).split(),
 
-                "prerequisites": []
+                "prerequisites": ROADMAP_PREREQUISITES.get(
+                    course["title"].lower(),
+                    []
+                )
             })
 
         ranked_courses = (
@@ -89,7 +106,7 @@ class RecommendationService:
             .rank_courses(
                 user_embedding,
                 prepared_courses,
-                request
+                profile
             )
         )
 
@@ -104,5 +121,6 @@ class RecommendationService:
 
             "user_profile": profile,
 
-            "recommended_roadmap": roadmap
+            "recommended_roadmap":
+                roadmap
         }
