@@ -1,7 +1,7 @@
 import React from 'react';
 import { Star } from 'lucide-react';
 import useGetCourse from '../hooks/useGetCourse';
-import { CoursesResponse } from '../types/api-response';
+import type { CoursesResponse } from '../types/api-response';
 import thumb from "../../../assets/coursethumbnail.png"
 import { NavLink } from 'react-router';
 const FeaturedCourses = () => {
@@ -24,7 +24,9 @@ const FeaturedCourses = () => {
             <NavLink 
                 key={course.id} 
                 to="/course" 
-                state={{ courseId: course.id }}
+                state={{ 
+                  courseId: course.id
+                }}
             >
               <div key={course.id} className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex flex-col cursor-pointer">
                 <div className="h-44 bg-gray-200 relative">

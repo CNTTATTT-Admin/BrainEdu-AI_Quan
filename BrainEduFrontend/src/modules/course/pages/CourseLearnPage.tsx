@@ -5,6 +5,7 @@ import SidebarCourse from '../component/SidebarCourse';
 import { useLocation } from 'react-router';
 import useGetLesson from '../hooks/useGetLesson';
 import useGetLessonProgressMe from '../hooks/useGetLessonProgressMe';
+import { useAnalytics } from '../../../hooks/useAnalytics';
 
 export type LessonResponse = {
   id: number;
@@ -20,11 +21,18 @@ const CourseLearnPage = () => {
   const location = useLocation();
   const { courseId } = location.state || {};
 
+  const { trackEvent } = useAnalytics()
+
+  useEffect(() => {
+    trackEvent('course_view', {
+      courseId: courseId
+    });
+  }, [courseId, trackEvent]);
+
   const { data: lessonData } = useGetLesson(courseId);
   const { data: progressData } = useGetLessonProgressMe();
 
   const lessonList: LessonResponse[] = lessonData?.data || [];
-  console.log(courseId);
   
   const progressList = Array.isArray(progressData?.data) 
     ? progressData.data 
