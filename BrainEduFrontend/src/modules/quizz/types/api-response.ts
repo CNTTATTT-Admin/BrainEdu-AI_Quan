@@ -72,3 +72,17 @@ export type QuizReviewResponse = {
     skippedQuestions: Number,
     questions: QuestionQuizReviewResponse[]
 }
+
+export type MyResultResponse = {
+    id: Number,
+    quizId: Number,
+    quizTitle: String,
+    totalQuestions: Number,
+    correctAnswers: Number,
+    score: Number,
+    answeredQuestions: Number,
+    skippedQuestions: Number,
+    passed: Boolean,
+    durationSeconds: Number,
+    submittedAt: String
+}

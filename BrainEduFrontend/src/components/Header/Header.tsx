@@ -47,6 +47,7 @@ const Header = () => {
           </NavLink>
           <NavLink to="/pathways">Lộ trình</NavLink>
           <NavLink to="/personal-roadmap">Lộ trình cá nhân</NavLink>
+          <NavLink to="/all-course">Danh sách khóa học</NavLink>
           <NavLink to="/community">Cộng đồng</NavLink>
           <NavLink to="/support">Hỗ trợ</NavLink>
         </nav>
@@ -90,6 +91,10 @@ const Header = () => {
                 <NavLink to="/profile" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                   <User size={16} className="text-gray-400" />
                   Trang cá nhân
+                </NavLink>
+                <NavLink to="/quiz-history" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                  <User size={16} className="text-gray-400" />
+                  Lịch sử nộp bài
                 </NavLink>
                 <a href="#" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                   <Settings size={16} className="text-gray-400" />

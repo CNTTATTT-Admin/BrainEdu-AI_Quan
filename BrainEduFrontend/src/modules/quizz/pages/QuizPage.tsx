@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import QuizContent from '../component/QuizzContent';
-import QuizSidebar from '../component/QuizSidebar';
+import QuizContent from '../component/CurrentQuiz.tsx/QuizzContent';
+import QuizSidebar from '../component/CurrentQuiz.tsx/QuizSidebar';
 import { useLocation, useNavigate } from 'react-router-dom';
 import useGetQuizz from '../hooks/useGetQuizz';
 import useGetQuestion from '../hooks/useGetQuestion';
@@ -237,25 +237,25 @@ const QuizPage: React.FC = () => {
     console.log(payload);
     
 
-    // mutate(payload, {
-    //   onSuccess: (response) => {
-    //     localStorage.removeItem(`quiz_progress_${quizId}`);
-    //     localStorage.removeItem(`quiz_time_${quizId}`);
-    //     localStorage.setItem(`quiz_submitted_${quizId}`, 'true');
+    mutate(payload, {
+      onSuccess: (response) => {
+        localStorage.removeItem(`quiz_progress_${quizId}`);
+        localStorage.removeItem(`quiz_time_${quizId}`);
+        localStorage.setItem(`quiz_submitted_${quizId}`, 'true');
         
-    //     navigate('/quiz-result', { 
-    //       state: { 
-    //         result: response.data,
-    //         submissionId: response.data?.submissionId || response.data?.id,
-    //         isSubmitted: true
-    //       },
-    //       replace: true
-    //     });
-    //   },
-    //   onError: (err) => {
-    //     console.error("Lỗi khi nộp bài:", err);
-    //   }
-    // });
+        navigate('/quiz-result', { 
+          state: { 
+            result: response.data,
+            submissionId: response.data?.submissionId || response.data?.id,
+            isSubmitted: true
+          },
+          replace: true
+        });
+      },
+      onError: (err) => {
+        console.error("Lỗi khi nộp bài:", err);
+      }
+    });
   };
 
   const questionStatuses: Record<number, 'completed' | 'current' | 'unassigned'> = {};

@@ -1,29 +1,32 @@
 import React from 'react';
-import MainCourseCard from '../component/MainCourseCard';
-import RecommendationWidget from '../component/RecommendationWidget';
-import Pagination from '../component/Pagination';
+import MainCourseCard from '../component/CourseDetail/MainCourseCard';
+import RecommendationWidget from '../component/CourseDetail/RecommendationWidget';
+import Pagination from '../component/CourseDetail/Pagination';
 import useGetCourseCategory from '../hooks/useGetCourseCategory';
 import { useLocation } from 'react-router';
 import type { CourseCategoryResponse } from '../types/api-response';
+import CategoryTabs from '../component/ListCourse/CategoryTabs';
 
 const CourseByCategoryPage: React.FC = () => {
     const location = useLocation()
-    const { categoryId } = location.state || {}
+    const { categoryId, categoryName } = location.state || {}
+    console.log(categoryId);
+    
     const { data, isPending } = useGetCourseCategory(categoryId)
     const courseList = data?.data || []
   return (
     <div className="min-h-screen bg-[#f8fafc] font-sans antialiased flex flex-col">
       <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        
+        <CategoryTabs size/>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-100 pb-6">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2 text-xs font-medium text-gray-400">
               <span className="hover:underline cursor-pointer">Khóa học</span>
               <span>•</span>
-              <span className="text-gray-600 font-semibold">Phát triển Phần mềm</span>
+              <span className="text-gray-600 font-semibold">{categoryName}</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
-              Khóa học Phát triển Phần mềm
+              Khóa học {categoryName}
             </h2>
             <p className="text-xs sm:text-sm text-gray-500 max-w-2xl leading-relaxed">
               Trang bị kỹ năng lập trình hiện đại với các khóa học từ Web, Mobile đến Hệ thống. Được hướng dẫn bởi AI Guide cá nhân hóa cho từng lộ trình của bạn.

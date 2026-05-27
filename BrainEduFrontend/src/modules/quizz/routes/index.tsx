@@ -13,5 +13,9 @@ export const quizzRouter: RouteObject[] = [
   {
     path: '/quiz-review',
     lazy: lazyLoad(() => import("../pages/QuizReviewPage"))
+  },
+  {
+    path: '/quiz-history',
+    lazy: lazyLoad(() => import("../pages/SubmissionHistoryPage"))
   }
 ];

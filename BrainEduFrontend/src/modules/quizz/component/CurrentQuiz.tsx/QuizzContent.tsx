@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight, Bookmark } from 'lucide-react';
-import useGetAnswer from '../hooks/useGetAnswer';
+import useGetAnswer from '../../hooks/useGetAnswer';
 
 interface QuizContentProps {
   questionData: {

@@ -28,12 +28,19 @@ export type RoadmapDetailResponse = {
 export type UserProfile = {
 
 }
+
+type Skill = String
+type LessonOverView = String
 export type RecommendedRoadmap = {
     step: Number,
     courseId: Number,
+    description: String,
     course: String,
     category: String,
-    level: String
+    level: String,
+    estimated_duration: Number,
+    skills: Skill[],
+    lesson_overview: LessonOverView[]
 }
 
 export type RecommendedResponse = {

@@ -113,7 +113,7 @@ class RecommendationService:
                             "skills",
                             ""
                         )
-                    ).split()
+                    )
             })
 
 

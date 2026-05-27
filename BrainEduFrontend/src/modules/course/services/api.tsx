@@ -1,7 +1,7 @@
 import type { BackendResponse } from "../../../libs/shared/types/backend-response";
 import api from "../../../services/axios";
 import type { LessonProgressRequest } from "../types/api-request";
-import type { CourseCategoryResponse, LessonResponse, ProgressItem } from "../types/api-response";
+import type { CategoryResponse, CourseCategoryResponse, LessonResponse, ProgressItem } from "../types/api-response";
 export const onGetLessonsApi = async(
     courseId: Number
 ) : Promise<BackendResponse<LessonResponse[]>> => {
@@ -28,3 +28,9 @@ export const onSaveLessonProgressMeApi = async(data: LessonProgressRequest) : Pr
 
     return response.data
 }
+
+// export const onGetCategoryApi = async() : Promise<BackendResponse<CategoryResponse[]>> => {
+//     const data = await api.get(`/fields`)
+
+//     return data.data
+// }

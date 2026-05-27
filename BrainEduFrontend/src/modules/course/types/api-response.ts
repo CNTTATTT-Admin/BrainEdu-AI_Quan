@@ -32,3 +32,9 @@ export type CourseCategoryResponse = {
   instructorId: Number,
   instructorName: String,
 }
+
+export type CategoryResponse = {
+  id: Number,
+  categoryName: String,
+  description: String
+}

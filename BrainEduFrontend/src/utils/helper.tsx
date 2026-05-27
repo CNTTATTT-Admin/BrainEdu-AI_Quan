@@ -22,7 +22,44 @@ export const formatDate = (dateString: string): string => {
 
   return `${day}/${month}/${year}`;
 };
+export const formatSubmissionTime = (isoString: string | undefined | null): string => {
+  if (!isoString) return '';
 
+  // Bắt buộc thêm ký tự 'Z' nếu chuỗi chưa có để ép JavaScript parse theo giờ UTC
+  const formattedIso = isoString.endsWith('Z') ? isoString : `${isoString}Z`;
+  const dateParsed = new Date(formattedIso);
+  
+  if (isNaN(dateParsed.getTime())) return '';
+
+  const hours = String(dateParsed.getHours()).padStart(2, '0');
+  const minutes = String(dateParsed.getMinutes()).padStart(2, '0');
+  const day = String(dateParsed.getDate()).padStart(2, '0');
+  const month = String(dateParsed.getMonth() + 1).padStart(2, '0');
+  const year = dateParsed.getFullYear();
+
+  const now = new Date();
+  const isToday = 
+    dateParsed.getDate() === now.getDate() &&
+    dateParsed.getMonth() === now.getMonth() &&
+    dateParsed.getFullYear() === now.getFullYear();
+
+  const yesterday = new Date();
+  yesterday.setDate(now.getDate() - 1);
+  const isYesterday = 
+    dateParsed.getDate() === yesterday.getDate() &&
+    dateParsed.getMonth() === yesterday.getMonth() &&
+    dateParsed.getFullYear() === yesterday.getFullYear();
+
+  if (isToday) {
+    return `${hours}:${minutes} - Hôm nay`;
+  }
+  
+  if (isYesterday) {
+    return `${hours}:${minutes} - Hôm qua`;
+  }
+
+  return `${hours}:${minutes} - ${day}/${month}/${year}`;
+};
 export const formatStepTime = (dateString: string | undefined) => {
   if (!dateString) return null;
   const date = new Date(dateString);

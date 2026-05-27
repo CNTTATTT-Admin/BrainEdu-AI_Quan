@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import VideoPlayer from '../component/VideoPlayer';
-import TabsContent from '../component/TabsContent';
-import SidebarCourse from '../component/SidebarCourse';
+import VideoPlayer from '../component/CourseDetail/VideoPlayer';
+import TabsContent from '../component/CourseDetail/TabsContent';
+import SidebarCourse from '../component/CourseDetail/SidebarCourse';
 import { useLocation } from 'react-router';
 import useGetLesson from '../hooks/useGetLesson';
 import useGetLessonProgressMe from '../hooks/useGetLessonProgressMe';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Share2, ArrowRight, RefreshCw, ChevronRight } from 'lucide-react';
 import StatSummary from './StatSummary';
-import type { QuestionStatus } from '../types/api-response';
+import type { QuestionStatus } from '../../types/api-response';
 
 interface ReviewSidebarProps {
   score: number;

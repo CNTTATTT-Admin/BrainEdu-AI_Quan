@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { CheckCircle2, PlayCircle, Lock, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import useGetLesson from '../hooks/useGetLesson';
-import useGetLessonProgressMe from '../hooks/useGetLessonProgressMe';
-import type { LessonResponse, ProgressItem } from '../types/api-response';
+import useGetLesson from '../../hooks/useGetLesson';
+import useGetLessonProgressMe from '../../hooks/useGetLessonProgressMe';
+import type { LessonResponse, ProgressItem } from '../../types/api-response';
 
 interface SidebarCourseProps {
   courseId: number;
@@ -121,7 +121,7 @@ const SidebarCourse: React.FC<SidebarCourseProps> = ({
                     {status === 'locked' && <Lock size={15} className="text-gray-400 shrink-0" />}
                     
                     <span className="truncate">
-                      Bài {String(lesson.lessonOrder)}: {lesson.title}
+                      Bài {String(lesson.lessonOrder)}: {lesson.content}
                     </span>
                   </div>
                   

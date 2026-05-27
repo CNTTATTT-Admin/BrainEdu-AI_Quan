@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Share2 } from 'lucide-react';
-import ReviewQuestion from '../component/ReviewQuestion';
-import ReviewSidebar from '../component/ReviewSidebar';
+import ReviewQuestion from '../component/CurrentQuiz.tsx/ReviewQuestion';
+import ReviewSidebar from '../component/CurrentQuiz.tsx/ReviewSidebar';
 import { useLocation } from 'react-router-dom';
 import useGetReviewQuiz from '../hooks/useGetReviewQuiz';
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
-import useSaveLessonProgress from '../hooks/useSaveLessonProgress';
+import useSaveLessonProgress from '../../hooks/useSaveLessonProgress';
 
 interface VideoPlayerProps {
   lessonId: number;
@@ -46,7 +46,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     return (match && match[2].length === 11) ? match[2] : '';
   };
 
-  const videoId = getYouTubeId("https://www.youtube.com/watch?v=jNQXAC9IVRw");
+  // const videoId = getYouTubeId("https://www.youtube.com/watch?v=jNQXAC9IVRw");
+  const videoId = getYouTubeId(videoUrl);
 
   useEffect(() => {
     maxTimeWatched.current = 0;
