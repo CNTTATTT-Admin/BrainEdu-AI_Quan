@@ -32,7 +32,7 @@ public class RecommendationOrchestratorService {
 
         return restTemplate.postForObject(
 
-                "http://localhost:8000/recommend/roadmap",
+                "http://host.docker.internal:8000/recommend/roadmap",
 
                 request,
 
