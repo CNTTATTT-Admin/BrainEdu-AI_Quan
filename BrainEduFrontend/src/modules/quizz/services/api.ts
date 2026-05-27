@@ -1,7 +1,7 @@
 import type { BackendResponse } from "../../../libs/shared/types/backend-response";
 import api from "../../../services/axios";
 import type { SubmitQuizRequest } from "../types/api-request";
-import type { QuestionResponse, QuizzResponse, QuizSubmissionResponse, QuestionQuizResponse, QuizReviewResponse } from "../types/api-response";
+import type { QuestionResponse, QuizzResponse, QuizSubmissionResponse, QuizReviewResponse } from "../types/api-response";
 export const onGetQuizzApi = async(
     lessonId: Number
 ) : Promise<BackendResponse<QuizzResponse>> => {

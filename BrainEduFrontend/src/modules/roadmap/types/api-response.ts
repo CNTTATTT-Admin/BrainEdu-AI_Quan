@@ -24,3 +24,19 @@ export type RoadmapDetailResponse = {
     totalCourses: Number,
     courses: CourseResponse[]
 }
+
+export type UserProfile = {
+
+}
+export type RecommendedRoadmap = {
+    step: Number,
+    courseId: Number,
+    course: String,
+    category: String,
+    level: String
+}
+
+export type RecommendedResponse = {
+    user_profile: UserProfile,
+    recommended_roadmap: RecommendedRoadmap[]
+}

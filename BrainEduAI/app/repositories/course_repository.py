@@ -23,17 +23,17 @@ def get_all_courses():
 
             GROUP_CONCAT(
                 DISTINCT s.skill_name
-                SEPARATOR ' '
+                SEPARATOR ' | '
             ) AS skills,
 
             GROUP_CONCAT(
                 DISTINCT l.title
-                SEPARATOR ' '
+                SEPARATOR ' | '
             ) AS lesson_titles,
 
             GROUP_CONCAT(
                 DISTINCT q.title
-                SEPARATOR ' '
+                SEPARATOR '|'
             ) AS quiz_titles
 
         FROM courses c
