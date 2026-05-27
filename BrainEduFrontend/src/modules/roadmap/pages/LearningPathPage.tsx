@@ -4,6 +4,7 @@ import CourseSection from '../component/Normal/CourseSection';
 import CourseCard from '../component/Normal/CourseCard';
 import { useNavigate } from 'react-router-dom';
 import useGetRoadmap from '../hooks/useGetRoadmap';
+import { useAnalytics } from '../../../hooks/useAnalytics';
 
 interface RoadmapItem {
   id: number;
@@ -57,6 +58,16 @@ const LearningPathPage: React.FC = () => {
     return acc;
   }, {});
 
+  const { trackEvent } = useAnalytics()
+  const trackBehavior = (id: number) => {
+    
+      trackEvent('roadmap_click', {
+        roadmapId: id
+      })
+      navigate(`/roadmap/detail`, { state: { roadmapId: id } })
+      
+  }
+
   return (
     <div className="min-h-screen bg-[#f8fafc] font-sans antialiased flex flex-col">
       <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
@@ -97,7 +108,7 @@ const LearningPathPage: React.FC = () => {
                   description={item.description}
                   totalCourses={0}
                   totalHours={0}
-                  onAction={() => navigate(`/roadmap/detail`, { state: { roadmapId: item.id } })}
+                  onAction={() => trackBehavior(item.id)}
                 />
               ))}
             </CourseSection>

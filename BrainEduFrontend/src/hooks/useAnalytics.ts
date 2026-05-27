@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import type { EventName, TrackingPayloads, TrackingEvent } from '../types/tracking.types';
+import useTrackBehavior from './useBehavior';
 
 const getOrCreateSessionId = (): string => {
   let sessionId = sessionStorage.getItem('analytics_session_id');
@@ -11,6 +12,8 @@ const getOrCreateSessionId = (): string => {
 };
 
 export const useAnalytics = () => {
+  const { track } = useTrackBehavior<EventName>();
+
   const trackEvent = useCallback(<T extends EventName>(
     eventName: T,
     payload: TrackingPayloads[T]
@@ -21,15 +24,11 @@ export const useAnalytics = () => {
       sessionId: getOrCreateSessionId(),
       pageUrl: window.location.href,
       userAgent: navigator.userAgent,
-      metadata: payload,
+      metadata: JSON.stringify(payload),
     };
 
-    console.group(`📊 [TRACKING EVENT]: ${eventName}`);
-    console.log("Payload Detail (Metadata):");
-    console.table(payload);
-    console.log("Full Event Object:", fullLogEvent);
-    console.groupEnd();
-  }, []);
+    track(fullLogEvent as any);
+  }, [track]);
 
   return { trackEvent };
 };

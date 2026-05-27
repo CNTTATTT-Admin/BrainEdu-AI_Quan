@@ -25,17 +25,24 @@ export interface TrackingPayloads {
   };
 
   lesson_start: {
+    courseId: number;
     lessonId: number;
+    lessonTitle?: string;
     watchPosition?: number;
   };
 
   lesson_complete: {
+    courseId: number;
     lessonId: number;
+    lessonTitle?: string;
     learningTime: number;
-    completionRate: number;
+    completionRate?: number;
+    isManualClick?: boolean;
   };
 
   quiz_submit: {
+    courseId?: number;
+    lessonId?: number;
     quizId: number;
     score: number;
     totalQuestions: number;
@@ -81,5 +88,5 @@ export interface TrackingPayloads {
 
 export type TrackingEvent<T extends EventName> = BaseTrackingEvent & {
   eventName: T;
-  metadata: TrackingPayloads[T];
+  metadata: string;
 };

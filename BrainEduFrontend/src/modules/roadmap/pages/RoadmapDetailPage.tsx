@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import RoadmapHeader from '../component/Normal/RoadmapHeader';
 import ProgressCard from '../component/Normal/ProgressCard';
@@ -8,60 +8,12 @@ import AiMentorWidget from '../component/Normal/AIMentorWidget';
 import StatsWidget from '../component/Normal/StatsWidget';
 import useGetRoadmapDetail from '../hooks/useGetRoadmapDetail';
 
-// const useGetRoadmapDetail = (id: number) => {
-//   return {
-//     data: {
-//       data: {
-//         id: id,
-//         roadmapName: "Backend Java Developer",
-//         description: "Complete Java Backend Learning Path từ cơ bản đến xây dựng hệ thống microservices.",
-//         level: "INTERMEDIATE",
-//         categoryName: "Java Backend",
-//         stages: [
-//           {
-//             index: 1,
-//             title: "Java Core & Object-Oriented Programming (OOP)",
-//             status: "completed" as const,
-//             totalLessons: 15,
-//             totalHours: 25
-//           },
-//           {
-//             index: 2,
-//             title: "Spring Boot Fundamentals & RESTful APIs",
-//             status: "active" as const,
-//             totalLessons: 20,
-//             totalHours: 40,
-//             lessons: [
-//               { id: 1, title: "Dependency Injection & Spring IoC Container", type: "current" as const },
-//               { id: 2, title: "Xây dựng REST Controller & Cấu hình Request Mapping", type: "next" as const }
-//             ]
-//           },
-//           {
-//             index: 3,
-//             title: "Database Integration (Hibernate, Spring Data JPA, MySQL)",
-//             status: "locked" as const,
-//             lockMessage: "Hoàn thành giai đoạn 2 về Spring Boot để mở khóa nội dung này."
-//           },
-//           {
-//             index: 4,
-//             title: "Microservices Architecture & Deployment (Docker, AWS)",
-//             status: "locked" as const
-//           }
-//         ]
-//       }
-//     },
-//     isPending: false
-//   };
-// };
-
 const RoadmapDetailPage: React.FC = () => {
   const location = useLocation();
   const { roadmapId } = location.state || {};
 
   const { data: detailData, isPending } = useGetRoadmapDetail(roadmapId);
   const roadmap = detailData?.data;
-  console.log(roadmap);
-  
 
   const mapLevel = (level: string) => {
     switch (level?.toUpperCase()) {
