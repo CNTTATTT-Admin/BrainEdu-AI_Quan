@@ -23,4 +23,9 @@ logs/
 
 .DS_Store
 Thumbs.db
+# Chặn file env ở thư mục gốc
+.env
+
+# Chặn tất cả các file env ở mọi thư mục con khác nếu có
 **/.env
+**/.env*
