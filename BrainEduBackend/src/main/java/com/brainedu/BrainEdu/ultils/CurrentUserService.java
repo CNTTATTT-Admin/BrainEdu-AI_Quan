@@ -34,6 +34,26 @@ public class CurrentUserService {
                 );
     }
 
+    public Long getCurrentUserId() {
+
+        String email =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getName();
+
+        User user =
+                userRepository
+                        .findByEmail(email)
+                        .orElseThrow(
+                                () -> new ApiException(
+                                        "User not found"
+                                )
+                        );
+
+        return user.getId();
+    }
+
     public String getCurrentUserEmail() {
 
         return SecurityContextHolder

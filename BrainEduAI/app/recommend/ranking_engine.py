@@ -10,10 +10,6 @@ from app.recommend.engines.skill_gap_engine import (
     SkillGapEngine
 )
 
-from app.recommend.engines.prerequisite_engine import (
-    PrerequisiteEngine
-)
-
 from app.recommend.engines.learning_style_engine import (
     LearningStyleEngine
 )
@@ -46,58 +42,58 @@ class RankingEngine:
 
         ranked = []
 
+
         weights = (
+
             SemanticWeightEngine
             .get_weights(
+
                 profile[
                     "experience_level"
                 ]
             )
         )
 
-        completed_courses = [
 
-            c.lower().strip()
+        completed_courses = set(
 
-            for c in profile[
-                "completed_courses"
-            ]
-        ]
+            profile.get(
+                "completed_courses",
+                []
+            )
+        )
+
 
         interests = [
 
-            interest.lower()
+            str(interest).lower()
 
-            for interest in profile[
-                "interests"
-            ]
+            for interest in profile.get(
+                "interests",
+                []
+            )
         ]
 
-        career_goal = (
-            profile[
-                "career_goal"
-            ]
-            .lower()
+
+        user_skills = profile.get(
+            "skills",
+            {}
         )
+
 
         for course in courses:
 
-            course_title = (
-                course["title"]
-                .lower()
-                .strip()
-            )
-
-            if (
-                course_title
-                in completed_courses
-            ):
+            if course["id"] in completed_courses:
                 continue
 
+
             semantic_score = (
+
                 SemanticEngine
                 .calculate_similarity(
+
                     user_embedding,
+
                     course["embedding"]
                 )
             )
@@ -105,44 +101,54 @@ class RankingEngine:
             if semantic_score < 0.20:
                 continue
 
+
             keyword_bonus = 0
+
+            searchable_text = " ".join([
+
+                str(
+                    course.get(
+                        "title",
+                        ""
+                    )
+                ),
+
+                str(
+                    course.get(
+                        "description",
+                        ""
+                    )
+                ),
+
+                str(
+                    course.get(
+                        "category",
+                        ""
+                    )
+                ),
+
+                str(
+                    course.get(
+                        "skills",
+                        ""
+                    )
+                )
+            ]).lower()
 
             for keyword in interests:
 
-                if keyword in course_title:
-                    keyword_bonus += 0.12
+                if keyword in searchable_text:
 
-            if "ai" in career_goal:
+                    keyword_bonus += 0.05
 
-                ai_keywords = [
-
-                    "machine learning",
-
-                    "deep learning",
-
-                    "tensorflow",
-
-                    "neural",
-
-                    "ai",
-
-                    "computer vision",
-
-                    "nlp"
-                ]
-
-                if any(
-                    keyword in course_title
-
-                    for keyword
-                    in ai_keywords
-                ):
-                    keyword_bonus += 0.18
 
             skill_gap_score = (
+
                 SkillGapEngine
                 .calculate_skill_gap_bonus(
-                    profile["skills"],
+
+                    user_skills,
+
                     course.get(
                         "skills",
                         []
@@ -150,70 +156,85 @@ class RankingEngine:
                 )
             )
 
+
             learning_style_bonus = (
+
                 LearningStyleEngine
                 .calculate_learning_style_bonus(
-                    profile[
-                        "preferred_learning_style"
-                    ],
+
+                    profile.get(
+                        "preferred_learning_style",
+                        ""
+                    ),
+
                     course
                 )
             )
+
 
             diversity_bonus = (
+
                 DiversityEngine
                 .calculate_diversity_bonus(
+
                     ranked,
+
                     course
                 )
             )
 
+
             timeline_bonus = (
+
                 TimelineEngine
                 .calculate_timeline_bonus(
-                    profile[
-                        "target_timeline_months"
-                    ],
+
+                    profile.get(
+                        "target_timeline_months",
+                        6
+                    ),
+
                     course.get(
                         "estimated_duration"
                     )
                 )
             )
+
 
             workload_penalty = (
+
                 WorkloadEngine
                 .calculate_workload_penalty(
-                    profile[
-                        "available_hours_per_week"
-                    ],
+
+                    profile.get(
+                        "available_hours_per_week",
+                        5
+                    ),
+
                     course.get(
                         "estimated_duration"
                     )
                 )
             )
 
-            prerequisite_penalty = (
-                PrerequisiteEngine
-                .calculate_prerequisite_penalty(
-                    completed_courses,
+
+            level_penalty = (
+
+                LevelEngine
+                .calculate_level_penalty(
+
+                    profile.get(
+                        "experience_level",
+                        "BEGINNER"
+                    ),
+
                     course.get(
-                        "prerequisites",
-                        []
+                        "level",
+                        "BEGINNER"
                     )
                 )
             )
 
-            level_penalty = (
-                LevelEngine
-                .calculate_level_penalty(
-                    profile[
-                        "experience_level"
-                    ],
-                    course[
-                        "level"
-                    ]
-                )
-            )
 
             final_score = (
 
@@ -246,10 +267,6 @@ class RankingEngine:
 
                 -
 
-                prerequisite_penalty
-
-                -
-
                 level_penalty
             )
 
@@ -264,9 +281,11 @@ class RankingEngine:
             })
 
         ranked.sort(
+
             key=lambda x: x[
                 "match_score"
             ],
+
             reverse=True
         )
 

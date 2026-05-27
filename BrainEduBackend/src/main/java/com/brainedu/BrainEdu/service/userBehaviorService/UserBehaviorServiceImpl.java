@@ -8,6 +8,7 @@ import com.brainedu.BrainEdu.entity.UserBehavior;
 import com.brainedu.BrainEdu.mapper.UserBehaviorMapper;
 import com.brainedu.BrainEdu.repository.UserBehaviorRepository;
 import com.brainedu.BrainEdu.repository.UserRepository;
+import com.brainedu.BrainEdu.ultils.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -29,31 +30,15 @@ public class UserBehaviorServiceImpl
 
     private final UserBehaviorMapper
             trackingMapper;
-
-    private User getCurrentUser() {
-
-        String email =
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-                        .getName();
-
-        return userRepository
-                .findByEmail(email)
-                .orElseThrow(
-                        () -> new ApiException(
-                                "User not found"
-                        )
-                );
-    }
+    private final CurrentUserService
+            currentUserService;
 
     @Override
     public UserBehaviorResponse trackBehavior(
             UserBehaviorRequest request
     ) {
 
-        User user =
-                getCurrentUser();
+        User user = currentUserService.getCurrentUser();
 
         UserBehavior tracking =
                 trackingMapper.toEntity(

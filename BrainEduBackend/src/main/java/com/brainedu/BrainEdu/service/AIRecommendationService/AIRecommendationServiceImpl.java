@@ -37,49 +37,49 @@ public class AIRecommendationServiceImpl
             AIRecommendationRequest request
     ) {
 
-        User user =
-                userRepository.findById(
-                                request.getUserId()
-                        )
-                        .orElseThrow(
-                                () -> new ApiException(
-                                        "User not found"
-                                )
-                        );
-
-        AIRecommendation recommendation =
-                AIRecommendation.builder()
-
-                        .user(user)
-
-                        .recommendationType(
-                                request.getRecommendationType()
-                        )
-
-                        .targetId(
-                                request.getTargetId()
-                        )
-
-                        .score(
-                                request.getScore()
-                        )
-
-                        .reason(
-                                request.getReason()
-                        )
-
-                        .createdAt(
-                                LocalDateTime.now()
-                        )
-
-                        .build();
-
-        recommendationRepository.save(
-                recommendation
-        );
+//        User user =
+//                userRepository.findById(
+//                                request.getUserId()
+//                        )
+//                        .orElseThrow(
+//                                () -> new ApiException(
+//                                        "User not found"
+//                                )
+//                        );
+//
+//        AIRecommendation recommendation =
+//                AIRecommendation.builder()
+//
+//                        .user(user)
+//
+//                        .recommendationType(
+//                                request.getRecommendationType()
+//                        )
+//
+//                        .targetId(
+//                                request.getTargetId()
+//                        )
+//
+//                        .score(
+//                                request.getScore()
+//                        )
+//
+//                        .reason(
+//                                request.getReason()
+//                        )
+//
+//                        .createdAt(
+//                                LocalDateTime.now()
+//                        )
+//
+//                        .build();
+//
+//        recommendationRepository.save(
+//                recommendation
+//        );
 
         return recommendationMapper.toResponse(
-                recommendation
+                null
         );
     }
 

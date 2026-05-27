@@ -56,7 +56,7 @@ services:
     ports:
       - "5173:5173"
     volumes:
-      - ./BrainEduFrontend:/app  # Đã sửa thành BrainEduFrontend
+      - ./BrainEduFrontend:/app  
       - /app/node_modules
     stdin_open: true
     tty: true

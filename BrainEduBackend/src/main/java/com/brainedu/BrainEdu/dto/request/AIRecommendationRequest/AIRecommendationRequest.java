@@ -1,17 +1,44 @@
 package com.brainedu.BrainEdu.dto.request.AIRecommendationRequest;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
+
+import java.util.List;
+import java.util.Map;
 
 @Data
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AIRecommendationRequest {
 
-    private Long userId;
+    @JsonProperty("career_goal")
+    private String careerGoal;
 
-    private String recommendationType;
+    private List<String> interests;
 
-    private Long targetId;
+    private Map<String, Integer> skills;
 
-    private Float score;
+    @JsonProperty("experience_level")
+    private String experienceLevel;
 
-    private String reason;
+    @JsonProperty("learning_goal_type")
+    private String learningGoalType;
+
+    @JsonProperty("preferred_learning_style")
+    private String preferredLearningStyle;
+
+    @JsonProperty("available_hours_per_week")
+    private Integer availableHoursPerWeek;
+
+    @JsonProperty("target_timeline_months")
+    private Integer targetTimelineMonths;
+
+    @JsonProperty("preferred_content_type")
+    private List<String> preferredContentType;
+
+    @JsonProperty("completed_courses")
+    private List<String> completedCourses;
 }
