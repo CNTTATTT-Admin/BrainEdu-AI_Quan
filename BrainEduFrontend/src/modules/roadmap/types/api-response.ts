@@ -26,24 +26,24 @@ export type RoadmapDetailResponse = {
 }
 
 export type UserProfile = {
-
+  id?: number;
+  target_job?: string;
 }
 
-type Skill = String
-type LessonOverView = String
 export type RecommendedRoadmap = {
-    step: Number,
-    courseId: Number,
-    description: String,
-    course: String,
-    category: String,
-    level: String,
-    estimated_duration: Number,
-    skills: Skill[],
-    lesson_overview: LessonOverView[]
+  step: number;
+  courseId: number;
+  description: string;
+  course: string;
+  category: string;
+  level: string;
+  estimated_duration: number;
+  skills: string[];
+  lesson_overview: string[];
+  match_score?: number; 
 }
 
 export type RecommendedResponse = {
-    user_profile: UserProfile,
-    recommended_roadmap: RecommendedRoadmap[]
+  user_profile: UserProfile;
+  recommended_roadmap: RecommendedRoadmap[];
 }

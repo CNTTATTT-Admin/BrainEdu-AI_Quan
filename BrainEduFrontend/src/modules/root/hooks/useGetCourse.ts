@@ -1,10 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
-import { onGetCoursesApi } from '../services/api'
+import { onGetAllCourseApi } from '../services/api'
 
-const useGetCourse = (enabled: boolean = true) => {
+interface UseGetCourseParams {
+    page?: number;
+    size?: number;
+    enabled?: boolean;
+}
+
+const useGetCourse = ({ page = 0, size = 6, enabled = true }: UseGetCourseParams = {}) => {
     const { data, error, isPending, isError, refetch, isFetched } = useQuery({
-        queryKey: ["courses"],
-        queryFn: onGetCoursesApi,
+        queryKey: ["courses", page, size],
+        queryFn: () => onGetAllCourseApi(page, size),
         enabled,
         retry: 0,
     }) 

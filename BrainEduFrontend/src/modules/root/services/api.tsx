@@ -8,8 +8,19 @@ export const onGetCategoryApi = async(
     return data.data
 }
 
+export const onGetAllCourseApi = async (page?: number, size?: number): Promise<BackendResponse<CoursesResponse[]>> => {
+    const data = await api.get("/courses", {
+        params: {
+            page,
+            size
+        }
+    })
+
+    return data.data
+}
+
 export const onGetCoursesApi = async(
-) : Promise<BackendResponse<CoursesResponse>> => {
+) : Promise<BackendResponse<CoursesResponse[]>> => {
     const data = await api.get("/courses?page=0&size=4")
 
     return data.data

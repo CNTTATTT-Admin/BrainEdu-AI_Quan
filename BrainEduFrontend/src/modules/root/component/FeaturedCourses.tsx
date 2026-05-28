@@ -5,7 +5,10 @@ import type { CoursesResponse } from '../types/api-response';
 import thumb from "../../../assets/coursethumbnail.png"
 import { NavLink } from 'react-router';
 const FeaturedCourses = () => {
-  const { data, isPending } = useGetCourse();
+  const { data, isPending } = useGetCourse({
+    page: 0,
+    size: 4
+  });
   const courseList = data?.data || [];
 
   return (
@@ -32,7 +35,7 @@ const FeaturedCourses = () => {
                 <div className="h-44 bg-gray-200 relative">
                   <img src={thumb} alt={course.title} className="w-full h-full object-cover" />
                   <span className="absolute top-3 left-3 bg-[#8b5cf6] text-white text-[9px] font-extrabold px-2 py-1 rounded-md tracking-wider">
-                    {course.estimatedDuration}
+                    {course.estimatedDuration}h
                   </span>
                 </div>
                 

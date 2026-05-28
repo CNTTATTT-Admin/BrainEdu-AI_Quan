@@ -1,17 +1,35 @@
-import React from 'react';
-import { Search, Sparkles, ArrowRight, Code, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Sparkles, ArrowRight, Code } from 'lucide-react';
 import FilterSidebar from '../component/ListCourse/FilterSidebar';
 import CourseCardVertical from '../component/ListCourse/CourseCartVertical';
 import CategoryTabs from '../component/ListCourse/CategoryTabs';
+import useGetCourse from '../../root/hooks/useGetCourse';
+import Pagination from '../../../components/common/Pagination';
+import type { CoursesResponse } from '../../root/types/api-response';
 
 const ExplorePage: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState<number>(0);
+
   const handleCategoryFilter = (id: string) => {
     console.log("Tìm kiếm theo danh mục:", id);
   };
+
+  const { data, isPending } = useGetCourse({ 
+    page: currentPage, 
+    size: 6 
+  });
+
+  const courseList = data?.data || [];
+  const pagination = data?.meta || {};
+
+  const handlePageChange = (targetPage: number) => {
+    setCurrentPage(targetPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50/40 font-sans antialiased">
       
-      {/* 1. HERO BANNER */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 md:p-12 text-center text-white space-y-6 shadow-sm relative overflow-hidden">
           <div className="space-y-2 relative z-10">
@@ -46,7 +64,6 @@ const ExplorePage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {/* Horizontal Course Item */}
             {[
               { title: 'Phân tích dữ liệu với Python & ChatGPT', badge: 'Top Match', cate: 'AI & Data Science', price: '1.299.000đ', author: 'Dr. Nguyễn Thành' },
               { title: 'Mastering React 18: Build AI-Powered Apps', badge: null, cate: 'Programming', price: 'Miễn phí', author: 'Phạm Minh Đức' },
@@ -99,7 +116,7 @@ const ExplorePage: React.FC = () => {
           <div className="flex-1 space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
               <span className="font-bold text-gray-500">
-                <strong className="text-gray-900">124</strong> kết quả được tìm thấy
+                <strong className="text-gray-900">{pagination?.totalElements || 0}</strong> kết quả được tìm thấy
               </span>
               <div className="flex items-center gap-2">
                 <span className="text-gray-400 font-medium">Sắp xếp:</span>
@@ -111,25 +128,44 @@ const ExplorePage: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              <CourseCardVertical title="Học máy cơ bản" instructor="Lê Quốc Anh" category="AI & Data" lessons={42} duration="12.5h" rating={4.8} reviews={120} price={699000} />
-              <CourseCardVertical title="Fullstack Web with AI" instructor="Nguyễn Mạnh Hùng" category="Lập trình" lessons={150} duration="42h" rating={4.9} reviews={342} price={1499000} />
-              <CourseCardVertical title="Digital Marketing 2024" instructor="Hoàng Thu Trang" category="Marketing" lessons={28} duration="9h" rating={4.5} reviews={68} price="Miễn phí" />
-              <CourseCardVertical title="Excel for Business AI" instructor="Vũ Hải Đăng" category="Kinh doanh" lessons={34} duration="10h" rating={4.7} reviews={450} price={450000} />
-              <CourseCardVertical title="Motion Design with AI" instructor="Phạm Tú" category="Thiết kế" lessons={62} duration="25h" rating={4.6} reviews={112} price={890000} />
-              <CourseCardVertical title="English for IT Pros" instructor="Alec Johnson" category="Ngoại ngữ" lessons={55} duration="18h" rating={4.6} reviews={189} price="Miễn phí" />
-            </div>
+            {isPending ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {[...Array(6)].map((_, idx) => (
+                  <div key={idx} className="bg-white border border-gray-100 rounded-2xl h-80 animate-pulse" />
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {courseList.map((course: CoursesResponse) => (
+                  <CourseCardVertical 
+                    key={course.id}
+                    title={course.title}
+                    instructor={course.instructorName || "Chưa cập nhật"}
+                    category={course.categoryName || "Khóa học"}
+                    lessons={course.totalLessons || 0}
+                    duration={course.estimatedDuration || "0"}
+                    rating={course.rating || 5.0}
+                    reviews={course.reviewsCount || 0}
+                    price={course.price || "Miễn phí"}
+                    thumbnail={course.thumbnail || "https://it.ctim.edu.vn/d89-ngon-ngu-lap-trinh-la-gi-khai-niem-ngon-ngu-lap-trinh-ngan-gon-de-hieu-nhat.html"}
+                    id={course.id}
+                  />
+                ))}
+              </div>
+            )}
 
-            {/* Pagination */}
-            <div className="flex items-center justify-center gap-1.5 pt-6 border-t border-gray-100">
-              <button className="p-2 border border-gray-100 rounded-lg text-gray-400 hover:bg-gray-50 transition"><ChevronLeft size={14} /></button>
-              <button className="w-8 h-8 rounded-lg text-xs font-bold bg-blue-600 text-white">1</button>
-              <button className="w-8 h-8 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50 border border-transparent">2</button>
-              <button className="w-8 h-8 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50 border border-transparent">3</button>
-              <span className="text-gray-400 px-1 text-xs">...</span>
-              <button className="w-8 h-8 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50 border border-transparent">12</button>
-              <button className="p-2 border border-gray-100 rounded-lg text-gray-400 hover:bg-gray-50 transition"><ChevronRight size={14} /></button>
-            </div>
+            {/* Pagination Component */}
+            {pagination && (
+              <Pagination
+                page={pagination.page}
+                size={pagination.size}
+                totalElements={pagination.totalElements}
+                totalPages={pagination.totalPages}
+                hasNext={pagination.hasNext}
+                hasPrevious={pagination.hasPrevious}
+                onPageChange={handlePageChange}
+              />
+            )}
 
           </div>
         </div>

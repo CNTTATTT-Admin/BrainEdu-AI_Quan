@@ -1,10 +1,10 @@
-export const CategoryResponse = {
+export type CategoryResponse = {
     id: Number,
     categoryName: String,
     description: String
 }
 
-export const CoursesResponse = {
+export type CoursesResponse = {
     id: Number,
     categoryId: Number,
     categoryName: String,
@@ -13,5 +13,5 @@ export const CoursesResponse = {
     instructorName: String,
     price: Number,
     title: String,
-    extimatedDuration: String
+    estimatedDuration: String
 }

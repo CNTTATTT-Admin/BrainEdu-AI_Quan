@@ -3,17 +3,39 @@ import RoadmapOverview from '../component/AIGen/RoadmapOverView';
 import RoadmapTimeline from '../component/AIGen/RoadmapTimeline';
 import RoadmapWhyFit from '../component/AIGen/RoadmapWhyFit';
 import RoadmapCTA from '../component/AIGen/RoadmapCTA';
-
+import useGetPersonalRoadmap from '../hooks/useGetPersonalRoadmap';
+import useGetMe from '../../../hooks/useGetMe';
 const PersonalRoadmapPage: React.FC = () => {
+  const { data: meData, isPending: isMePending } = useGetMe();
+  const { data: roadmapData, isPending: isRoadmapPending } = useGetPersonalRoadmap(meData?.data?.id);
+
+  const isPending = isMePending || isRoadmapPending;
+  const roadmapList = roadmapData?.recommended_roadmap || [];
+  const targetJob = roadmapData?.user_profile?.target_job || "Fullstack Developer";
+
+  const totalLessons = roadmapList.length;
+  const timeline = Math.ceil(
+    roadmapList.reduce((sum, item) => sum + (item.estimated_duration || 0), 0) / 40
+  ) || 0;
+
+  const uniqueSkills = new Set(roadmapList.flatMap(item => item.skills || []));
+  const skillNumber = uniqueSkills.size;
+
   return (
     <div className="min-h-screen bg-[#f8fafc] font-sans antialiased flex flex-col">
       <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
-        <RoadmapOverview />
+        <RoadmapOverview 
+          timeline={timeline} 
+          totalLessons={totalLessons} 
+          skillNumber={skillNumber}
+          targetJob={targetJob}
+          isPending={isPending}
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           <div className="lg:col-span-7">
-            <RoadmapTimeline />
+            <RoadmapTimeline roadmapPersonal={roadmapList} isPending={isPending} />
           </div>
 
           <div className="lg:col-span-5">

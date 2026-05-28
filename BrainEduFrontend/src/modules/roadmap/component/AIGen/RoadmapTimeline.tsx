@@ -1,28 +1,13 @@
 import React from 'react';
-import { GraduationCap, Database, Rocket, BookOpen, Clock, Target } from 'lucide-react';
-import useGetMe from '../../../../hooks/useGetMe';
-import useGetPersonalRoadmap from '../../hooks/useGetPersonalRoadmap';
+import { GraduationCap, Database, Rocket, BookOpen, Clock, Target, TriangleAlert } from 'lucide-react';
+import type { RecommendedRoadmap } from '../../types/api-response';
 
-interface RoadmapStep {
-  step: number;
-  courseId: number;
-  course: string;
-  description: string;
-  category: string;
-  level: string;
-  estimated_duration: number;
-  skills: string[];
-  lesson_overview: string[];
-  quiz_overview?: string[];
-  match_score: number;
+interface TimelineProps {
+  roadmapPersonal: RecommendedRoadmap[];
+  isPending: boolean;
 }
 
-const RoadmapTimeline: React.FC = () => {
-  const { data: meData, isPending: isMePending } = useGetMe();
-  const { data: roadmapData, isPending: isRoadmapPending } = useGetPersonalRoadmap(meData?.data?.id);
-
-  const roadmapPersonal: RoadmapStep[] = roadmapData?.recommended_roadmap || [];
-
+const RoadmapTimeline: React.FC<TimelineProps> = ({ roadmapPersonal, isPending }) => {
   const getStepStyles = (level: string) => {
     switch (level?.toUpperCase()) {
       case 'INTERMEDIATE':
@@ -46,7 +31,7 @@ const RoadmapTimeline: React.FC = () => {
     }
   };
 
-  if (isMePending || isRoadmapPending) {
+  if (isPending) {
     return (
       <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-2xs space-y-4">
         <div className="h-4 bg-gray-100 rounded-md w-1/3 animate-pulse" />
@@ -87,7 +72,7 @@ const RoadmapTimeline: React.FC = () => {
       <div className="relative pl-8 space-y-6 before:absolute before:top-2 before:bottom-2 before:left-3.5 before:w-[2px] before:bg-gray-100">
         {roadmapPersonal.map((stage) => {
           const config = getStepStyles(stage.level);
-          const matchPercent = Math.round(stage.match_score * 100);
+          const matchPercent = stage.match_score ? Math.round(stage.match_score * 100) : 100;
           
           const validLessons = stage.lesson_overview?.filter(lesson => lesson !== "None") || [];
           const validSkills = stage.skills || [];
@@ -135,7 +120,7 @@ const RoadmapTimeline: React.FC = () => {
                 {validSkills.length > 0 && (
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-1 text-[10px] font-black text-gray-400 uppercase tracking-wider">
-                      <Target size={12} />
+                      <TriangleAlert size={12} />
                       <span>Kỹ năng đầu ra</span>
                     </div>
                     <div className="flex flex-wrap gap-1.5">

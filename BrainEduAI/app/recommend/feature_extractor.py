@@ -2,15 +2,10 @@ import json
 
 from collections import defaultdict
 
-
 class FeatureExtractor:
 
     @staticmethod
     def feature_extractor(events_df):
-
-        # =========================
-        # FEATURE CONTAINERS
-        # =========================
 
         interests = defaultdict(float)
 
@@ -28,10 +23,6 @@ class FeatureExtractor:
 
         search_keywords = defaultdict(float)
 
-        # =========================
-        # PROCESS EVENTS
-        # =========================
-
         for _, row in events_df.iterrows():
 
             event_name = row.get(
@@ -44,7 +35,6 @@ class FeatureExtractor:
                 {}
             )
 
-            # parse JSON metadata
             if isinstance(metadata, str):
 
                 try:
@@ -56,10 +46,6 @@ class FeatureExtractor:
                 except Exception:
 
                     metadata = {}
-
-            # =========================
-            # COURSE VIEW
-            # =========================
 
             if event_name == "course_view":
 
@@ -84,10 +70,6 @@ class FeatureExtractor:
                     skills[
                         course_name
                     ] += 0.3
-
-            # =========================
-            # LESSON COMPLETE
-            # =========================
 
             elif event_name == "lesson_complete":
 
@@ -116,14 +98,12 @@ class FeatureExtractor:
                         course_id
                     )
 
-                # skill estimation
                 if lesson_title:
 
                     skills[
                         lesson_title
                     ] += 1
 
-                # hands-on signal
                 is_manual_click = metadata.get(
                     "isManualClick",
                     False
@@ -134,10 +114,6 @@ class FeatureExtractor:
                     content_preferences[
                         "project"
                     ] += 1
-
-            # =========================
-            # SEARCH EVENT
-            # =========================
 
             elif event_name == "search":
 
@@ -150,10 +126,6 @@ class FeatureExtractor:
                     search_keywords[
                         keyword
                     ] += 1
-
-            # =========================
-            # VIDEO WATCH
-            # =========================
 
             elif event_name == "video_watch":
 
@@ -168,10 +140,6 @@ class FeatureExtractor:
                         "video"
                     ] += 1
 
-            # =========================
-            # ARTICLE READ
-            # =========================
-
             elif event_name == "article_read":
 
                 read_time = metadata.get(
@@ -185,22 +153,16 @@ class FeatureExtractor:
                         "article"
                     ] += 1
 
-        # =========================
-        # NORMALIZE SKILLS
-        # =========================
-
         normalized_skills = {}
 
         for skill, score in skills.items():
 
-            normalized_skills[skill] = round(
+            normalized_skills[
+                skill
+            ] = round(
                 score,
                 2
             )
-
-        # =========================
-        # BUILD FEATURES
-        # =========================
 
         return {
 
@@ -227,4 +189,69 @@ class FeatureExtractor:
 
             "search_keywords":
                 dict(search_keywords)
+        }
+
+    @staticmethod
+    def extract_quiz_features(
+
+            submission,
+
+            questions_df
+    ):
+
+        skills_performance = defaultdict(float)
+
+        total_questions = len(questions_df)
+
+        score = submission["score"] / 10
+
+        duration = submission[
+                "duration_seconds"
+            ]
+
+        for _, row in questions_df.iterrows():
+
+            skill_name = row.get(
+                "skill_name"
+            )
+
+            if skill_name:
+
+                skills_performance[
+                    skill_name
+                ] += 1
+
+        normalized_skills = []
+
+        for skill, value in (
+                skills_performance
+                .items()
+        ):
+
+            normalized_skills.append({
+
+                "skill": skill,
+
+                "correct_ratio": round(
+                    value / total_questions,
+                    2
+                )
+            })
+
+        return {
+
+            "score":
+                score,
+
+            "duration_seconds":
+                duration,
+
+            "skills_performance":
+                normalized_skills,
+
+            "total_questions":
+                total_questions,
+
+            "passed":
+                submission["passed"]
         }

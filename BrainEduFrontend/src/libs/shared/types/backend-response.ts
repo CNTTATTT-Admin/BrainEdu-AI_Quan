@@ -1,13 +1,16 @@
 export type BackendResponse<T> = {
     code: T;
     data: T;
-    unreadCount: number
+    meta: Pagination;
 }
 export type Pagination = {
     meta: {
         page: number;
-        limit: number;
-        total: number;
+        size: number;
+        totalElements: number;
+        totalPages: number;
+        haxNext: boolean;
+        hasPrevios: boolean;
     }
 }
 
