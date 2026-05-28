@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Award, CheckCircle2, Search, Eye, RefreshCw } from 'lucide-react';
+import { FileText, Award, CheckCircle2, Search, Eye, RefreshCw, Turntable } from 'lucide-react';
 import AITutorSidebar from '../component/HistoryQuizz/AITutorSidebar';
 import useGetSubmissionHistory from '../hooks/useGetSubmissionHistory';
 import { formatSubmissionTime } from '../../../utils/helper';
@@ -14,12 +14,6 @@ interface QuizAttempt {
   score: number | string;
   status: 'COMPLETED' | 'PROCESSING';
 }
-
-const attemptsData: QuizAttempt[] = [
-  { id: 1, title: 'Kiểm tra cuối khóa - JavaScript Foundation', category: 'JS', time: '14:30 - 20/10/2024', duration: '45 phút', score: 9.5, status: 'COMPLETED' },
-  { id: 2, title: 'Layout nâng cao với CSS Grid & Flexbox', category: 'HTML', time: '09:15 - 18/10/2024', duration: '30 phút', score: 6.8, status: 'COMPLETED' },
-  { id: 3, title: 'Thuật toán và Cấu trúc dữ liệu cơ bản', category: 'CODE', time: 'Tiết 4 - Hôm nay', duration: '60 phút', score: 'Đang chấm...', status: 'PROCESSING' }
-];
 
 const SubmissionHistoryPage: React.FC = () => {
   const { data, isPending } = useGetSubmissionHistory()
@@ -140,8 +134,24 @@ const SubmissionHistoryPage: React.FC = () => {
 
                     <div className="pt-3 border-t border-gray-50 flex items-center gap-2">
                       <NavLink
+                        to="/quiz-result"
+                        state={{
+                          submissionId: item.id
+                        }}
+                      >
+                        <button 
+                          className={`flex items-center gap-1 px-3 py-1.5 border rounded-xl text-[11px] font-bold transition cursor-pointer border-blue-100 text-blue-600 bg-blue-50/20 hover:bg-blue-50/80`}
+                        >
+                          <Turntable size={11} />
+                          <span>Xem lại kết quả</span>
+                        </button>
+                      </NavLink>
+
+                      <NavLink
                         to="/quiz-review"
-                        state={{submissionId: item.id}}
+                        state={{
+                          submissionId: item.id
+                        }}
                       >
                         <button 
                           className={`flex items-center gap-1 px-3 py-1.5 border rounded-xl text-[11px] font-bold transition cursor-pointer border-blue-100 text-blue-600 bg-blue-50/30 hover:bg-blue-50/80`}

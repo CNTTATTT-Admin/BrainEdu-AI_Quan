@@ -1,13 +1,21 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { CheckCircle2, XCircle, AlertCircle, Clock, Award, Star, BookOpen, Lightbulb, MessageSquare } from 'lucide-react';
+import useGetReviewQuiz from '../hooks/useGetReviewQuiz';
+import useGetAIInsight from '../hooks/useGetAIInsight';
 
 const QuizResultPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const result = location.state?.result;
+  const { submissionId } = location?.state || {};
 
-  if (!result) {
+  const { data, isPending } = useGetReviewQuiz(submissionId);
+  const { data: aiInsightData, isPending: aiPending } = useGetAIInsight(submissionId);
+  
+  const result = data?.data;
+  const aiInsight = aiInsightData || aiInsightData;
+
+  if (!submissionId) {
     return (
       <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center font-sans">
         <div className="text-center p-8 bg-white rounded-2xl shadow-sm border border-gray-100">
@@ -22,21 +30,15 @@ const QuizResultPage: React.FC = () => {
       </div>
     );
   }
-  console.log(result);
 
-  const {
-    correctAnswers = 0,
-    durationSeconds = 0,
-    passed = false,
-    quizTitle = "Bài kiểm tra",
-    answeredQuestions = 0,
-    skippedQuestions = 0,
-    score = 0,
-    totalQuestions = 0
-  } = result;
-  
-
-  const wrongAnswers = totalQuestions - correctAnswers - skippedQuestions; 
+  const wrongAnswers = (result?.totalQuestions ?? 0) - (result?.correctAnswers ?? 0);
+  const score = result?.score ?? 0;
+  const correctAnswers = result?.correctAnswers ?? 0;
+  const totalQuestions = result?.totalQuestions ?? 0;
+  const skippedQuestions = result?.skippedQuestions ?? 0;
+  const durationSeconds = result?.durationSeconds ?? 0;
+  const passed = result?.passed ?? false;
+  const quizTitle = result?.quizTitle ?? '';
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
@@ -57,17 +59,45 @@ const QuizResultPage: React.FC = () => {
     { label: 'Thời gian', value: formatTime(durationSeconds), icon: <Clock className="text-purple-500" size={16} /> },
   ];
 
-  const analysisData = [
-    { name: 'Kỹ năng Logic & Suy luận', value: passed ? 85 : 50, color: 'bg-[#0052cc]' },
-    { name: 'Đọc hiểu văn bản', value: passed ? 78 : 45, color: 'bg-[#0052cc]' },
-    { name: 'Từ vựng chuyên ngành', value: passed ? 65 : 30, color: 'bg-purple-500' },
-  ];
+  const levelStats: Record<string, { total: number; correct: number }> = {};
+  result?.questions?.forEach((q: any) => {
+    const level = q.difficultyLevel || 'BEGINNER';
+    if (!levelStats[level]) {
+      levelStats[level] = { total: 0, correct: 0 };
+    }
+    levelStats[level].total += 1;
+    if (q.isCorrect) {
+      levelStats[level].correct += 1;
+    }
+  });
 
-  const courses = [
-    { title: `Khóa học tối ưu kiến thức về ${quizTitle}`, students: '1.2k', duration: '4h 30m', tag: 'AI đề xuất' },
-    { title: 'Kỹ năng Đọc hiểu văn bản khoa học', students: '850', duration: '6h 15m' },
-    { title: 'Luyện tập tư duy Logic nâng cao', students: '2.4k', duration: '8h 00m' },
-  ];
+  const levelNameMap: Record<string, string> = {
+    BEGINNER: 'Mức độ Cơ bản (Beginner)',
+    INTERMEDIATE: 'Mức độ Trung cấp (Intermediate)',
+    ADVANCED: 'Mức độ Nâng cao (Advanced)',
+  };
+
+  const colorMap = ['bg-[#0052cc]', 'bg-purple-500', 'bg-amber-500'];
+
+  const dynamicAnalysisData = Object.keys(levelStats).map((level, index) => {
+    const stats = levelStats[level];
+    const percentage = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
+    return {
+      name: levelNameMap[level] || level,
+      value: percentage,
+      color: colorMap[index % colorMap.length]
+    };
+  });
+
+  if (dynamicAnalysisData.length === 0) {
+    dynamicAnalysisData.push({
+      name: 'Độ chính xác chung bài làm',
+      value: totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0,
+      color: 'bg-[#0052cc]'
+    });
+  }
+
+  const recommendedTopics = aiInsight?.recommended_topics || [];
 
   return (
     <div className="min-h-screen bg-[#f8fafc] p-6 font-sans antialiased text-gray-900">
@@ -90,8 +120,8 @@ const QuizResultPage: React.FC = () => {
               <button className="bg-[#0052cc] text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-blue-700 transition">
                 Học tiếp lộ trình
               </button>
-              <NavLink to="/quiz-review" state={{ submissionId: result.id }} className="bg-gray-100 text-gray-700 text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-gray-200 transition">
-                  Xem lại đáp án
+              <NavLink to="/quiz-review" state={{ submissionId: submissionId }} className="bg-gray-100 text-gray-700 text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-gray-200 transition">
+                Xem lại đáp án
               </NavLink>
             </div>
           </div>
@@ -143,108 +173,127 @@ const QuizResultPage: React.FC = () => {
             Phân tích từ AI Tutor
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            <div className="lg:col-span-8 border border-gray-100 rounded-2xl p-6 space-y-5">
-              <p className="text-sm italic text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-100">
-                {passed 
-                  ? '"Dựa trên dữ liệu bài làm, bạn thể hiện tư duy logic rất sắc bén. Tuy nhiên, phần từ vựng chuyên ngành đang là rào cản khiến bạn mất điểm ở các câu hỏi mức độ vận dụng cao."'
-                  : '"Kết quả phân tích cho thấy cấu trúc cốt lõi của phần kiến thức này chưa được tối ưu. Bạn cần chú trọng rèn luyện lại các định nghĩa cơ bản và tăng tốc thời gian đọc hiểu bài toán hơn."'}
-              </p>
-              
-              <div className="space-y-4">
-                {analysisData.map((bar, i) => (
-                  <div key={i} className="space-y-1.5">
-                    <div className="flex justify-between text-xs font-bold text-gray-700">
-                      <span>{bar.name}</span>
-                      <span>{bar.value}%</span>
+          {aiPending ? (
+            <div className="h-48 w-full bg-gray-50 rounded-2xl animate-pulse border border-gray-100" />
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              <div className="lg:col-span-8 border border-gray-100 rounded-2xl p-6 space-y-5">
+                <p className="text-sm italic text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-100">
+                  "{aiInsight?.mentor_feedback || aiInsight?.summary || 'Chưa có nhận xét tổng quan từ AI.'}"
+                </p>
+                
+                <div className="space-y-4">
+                  {dynamicAnalysisData.map((bar: any, i: number) => (
+                    <div key={i} className="space-y-1.5">
+                      <div className="flex justify-between text-xs font-bold text-gray-700">
+                        <span>{bar.name}</span>
+                        <span>{bar.value}%</span>
+                      </div>
+                      <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full ${bar.color} rounded-full transition-all duration-500`} 
+                          style={{ width: `${bar.value}%` }} 
+                        />
+                      </div>
                     </div>
-                    <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-                      <div className={`h-full ${bar.color} rounded-full`} style={{ width: `${bar.value}%` }} />
-                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="lg:col-span-4 space-y-4">
+                <div className="bg-green-50 border border-green-100 rounded-2xl p-5 space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-bold text-green-700 uppercase tracking-wide">
+                    <Star size={14} /> Điểm mạnh
                   </div>
-                ))}
+                  <div className="text-xs text-green-600 leading-relaxed space-y-1.5">
+                    {aiInsight?.strengths && aiInsight.strengths.length > 0 ? (
+                      aiInsight.strengths.map((str: string, index: number) => (
+                        <p key={index}>• {str}</p>
+                      ))
+                    ) : (
+                      <p>Hệ thống đang phân tích điểm mạnh của bạn.</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="bg-red-50 border border-red-100 rounded-2xl p-5 space-y-2 relative">
+                  <div className="flex items-center gap-2 text-xs font-bold text-red-700 uppercase tracking-wide">
+                    <AlertCircle size={14} /> Cần cải thiện
+                  </div>
+                  <div className="text-xs text-red-600 leading-relaxed space-y-1.5">
+                    {aiInsight?.weaknesses && aiInsight.weaknesses.length > 0 ? (
+                      aiInsight.weaknesses.map((weak: string, index: number) => (
+                        <p key={index}>• {weak}</p>
+                      ))
+                    ) : (
+                      <p>Hệ thống chưa ghi nhận điểm cần cải thiện yếu.</p>
+                    )}
+                  </div>
+                  <div className="absolute right-[-10px] bottom-2 w-8 h-8 rounded-full bg-[#0052cc] flex items-center justify-center text-white shadow-md cursor-pointer">
+                    <MessageSquare size={14} />
+                  </div>
+                </div>
+
+                <div className="bg-purple-50 border border-purple-100 rounded-2xl p-5 space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-bold text-purple-700 uppercase tracking-wide">
+                    <Lightbulb size={14} /> Bước tiếp theo từ AI
+                  </div>
+                  <div className="text-xs text-purple-600 leading-relaxed space-y-1.5">
+                    {aiInsight?.next_steps && aiInsight.next_steps.length > 0 ? (
+                      aiInsight.next_steps.map((step: string, index: number) => (
+                        <p key={index}>• {step}</p>
+                      ))
+                    ) : (
+                      <p>Hãy tiếp tục luyện tập theo lộ trình đề xuất.</p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-
-            <div className="lg:col-span-4 space-y-4">
-              <div className="bg-green-50 border border-green-100 rounded-2xl p-5 space-y-2">
-                <div className="flex items-center gap-2 text-xs font-bold text-green-700 uppercase tracking-wide">
-                  <Star size={14} /> Điểm mạnh
-                </div>
-                <p className="text-xs text-green-600 leading-relaxed">
-                  {passed 
-                    ? 'Xử lý tình huống tốt, tốc độ trả lời các câu hỏi tính toán vượt 20% so với trung bình.'
-                    : 'Tập trung cao độ khi làm bài, không bỏ sót các câu hỏi dễ.'}
-                </p>
-              </div>
-
-              <div className="bg-red-50 border border-red-100 rounded-2xl p-5 space-y-2 relative">
-                <div className="flex items-center gap-2 text-xs font-bold text-red-700 uppercase tracking-wide">
-                  <AlertCircle size={14} /> Cần cải thiện
-                </div>
-                <p className="text-xs text-red-600 leading-relaxed">
-                  {passed
-                    ? 'Các thuật ngữ về tài chính và công nghệ thông tin cần được bổ sung kịp thời.'
-                    : 'Cần phân bổ lại thời gian hợp lý, tránh việc trả lời vội vã ở các câu hỏi trọng tâm.'}
-                </p>
-                <div className="absolute right-[-10px] bottom-2 w-8 h-8 rounded-full bg-[#0052cc] flex items-center justify-center text-white shadow-md cursor-pointer">
-                  <MessageSquare size={14} />
-                </div>
-              </div>
-
-              <div className="bg-purple-50 border border-purple-100 rounded-2xl p-5 space-y-2">
-                <div className="flex items-center gap-2 text-xs font-bold text-purple-700 uppercase tracking-wide">
-                  <Lightbulb size={14} /> Mẹo từ AI
-                </div>
-                <p className="text-xs text-purple-600 leading-relaxed">
-                  Hãy thử phương pháp Flashcard cho bộ dữ liệu từ vựng chuyên ngành hệ thống đã chuẩn bị dưới đây.
-                </p>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
 
-        <div className="space-y-4">
-          <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">Lộ trình học đề xuất</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {courses.map((course, index) => (
-              <div key={index} className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between">
-                <div className="relative aspect-video bg-gray-100 flex items-center justify-center">
-                  <BookOpen size={40} className="text-gray-300" />
-                  {course.tag && (
+        {recommendedTopics.length > 0 && (
+          <div className="space-y-4">
+            <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">Chủ đề học tập được khuyến nghị</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {recommendedTopics.map((topic: string, index: number) => (
+                <div key={index} className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between">
+                  <div className="relative aspect-video bg-gray-100 flex items-center justify-center">
+                    <BookOpen size={40} className="text-gray-300" />
                     <span className="absolute top-3 left-3 bg-purple-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md">
-                      {course.tag}
+                      AI Đề Xuất
                     </span>
-                  )}
-                </div>
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                  <div className="space-y-1">
-                    <h4 className="text-sm font-bold text-gray-900 line-clamp-2">{course.title}</h4>
-                    <div className="flex gap-4 text-xs text-gray-400 font-medium">
-                      <span>👤 {course.students} học viên</span>
-                      <span>⏱ {course.duration}</span>
-                    </div>
                   </div>
-                  <button className={`w-full text-xs font-bold py-2.5 rounded-xl border transition ${
-                    index === 0 
-                      ? 'bg-[#0052cc] text-white border-[#0052cc] hover:bg-blue-700' 
-                      : 'bg-blue-50 text-[#0052cc] border-blue-50 hover:bg-blue-100'
-                  }`}>
-                    {index === 0 ? 'Học ngay' : 'Khám phá'}
-                  </button>
+                  <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-bold text-gray-900 line-clamp-2">Trọng tâm: {topic}</h4>
+                      <div className="flex gap-4 text-xs text-gray-400 font-medium">
+                        <span>📖 Tài liệu thông minh</span>
+                        <span>⏱ Đọc hiểu nhanh</span>
+                      </div>
+                    </div>
+                    <button className={`w-full text-xs font-bold py-2.5 rounded-xl border transition ${
+                      index === 0 
+                        ? 'bg-[#0052cc] text-white border-[#0052cc] hover:bg-blue-700' 
+                        : 'bg-blue-50 text-[#0052cc] border-blue-50 hover:bg-blue-100'
+                    }`}>
+                      {index === 0 ? 'Học ngay' : 'Khám phá'}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="flex flex-wrap items-center justify-center gap-4 pt-6 border-t border-gray-200">
           <button className="bg-[#0052cc] text-white text-xs font-bold px-6 py-3 rounded-xl flex items-center gap-2 hover:bg-blue-700 transition shadow-sm">
             Học tiếp lộ trình
           </button>
-          <button className="bg-white border border-gray-200 text-gray-700 text-xs font-bold px-6 py-3 rounded-xl hover:bg-gray-50 transition">
+          <NavLink to="/quiz-review" state={{ submissionId: submissionId }} className="bg-white border border-gray-200 text-gray-700 text-xs font-bold px-6 py-3 rounded-xl hover:bg-gray-50 transition flex items-center justify-center">
             Xem lại đáp án chi tiết
-          </button>
+          </NavLink>
           <button className="bg-white border border-gray-200 text-gray-700 text-xs font-bold px-6 py-3 rounded-xl hover:bg-gray-50 transition">
             Làm lại bài kiểm tra
           </button>

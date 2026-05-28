@@ -1,7 +1,7 @@
 import type { BackendResponse } from "../../../libs/shared/types/backend-response";
 import api from "../../../services/axios";
 import type { SubmitQuizRequest } from "../types/api-request";
-import type { QuestionResponse, QuizzResponse, QuizSubmissionResponse, QuizReviewResponse, MyResultResponse } from "../types/api-response";
+import type { QuestionResponse, QuizzResponse, QuizSubmissionResponse, QuizReviewResponse, MyResultResponse, AIInsightResponse } from "../types/api-response";
 export const onGetQuizzApi = async(
     lessonId: Number
 ) : Promise<BackendResponse<QuizzResponse>> => {
@@ -49,3 +49,8 @@ export const onGetSubmissionHistoryQuiz = async() : Promise<BackendResponse<MyRe
 
     return data.data
 }
+
+export const onGetAIInsightApi = async (quizSubmissionId: number): Promise<AIInsightResponse> => {
+  const data = await api.post(`/behavior/quiz-insight`, { quiz_submission_id: quizSubmissionId });
+  return data.data;
+};

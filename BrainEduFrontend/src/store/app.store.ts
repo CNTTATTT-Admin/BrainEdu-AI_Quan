@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getToken, removeRefreshToken, removeToken } from "../utils/token";
+import { getToken } from "../utils/token";
 import { jwtDecode } from 'jwt-decode'
 import { devtools } from "zustand/middleware";
 import type { JwtPayload } from "../libs/shared/types/jwt-payload";
@@ -17,18 +17,11 @@ export const useAppStore = create<AppStore>()(
         try {
             if (token) {
                 const decoded = jwtDecode<JwtPayload>(token);
-
                 const currentTime = Date.now() / 1000;
 
                 if (decoded.exp && decoded.exp > currentTime) {
                     initUserData = decoded;
-                } else {
-                    removeToken()
-                    removeRefreshToken()
-                    initUserData = null;
                 }
-                
-                initUserData = decoded;
             }
         } catch (error) {
             initUserData = null;

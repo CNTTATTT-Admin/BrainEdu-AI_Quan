@@ -86,3 +86,12 @@ export type MyResultResponse = {
     durationSeconds: Number,
     submittedAt: String
 }
+
+export type AIInsightResponse = {
+    summary: string
+    strengths: string
+    weaknesses: string[]
+    recommended_topics: string[]
+    next_steps: string[]
+    mentor_feedback: string
+}

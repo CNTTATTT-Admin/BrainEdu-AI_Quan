@@ -33,7 +33,7 @@ const processQueue = (error: any, token: string | null = null) => {
 api.interceptors.request.use(
     async (config) => { 
         const token = getToken(); 
-        if (token) {
+        if (token && config.headers) {
             config.headers["Authorization"] = `Bearer ${token}`;
         }
         return config;
@@ -50,24 +50,26 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config
         
-        if (!error.response) {
+        if (!error.response || !originalRequest) {
             return Promise.reject(error);
         }
 
-        if(
-            error.response?.status === 401 &&
-            !originalRequest._retry &&
-            originalRequest.url !== "/auth/refresh" &&
-            originalRequest.url !== "/auth/login" &&
-            originalRequest.url !== "/auth/logout" &&
-            originalRequest.url !== "/auth/register" 
-        ) {
+        const requestUrl = originalRequest.url || "";
+        const isAuthEndpoint = 
+            requestUrl.includes("/auth/refresh") || 
+            requestUrl.includes("/auth/login") || 
+            requestUrl.includes("/auth/logout") || 
+            requestUrl.includes("/auth/register");
+
+        if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
             if (isRefreshing) {
                 return new Promise((resolve, reject) => {
                     failedQueue.push({ resolve, reject });
                 })
                     .then((token) => {
-                        originalRequest.headers["Authorization"] = "Bearer " + token;
+                        if (originalRequest.headers) {
+                            originalRequest.headers["Authorization"] = "Bearer " + token;
+                        }
                         return api(originalRequest);
                     })
                     .catch((err) => {
@@ -79,12 +81,20 @@ api.interceptors.response.use(
             isRefreshing = true;
 
             const refreshToken = getRefreshToken()
-            if(refreshToken) {
+            if (refreshToken) {
                 try {
-                    delete originalRequest.headers["Authorization"]
+                    if (originalRequest.headers) {
+                        if (typeof originalRequest.headers.delete === 'function') {
+                            originalRequest.headers.delete("Authorization");
+                        } else {
+                            delete originalRequest.headers["Authorization"];
+                        }
+                    }
 
                     const response = await axios.post(
-                        `${ApiUrls.apiBaseUrl}/auth/refresh`, { refreshToken: refreshToken }
+                        `${ApiUrls.apiBaseUrl}/auth/refresh`, 
+                        { refreshToken: refreshToken },
+                        { withCredentials: true }
                     )
 
                     const responseData = response.data?.data;
@@ -92,13 +102,15 @@ api.interceptors.response.use(
                     const newAccessToken = responseData?.access_token || responseData?.accessToken;
                     const newRefreshToken = responseData?.refresh_token || responseData?.refreshToken;
 
-                    if(response.status === 200 && newAccessToken) {
+                    if (response.status === 200 && newAccessToken) {
                         setToken(newAccessToken)
                         if (newRefreshToken) {
                             setRefreshToken(newRefreshToken)
                         }
 
-                        originalRequest.headers["Authorization"] = "Bearer " + newAccessToken;
+                        if (originalRequest.headers) {
+                            originalRequest.headers["Authorization"] = "Bearer " + newAccessToken;
+                        }
                         
                         processQueue(null, newAccessToken);
                         isRefreshing = false;
