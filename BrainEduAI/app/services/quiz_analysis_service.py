@@ -61,8 +61,6 @@ class QuizAnalysisService:
             )
         )
 
-        print(content)
-
         content = content.strip()
 
         content = content.replace(

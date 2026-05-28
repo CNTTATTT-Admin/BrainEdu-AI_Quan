@@ -205,6 +205,14 @@ class FeatureExtractor:
 
         score = submission["score"] / 10
 
+        correct_answers = submission["correct_answers"]
+
+        accuracy_percent = round(
+            correct_answers /
+            total_questions * 100,
+            1
+        )
+
         duration = submission[
                 "duration_seconds"
             ]
@@ -251,6 +259,9 @@ class FeatureExtractor:
 
             "total_questions":
                 total_questions,
+            
+            "accuracy_percent":
+                accuracy_percent,
 
             "passed":
                 submission["passed"]
