@@ -122,22 +122,14 @@ public class QuestionServiceImpl
     }
 
     @Override
-    public Page<QuestionResponse> getByQuiz(
-            Long quizId,
-            int page,
-            int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size);
+        public List<QuestionResponse> getByQuiz(Long quizId) {
 
         return questionRepository
-                .findByQuizId(
-                        quizId,
-                        pageable
-                )
-                .map(
-                        questionMapper::toResponse
-                );
-    }
+                .findByQuizId(quizId)
+                .stream()
+                .map(questionMapper::toResponse)
+                .toList();
+        }
 
     @Override
     public Page<QuestionResponse> getBySkill(

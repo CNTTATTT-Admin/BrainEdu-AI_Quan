@@ -4,10 +4,11 @@ import useGetCourse from '../hooks/useGetCourse';
 import type { CoursesResponse } from '../types/api-response';
 import thumb from "../../../assets/coursethumbnail.png"
 import { NavLink } from 'react-router';
+import { formatVND } from '../../../utils/helper';
 const FeaturedCourses = () => {
   const { data, isPending } = useGetCourse({
     page: 0,
-    size: 4
+    size: 12
   });
   const courseList = data?.data || [];
 
@@ -33,7 +34,7 @@ const FeaturedCourses = () => {
             >
               <div key={course.id} className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex flex-col cursor-pointer">
                 <div className="h-44 bg-gray-200 relative">
-                  <img src={thumb} alt={course.title} className="w-full h-full object-cover" />
+                  <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover" />
                   <span className="absolute top-3 left-3 bg-[#8b5cf6] text-white text-[9px] font-extrabold px-2 py-1 rounded-md tracking-wider">
                     {course.estimatedDuration}h
                   </span>
@@ -50,9 +51,9 @@ const FeaturedCourses = () => {
                   <div className="flex items-center justify-between border-t border-gray-50 pt-3">
                     <div className="flex items-center gap-1 text-xs font-bold text-amber-500">
                       <Star size={14} fill="currentColor" />
-                      <span>{course.price.toFixed(1)}</span>
+                      <span>{formatVND(course.price.toFixed(1))}</span>
                     </div>
-                    <span className="text-sm font-bold text-[#0052cc]">{course.price}</span>
+                    <span className="text-sm font-bold text-[#0052cc]">{formatVND(course.price.toFixed(1))}</span>
                   </div>
                 </div>
               </div>

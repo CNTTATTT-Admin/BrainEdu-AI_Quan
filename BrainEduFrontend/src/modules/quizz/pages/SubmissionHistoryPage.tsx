@@ -5,16 +5,6 @@ import useGetSubmissionHistory from '../hooks/useGetSubmissionHistory';
 import { formatSubmissionTime } from '../../../utils/helper';
 import { NavLink } from 'react-router';
 
-interface QuizAttempt {
-  id: number;
-  title: string;
-  category: string;
-  time: string;
-  duration: string;
-  score: number | string;
-  status: 'COMPLETED' | 'PROCESSING';
-}
-
 const SubmissionHistoryPage: React.FC = () => {
   const { data, isPending } = useGetSubmissionHistory()
   const submissionList = data?.data || []
@@ -22,7 +12,6 @@ const SubmissionHistoryPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50/40 font-sans antialiased">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         
-        {/* TIÊU ĐỀ TRANG */}
         <div className="space-y-1">
           <h1 className="text-xl font-black text-gray-900 tracking-tight">Lịch sử nộp bài</h1>
           <p className="text-xs text-gray-500 font-medium">Theo dõi và xem lại các bài kiểm tra đã thực hiện trên nền tảng.</p>
@@ -90,7 +79,6 @@ const SubmissionHistoryPage: React.FC = () => {
               </div>
             </div>
 
-            {/* DANH SÁCH CÁC MỤC BÀI LÀM */}
             <div className="space-y-3.5">
               {submissionList.map((item) => {
                 const isComp = item.passed ? "COMPLETED" : "";
@@ -119,7 +107,7 @@ const SubmissionHistoryPage: React.FC = () => {
                         <div className="text-right">
                           <span className="text-[10px] text-gray-400 font-bold block">Điểm số</span>
                           <span className={`text-sm font-black ${isComp ? 'text-blue-600' : 'text-gray-500 italic'}`}>
-                            {item.score / 10} / 10
+                            {(item.score / 10).toFixed(1)} / 10
                           </span>
                         </div>
                         <span className={`text-[10px] font-black tracking-wider px-2 py-0.5 rounded-md uppercase border ${
@@ -142,7 +130,7 @@ const SubmissionHistoryPage: React.FC = () => {
                         <button 
                           className={`flex items-center gap-1 px-3 py-1.5 border rounded-xl text-[11px] font-bold transition cursor-pointer border-blue-100 text-blue-600 bg-blue-50/20 hover:bg-blue-50/80`}
                         >
-                          <Turntable size={11} />
+                          <Eye size={11} />
                           <span>Xem lại kết quả</span>
                         </button>
                       </NavLink>

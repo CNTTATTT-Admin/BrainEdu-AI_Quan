@@ -4,7 +4,7 @@ from app.database import engine
 
 def get_quiz_submission(
     quiz_submission_id
-):
+    ):
 
     query = """
 
@@ -36,11 +36,8 @@ def get_quiz_submission(
     """
 
     df = pd.read_sql(
-
         query,
-
         con=engine,
-
         params=(quiz_submission_id,)
     )
 
@@ -49,29 +46,54 @@ def get_quiz_submission(
 
     return df.iloc[0].to_dict()
 
-def get_quiz_questions(
-    quiz_id
-):
+def get_quiz_answers(
+    quiz_submission_id
+    ):
 
     query = """
 
         SELECT
 
-            qu.id,
-            qu.question_text,
-            qu.question_type,
-            qu.difficulty_level,
-            qu.weight_score,
+            ua.id,
 
-            s.skill_name
+            ua.is_correct,
 
-        FROM questions qu
+            ua.response_time,
+
+            q.id AS question_id,
+
+            q.question_text,
+
+            q.question_type,
+
+            q.difficulty_level,
+
+            s.skill_name,
+
+            selected.answer_text
+                AS selected_answer,
+
+            correct.answer_text
+                AS correct_answer
+
+        FROM user_answers ua
+
+        INNER JOIN questions q
+            ON q.id = ua.question_id
 
         LEFT JOIN skills s
-            ON s.id = qu.skill_id
+            ON s.id = q.skill_id
 
-        WHERE qu.quiz_id = %s
-        AND qu.deleted = 0
+        LEFT JOIN answers selected
+            ON selected.id =
+                ua.selected_answer_id
+
+        LEFT JOIN answers correct
+            ON correct.question_id =
+                q.id
+        AND correct.is_correct = 1
+
+        WHERE ua.quiz_submission_id = %s
 
     """
 
@@ -81,5 +103,5 @@ def get_quiz_questions(
 
         con=engine,
 
-        params=(quiz_id,)
+        params=(quiz_submission_id,)
     )

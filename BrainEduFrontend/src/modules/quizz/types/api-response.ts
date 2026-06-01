@@ -1,90 +1,90 @@
 export type QuizzResponse = {
-    id: Number,
-    lessonId: Number,
-    lessonTtitle: String,
-    title: String,
-    quizType: String,
-    totalQuestions: Number,
-    duration: Number,
-    passingScore: Number
+    id: number,
+    lessonId: number,
+    lessonTtitle: string,
+    title: string,
+    quizType: string,
+    totalQuestions: number,
+    duration: number,
+    passingScore: number
 }
 
 export type QuestionResponse = {
-    id: Number,
-    quizId: Number,
-    quizTitle: String,
-    skillId: Number,
-    skillName: String,
-    questionText: String,
-    difficultyLevel: String,
-    questionType: String,
-    weightScore: Number
+    id: number,
+    quizId: number,
+    quizTitle: string,
+    skillId: number,
+    skillName: string,
+    questionText: string,
+    difficultyLevel: string,
+    questionType: string,
+    weightScore: number
 }
 
 export type AnswerResponse = {
-    id: Number,
-    questionId: Number,
-    questionText: String,
-    answerText: String,
-    isCorrect: Boolean
+    id: number,
+    questionId: number,
+    questionText: string,
+    answerText: string,
+    isCorrect: boolean
 }
 
 export type QuizSubmissionResponse = {
-    id: Number,
-    quizId: Number,
-    quizTitle: String,
-    totalQuestions: Number,
-    correctAnswers: Number,
-    score: Number,
-    answeredQuestions: Number,
-    skippedQuestions: Number,
-    passed: Boolean,
-    durationSeconds: Number,
-    submittedAt: String
+    id: number,
+    quizId: number,
+    quizTitle: string,
+    totalQuestions: number,
+    correctAnswers: number,
+    score: number,
+    answeredQuestions: number,
+    skippedQuestions: number,
+    passed: boolean,
+    durationSeconds: number,
+    submittedAt: string
 }
 
 export type QuestionQuizReviewResponse = {
-    questionId: Number,
-    questionNumber: Number,
-    questionText: String,
-    questionType: String,
-    difficultyLevel: String,
-    selectedAnswerId: Number | null,
-    correctAnswerId: Number,
-    isCorrect: Boolean,
+    questionId: number,
+    questionNumber: number,
+    questionText: string,
+    questionType: string,
+    difficultyLevel: string,
+    selectedAnswerId: number | null,
+    correctAnswerId: number,
+    isCorrect: boolean,
     answers: AnswerResponse[]
 }
 
 export type QuestionStatus = {
-    id: Number,
+    id: number,
     status: 'correct' | 'wrong' | 'skipped';
 }
 
 
 export type QuizReviewResponse = {
-    submissionId: Number,
-    quizId: Number,
-    quizTitle: String,
-    score: Number,
-    passed: Boolean,
-    totalQuestions: Number,
-    correctAnswers: Number,
-    skippedQuestions: Number,
+    submissionId: number,
+    quizId: number,
+    quizTitle: string,
+    score: number,
+    passed: boolean,
+    totalQuestions: number,
+    correctAnswers: number,
+    skippedQuestions: number,
     questions: QuestionQuizReviewResponse[]
 }
 
 export type MyResultResponse = {
-    id: Number,
-    quizId: Number,
-    quizTitle: String,
-    totalQuestions: Number,
-    correctAnswers: Number,
-    score: Number,
-    answeredQuestions: Number,
-    skippedQuestions: Number,
-    passed: Boolean,
-    durationSeconds: Number,
-    submittedAt: String
+    id: number,
+    quizId: number,
+    quizTitle: string,
+    totalQuestions: number,
+    correctAnswers: number,
+    score: number,
+    answeredQuestions: number,
+    skippedQuestions: number,
+    passed: boolean,
+    durationSeconds: number,
+    submittedAt: string
 }
 
 export type AIInsightResponse = {
@@ -92,6 +92,7 @@ export type AIInsightResponse = {
     strengths: string
     weaknesses: string[]
     recommended_topics: string[]
-    next_steps: string[]
+    next_actions: string[]
+    study_plan: string[]
     mentor_feedback: string
 }

@@ -60,6 +60,7 @@ export const formatSubmissionTime = (isoString: string | undefined | null): stri
 
   return `${hours}:${minutes} - ${day}/${month}/${year}`;
 };
+
 export const formatStepTime = (dateString: string | undefined) => {
   if (!dateString) return null;
   const date = new Date(dateString);

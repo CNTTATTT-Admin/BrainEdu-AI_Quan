@@ -83,40 +83,18 @@ public class QuestionController {
     }
 
     @GetMapping("/quiz/{quizId}")
-    public ApiResponse<List<QuestionResponse>>
-    getByQuiz(
+        public ApiResponse<List<QuestionResponse>> getByQuiz(
+                @PathVariable Long quizId
+        ) {
 
-            @PathVariable Long quizId,
-
-            @RequestParam(
-                    defaultValue = "0"
-            )
-            int page,
-
-            @RequestParam(
-                    defaultValue = "10"
-            )
-            int size
-    ) {
-
-        Page<QuestionResponse> questions =
-                questionService.getByQuiz(
-                        quizId,
-                        page,
-                        size
-                );
-
-        PaginationMeta meta =
-                ResponseFactory.pagination(
-                        questions
-                );
+        List<QuestionResponse> questions =
+                questionService.getByQuiz(quizId);
 
         return ResponseFactory.success(
                 "Questions by quiz fetched successfully",
-                questions.getContent(),
-                meta
+                questions
         );
-    }
+        }
 
     @GetMapping("/skill/{skillId}")
     public ApiResponse<List<QuestionResponse>>

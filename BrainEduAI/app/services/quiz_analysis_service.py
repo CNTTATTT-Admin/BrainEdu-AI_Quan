@@ -2,7 +2,7 @@ import json
 
 from app.repositories.quiz_repository import (
 get_quiz_submission,
-get_quiz_questions
+get_quiz_answers
 )
 
 from app.recommend.feature_extractor import (
@@ -33,11 +33,12 @@ class QuizAnalysisService:
             )
         )
 
-        questions_df = (
-            get_quiz_questions(
-                submission["quiz_id"]
+        answers_df = (
+            get_quiz_answers(
+                quiz_submission_id
             )
         )
+        print(answers_df.columns.tolist())
 
         features = (
             FeatureExtractor
@@ -45,7 +46,7 @@ class QuizAnalysisService:
 
                 submission,
 
-                questions_df
+                answers_df
             )
         )
 

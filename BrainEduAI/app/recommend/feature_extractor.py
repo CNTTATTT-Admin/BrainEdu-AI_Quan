@@ -193,76 +193,274 @@ class FeatureExtractor:
 
     @staticmethod
     def extract_quiz_features(
-
             submission,
 
-            questions_df
-    ):
+            answers_df
+        ):
 
-        skills_performance = defaultdict(float)
+        skill_stats = defaultdict(
 
-        total_questions = len(questions_df)
+            lambda: {
 
-        score = submission["score"] / 10
+                "correct": 0,
 
-        correct_answers = submission["correct_answers"]
-
-        accuracy_percent = round(
-            correct_answers /
-            total_questions * 100,
-            1
+                "total": 0
+            }
         )
 
-        duration = submission[
-                "duration_seconds"
-            ]
+        weak_skills = []
 
-        for _, row in questions_df.iterrows():
+        strong_skills = []
 
-            skill_name = row.get(
+        wrong_questions = []
+
+        correct_questions = []
+
+        difficulty_stats = defaultdict(
+
+            lambda: {
+
+                "correct": 0,
+
+                "total": 0
+            }
+        )
+
+        total_response_time = 0
+
+        for _, row in answers_df.iterrows():
+
+            skill = row.get(
                 "skill_name"
             )
 
-            if skill_name:
+            difficulty = row.get(
+                "difficulty_level"
+            )
 
-                skills_performance[
-                    skill_name
-                ] += 1
+            raw_correct = row.get(
+                "is_correct"
+            )
 
-        normalized_skills = []
+            if isinstance(
+                    raw_correct,
+                    bytes
+            ):
 
-        for skill, value in (
-                skills_performance
-                .items()
+                is_correct = (
+                    raw_correct == b"\x01"
+                )
+
+            else:
+
+                is_correct = bool(
+                    raw_correct
+                )
+
+            response_time = (
+                row.get(
+                    "response_time"
+                ) or 0
+            )
+
+            total_response_time += (
+                response_time
+            )
+
+            if skill:
+
+                skill_stats[
+                    skill
+                ]["total"] += 1
+
+                if is_correct:
+
+                    skill_stats[
+                        skill
+                    ]["correct"] += 1
+
+            if difficulty:
+
+                difficulty_stats[
+                    difficulty
+                ]["total"] += 1
+
+                if is_correct:
+
+                    difficulty_stats[
+                        difficulty
+                    ]["correct"] += 1
+
+            question_data = {
+
+                "question":
+
+                    row.get(
+                        "question_text"
+                    ),
+
+                "selected_answer":
+
+                    row.get(
+                        "selected_answer"
+                    ),
+
+                "correct_answer":
+
+                    row.get(
+                        "correct_answer"
+                    ),
+
+                "skill":
+
+                    skill,
+
+                "difficulty":
+
+                    difficulty
+            }
+
+            if is_correct:
+
+                correct_questions.append(
+                    question_data
+                )
+
+            else:
+
+                wrong_questions.append(
+                    question_data
+                )
+
+        skills_performance = []
+
+        for skill, stats in (
+
+                skill_stats.items()
         ):
 
-            normalized_skills.append({
+            ratio = round(
+
+                stats["correct"]
+                / stats["total"],
+
+                2
+            )
+
+            skills_performance.append({
 
                 "skill": skill,
 
-                "correct_ratio": round(
-                    value / total_questions,
-                    2
-                )
+                "correct_ratio":
+                    ratio
             })
+
+            if ratio >= 0.8:
+
+                strong_skills.append(
+                    skill
+                )
+
+            elif ratio <= 0.5:
+
+                weak_skills.append(
+                    skill
+                )
+
+        difficulty_performance = {}
+
+        for difficulty, stats in (
+
+                difficulty_stats.items()
+        ):
+
+            difficulty_performance[
+                difficulty
+            ] = round(
+
+                stats["correct"]
+                / stats["total"],
+
+                2
+            )
+
+        total_questions = max(
+            len(answers_df),
+            1
+        )
+
+        avg_response_time = round(
+
+            total_response_time
+            / total_questions,
+
+            2
+        )
+
+        accuracy_percent = round(
+
+            submission[
+                "correct_answers"
+            ]
+
+            /
+
+            submission[
+                "total_questions"
+            ]
+
+            * 100,
+
+            1
+        )
+        print(skills_performance)
+        print(strong_skills)
+        print(weak_skills)
+        print(difficulty_performance)
 
         return {
 
+            "quiz_title":
+                submission[
+                    "quiz_title"
+                ],
+
             "score":
-                score,
+                submission[
+                    "score"
+                ],
 
-            "duration_seconds":
-                duration,
+            "passed":
+                submission[
+                    "passed"
+                ],
 
-            "skills_performance":
-                normalized_skills,
-
-            "total_questions":
-                total_questions,
-            
             "accuracy_percent":
                 accuracy_percent,
 
-            "passed":
-                submission["passed"]
+            "duration_seconds":
+                submission[
+                    "duration_seconds"
+                ],
+
+            "avg_response_time":
+                avg_response_time,
+
+            "skills_performance":
+                skills_performance,
+
+            "strong_skills":
+                strong_skills,
+
+            "weak_skills":
+                weak_skills,
+
+            "difficulty_performance":
+                difficulty_performance,
+
+            "wrong_questions":
+                wrong_questions,
+
+            "correct_questions":
+                correct_questions
         }

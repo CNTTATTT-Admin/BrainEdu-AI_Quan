@@ -3,7 +3,7 @@ package com.brainedu.BrainEdu.controller;
 import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.common.response.PaginationMeta;
 import com.brainedu.BrainEdu.common.response.ResponseFactory;
-import com.brainedu.BrainEdu.dto.request.QuizRequest.SubmitQuizRequest;
+import com.brainedu.BrainEdu.dto.request.SubmitQuizRequest.java.*;
 import com.brainedu.BrainEdu.dto.response.QuizResponse.QuizReviewResponse;
 import com.brainedu.BrainEdu.dto.response.QuizSubmissionResponse.*;
 import com.brainedu.BrainEdu.service.quizSubmissionService.*;

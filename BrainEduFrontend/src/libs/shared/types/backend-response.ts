@@ -4,14 +4,12 @@ export type BackendResponse<T> = {
     meta: Pagination;
 }
 export type Pagination = {
-    meta: {
-        page: number;
-        size: number;
-        totalElements: number;
-        totalPages: number;
-        haxNext: boolean;
-        hasPrevios: boolean;
-    }
+    page: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrevious: boolean;
 }
 
 export type BackendErrorResponse = {

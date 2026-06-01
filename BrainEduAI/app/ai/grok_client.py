@@ -51,7 +51,12 @@ class GroqClient:
                     }
                 ],
 
-                temperature=0.7
+                temperature=0.3,
+
+                response_format={
+                "type": "json_object"
+                }
+
             )
         )
 

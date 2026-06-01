@@ -18,11 +18,7 @@ public interface QuestionService {
             Long id
     );
 
-    Page<QuestionResponse> getByQuiz(
-            Long quizId,
-            int page,
-            int size
-    );
+    List<QuestionResponse> getByQuiz(Long quizId);
 
     Page<QuestionResponse> getBySkill(
             Long skillId,

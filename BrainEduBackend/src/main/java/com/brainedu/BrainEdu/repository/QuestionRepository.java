@@ -11,11 +11,6 @@ import java.util.Optional;
 public interface QuestionRepository
         extends JpaRepository<Question, Long> {
 
-    Page<Question> findByQuizId(
-            Long quizId,
-            Pageable pageable
-    );
-
     Page<Question> findBySkillId(
             Long skillId,
             Pageable pageable

@@ -43,7 +43,7 @@ const CourseByCategoryPage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {courseList.map((item: CourseCategoryResponse) => (
                   <MainCourseCard 
-                    image="https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=500"
+                    image={item.thumbnail}
                     level={item.level}
                     title={item.title}
                     instructor={item.instructorName}

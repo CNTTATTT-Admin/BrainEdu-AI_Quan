@@ -1,17 +1,17 @@
 export type CategoryResponse = {
-    id: Number,
-    categoryName: String,
-    description: String
+    id: number,
+    categoryName: string,
+    description: string
 }
 
 export type CoursesResponse = {
-    id: Number,
-    categoryId: Number,
-    categoryName: String,
-    description: String,
-    thumbnail: String,
-    instructorName: String,
-    price: Number,
-    title: String,
-    estimatedDuration: String
+    id: number,
+    categoryId: number,
+    categoryName: string,
+    description: string,
+    thumbnail: string,
+    instructorName: string,
+    price: number,
+    title: string,
+    estimatedDuration: string
 }

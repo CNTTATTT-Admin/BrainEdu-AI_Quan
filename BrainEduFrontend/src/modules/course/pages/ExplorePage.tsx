@@ -16,11 +16,11 @@ const ExplorePage: React.FC = () => {
 
   const { data, isPending } = useGetCourse({ 
     page: currentPage, 
-    size: 6 
+    size: 9
   });
 
   const courseList = data?.data || [];
-  const pagination = data?.meta || {};
+  const pagination = data?.meta;
 
   const handlePageChange = (targetPage: number) => {
     setCurrentPage(targetPage);
@@ -55,7 +55,6 @@ const ExplorePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. AI RECOMMENDATIONS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
         <div className="bg-gradient-to-br from-purple-50/50 to-indigo-50/30 border border-purple-100/60 rounded-3xl p-6 space-y-5 relative">
           <div className="flex items-center gap-2 text-purple-900">
@@ -105,14 +104,11 @@ const ExplorePage: React.FC = () => {
         <CategoryTabs onCategoryChange={handleCategoryFilter} />
       </section>
 
-      {/* 3. MAIN CATALOG SECTION */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex flex-col md:flex-row gap-8">
           
-          {/* Filter Sidebar Component */}
           <FilterSidebar />
 
-          {/* Main Grid Content */}
           <div className="flex-1 space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
               <span className="font-bold text-gray-500">
@@ -147,7 +143,7 @@ const ExplorePage: React.FC = () => {
                     rating={course.rating || 5.0}
                     reviews={course.reviewsCount || 0}
                     price={course.price || "Miễn phí"}
-                    thumbnail={course.thumbnail || "https://it.ctim.edu.vn/d89-ngon-ngu-lap-trinh-la-gi-khai-niem-ngon-ngu-lap-trinh-ngan-gon-de-hieu-nhat.html"}
+                    thumbnail={course.thumbnail}
                     id={course.id}
                   />
                 ))}

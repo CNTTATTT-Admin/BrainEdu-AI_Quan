@@ -1,6 +1,5 @@
-package com.brainedu.BrainEdu.dto.request.QuizRequest;
+package com.brainedu.BrainEdu.dto.request.SubmitQuizRequest.java;
 
-import com.brainedu.BrainEdu.dto.request.SubmitQuizRequest.java.QuizAnswerRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

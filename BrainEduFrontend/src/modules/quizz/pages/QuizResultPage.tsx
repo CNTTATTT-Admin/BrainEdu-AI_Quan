@@ -239,8 +239,8 @@ const QuizResultPage: React.FC = () => {
                     <Lightbulb size={14} /> Bước tiếp theo từ AI
                   </div>
                   <div className="text-xs text-purple-600 leading-relaxed space-y-1.5">
-                    {aiInsight?.next_steps && aiInsight.next_steps.length > 0 ? (
-                      aiInsight.next_steps.map((step: string, index: number) => (
+                    {aiInsight?.next_actions && aiInsight.next_actions.length > 0 ? (
+                      aiInsight.next_actions.map((step: string, index: number) => (
                         <p key={index}>• {step}</p>
                       ))
                     ) : (

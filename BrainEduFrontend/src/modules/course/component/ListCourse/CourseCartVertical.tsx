@@ -28,7 +28,7 @@ const CourseCardVertical: React.FC<CourseProps> = ({
           <div className="bg-gray-50 h-40 w-full relative border-b border-gray-50 overflow-hidden flex items-center justify-center">
             {thumbnail ? (
               <img 
-                src={tn} 
+                src={thumbnail} 
                 alt={title} 
                 className="w-full h-full object-cover"
                 loading="lazy"
