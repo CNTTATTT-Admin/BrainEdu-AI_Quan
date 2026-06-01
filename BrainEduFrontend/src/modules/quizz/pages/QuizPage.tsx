@@ -237,25 +237,25 @@ const QuizPage: React.FC = () => {
     console.log(payload);
     
 
-    // mutate(payload, {
-    //   onSuccess: (response) => {
-    //     localStorage.removeItem(`quiz_progress_${quizId}`);
-    //     localStorage.removeItem(`quiz_time_${quizId}`);
-    //     localStorage.setItem(`quiz_submitted_${quizId}`, 'true');
+    mutate(payload, {
+      onSuccess: (response) => {
+        localStorage.removeItem(`quiz_progress_${quizId}`);
+        localStorage.removeItem(`quiz_time_${quizId}`);
+        localStorage.setItem(`quiz_submitted_${quizId}`, 'true');
         
-    //     navigate('/quiz-result', { 
-    //       state: { 
-    //         result: response.data,
-    //         submissionId: response.data?.submissionId || response.data?.id,
-    //         isSubmitted: true
-    //       },
-    //       replace: true
-    //     });
-    //   },
-    //   onError: (err) => {
-    //     console.error("Lỗi khi nộp bài:", err);
-    //   }
-    // });
+        navigate('/quiz-result', { 
+          state: { 
+            result: response.data,
+            submissionId: response.data?.submissionId || response.data?.id,
+            isSubmitted: true
+          },
+          replace: true
+        });
+      },
+      onError: (err) => {
+        console.error("Lỗi khi nộp bài:", err);
+      }
+    });
   };
 
   const questionStatuses: Record<number, 'completed' | 'current' | 'unassigned'> = {};

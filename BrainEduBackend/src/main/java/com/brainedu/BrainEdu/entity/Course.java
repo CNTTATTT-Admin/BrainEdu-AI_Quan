@@ -5,6 +5,9 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import com.brainedu.BrainEdu.common.enums.CourseStatus;
+import com.brainedu.BrainEdu.common.enums.CourseType;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -25,9 +28,7 @@ import java.time.LocalDateTime;
 public class Course extends BaseEntity {
 
     @Id
-    @GeneratedValue(
-            strategy = GenerationType.IDENTITY
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -36,49 +37,59 @@ public class Course extends BaseEntity {
 
     private String title;
 
-    @Column(
-            columnDefinition = "TEXT"
-    )
+    @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(name = "short_description")
+    private String shortDescription;
 
     private String level;
 
     @Column(name = "estimated_duration")
     private Integer estimatedDuration;
 
-    @Column(
-            columnDefinition = "TEXT"
-    )
+    @Column(columnDefinition = "TEXT")
     private String thumbnail;
 
     @Column(name = "difficulty_score")
     private Float difficultyScore;
 
-    // đổi createdBy -> instructor
     @ManyToOne
     @JoinColumn(name = "instructor_id")
     private User instructor;
 
-    @Column(name = "short_description")
-    private String shortDescription;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "course_type")
+    private CourseType courseType;
 
-    @Column(name = "tags")
+    @Enumerated(EnumType.STRING)
+    private CourseStatus status;
+
+    private Float price;
+
+    @Column(name = "max_students")
+    private Integer maxStudents;
+
+    @Column(name = "enrollment_start")
+    private LocalDateTime enrollmentStart;
+
+    @Column(name = "enrollment_end")
+    private LocalDateTime enrollmentEnd;
+
+    @Column(name = "tags", columnDefinition = "TEXT")
     private String tags;
 
-    @Column(name = "career_paths")
+    @Column(name = "career_paths", columnDefinition = "TEXT")
     private String careerPaths;
 
-    @Column(name = "domain_keywords")
+    @Column(name = "domain_keywords", columnDefinition = "TEXT")
     private String domainKeywords;
 
-    @Column(name = "learning_outcomes")
+    @Column(name = "learning_outcomes", columnDefinition = "TEXT")
     private String learningOutcomes;
 
-    @Column(name = "industries")
+    @Column(name = "industries", columnDefinition = "TEXT")
     private String industries;
-
-    // thêm price nếu muốn bán course
-    private Float price;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

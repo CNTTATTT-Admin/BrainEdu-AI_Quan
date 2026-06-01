@@ -1,5 +1,7 @@
 package com.brainedu.BrainEdu.service.courseService;
 
+import com.brainedu.BrainEdu.common.enums.CourseStatus;
+import com.brainedu.BrainEdu.common.enums.CourseType;
 import com.brainedu.BrainEdu.config.ApiException;
 import com.brainedu.BrainEdu.dto.request.CourseRequest.*;
 import com.brainedu.BrainEdu.dto.response.CourseResponse.*;
@@ -39,89 +41,95 @@ public class CourseServiceImpl
             courseMapper;
 
     @Override
-    public CourseResponse create(
-            CreateCourseRequest request
-    ) {
+        public CourseResponse create(
+                CreateCourseRequest request
+        ) {
 
-        Authentication authentication =
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication();
+        String email = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
 
-        String email =
-                authentication.getName();
-
-        User instructor =
-                userRepository
-                        .findByEmail(email)
-                        .orElseThrow(
-                                () -> new ApiException(
-                                        "Instructor not found"
-                                )
-                        );
-
-        Category category =
-                categoryRepository
-                        .findById(
-                                request.getCategoryId()
+        User instructor = userRepository
+                .findByEmail(email)
+                .orElseThrow(
+                        () -> new ApiException(
+                                "Instructor not found"
                         )
-                        .orElseThrow(
-                                () -> new ApiException(
-                                        "Category not found"
-                                )
-                        );
+                );
 
-        Course course =
-                Course.builder()
-
-                        .category(category)
-
-                        .title(
-                                request.getTitle()
+        Category category = categoryRepository
+                .findById(
+                        request.getCategoryId()
+                )
+                .orElseThrow(
+                        () -> new ApiException(
+                                "Category not found"
                         )
+                );
 
-                        .description(
-                                request.getDescription()
-                        )
+        Float price = request.getPrice();
 
-                        .level(
-                                request.getLevel()
-                        )
+        if (request.getCourseType() == CourseType.FREE) {
+                price = 0F;
+        } else if (price <= 0) {
+                throw new ApiException(
+                        "Price must be greater than 0"
+                );
+        }
 
-                        .estimatedDuration(
-                                request
-                                        .getEstimatedDuration()
-                        )
+        Course course = Course.builder()
 
-                        .thumbnail(
-                                request.getThumbnail()
-                        )
+                .category(category)
 
-                        .difficultyScore(
-                                request
-                                        .getDifficultyScore()
-                        )
+                .title(
+                        request.getTitle()
+                )
 
-                        .price(
-                                request.getPrice()
-                        )
+                .description(
+                        request.getDescription()
+                )
 
-                        .instructor(
-                                instructor
-                        )
+                .level(
+                        request.getLevel()
+                )
 
-                        .createdAt(
-                                LocalDateTime.now()
-                        )
+                .estimatedDuration(
+                        request.getEstimatedDuration()
+                )
 
-                        .build();
+                .thumbnail(
+                        request.getThumbnail()
+                )
 
-        courseRepository.save(course);
+                .courseType(
+                        request.getCourseType()
+                )
+
+                .status(
+                        CourseStatus.DRAFT
+                )
+
+                .price(
+                        price
+                )
+
+                .instructor(
+                        instructor
+                )
+
+                .createdAt(
+                        LocalDateTime.now()
+                )
+
+                .build();
+
+        course = courseRepository.save(course);
 
         return courseMapper.toResponse(
                 course
         );
-    }
+        }
 
     @Override
     public Page<CourseResponse> getAll(int page, int size) {

@@ -1,9 +1,12 @@
-        package com.brainedu.BrainEdu.dto.request.CourseRequest;
+package com.brainedu.BrainEdu.dto.request.CourseRequest;
 
+import com.brainedu.BrainEdu.common.enums.*;
 import jakarta.validation.constraints.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class CreateCourseRequest {
 
     @NotNull
@@ -27,8 +30,7 @@ public class CreateCourseRequest {
     private String thumbnail;
 
     @NotNull
-    @Positive
-    private Float difficultyScore;
+    private CourseType courseType;
 
     @NotNull
     @PositiveOrZero
