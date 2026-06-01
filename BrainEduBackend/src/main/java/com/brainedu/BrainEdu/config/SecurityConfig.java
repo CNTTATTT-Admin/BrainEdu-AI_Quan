@@ -54,6 +54,10 @@ public class SecurityConfig {
                                 "/api/v1/behavior/**"
                         ).permitAll()
 
+                        .requestMatchers(
+                                "/api/v1/quiz-analyses/**"
+                        ).permitAll()
+
                         // PUBLIC GET
                         .requestMatchers(
                                 HttpMethod.GET,

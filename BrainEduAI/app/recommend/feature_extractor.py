@@ -194,16 +194,12 @@ class FeatureExtractor:
     @staticmethod
     def extract_quiz_features(
             submission,
-
             answers_df
         ):
 
         skill_stats = defaultdict(
-
             lambda: {
-
                 "correct": 0,
-
                 "total": 0
             }
         )
@@ -217,11 +213,8 @@ class FeatureExtractor:
         correct_questions = []
 
         difficulty_stats = defaultdict(
-
             lambda: {
-
                 "correct": 0,
-
                 "total": 0
             }
         )
@@ -294,29 +287,24 @@ class FeatureExtractor:
             question_data = {
 
                 "question":
-
                     row.get(
                         "question_text"
                     ),
 
                 "selected_answer":
-
                     row.get(
                         "selected_answer"
                     ),
 
                 "correct_answer":
-
                     row.get(
                         "correct_answer"
                     ),
 
                 "skill":
-
                     skill,
 
                 "difficulty":
-
                     difficulty
             }
 
@@ -334,16 +322,11 @@ class FeatureExtractor:
 
         skills_performance = []
 
-        for skill, stats in (
-
-                skill_stats.items()
-        ):
+        for skill, stats in skill_stats.items():
 
             ratio = round(
-
                 stats["correct"]
                 / stats["total"],
-
                 2
             )
 
@@ -351,8 +334,7 @@ class FeatureExtractor:
 
                 "skill": skill,
 
-                "correct_ratio":
-                    ratio
+                "correct_ratio": ratio
             })
 
             if ratio >= 0.8:
@@ -369,10 +351,7 @@ class FeatureExtractor:
 
         difficulty_performance = {}
 
-        for difficulty, stats in (
-
-                difficulty_stats.items()
-        ):
+        for difficulty, stats in difficulty_stats.items():
 
             difficulty_performance[
                 difficulty
@@ -380,11 +359,10 @@ class FeatureExtractor:
 
                 stats["correct"]
                 / stats["total"],
-
                 2
             )
 
-        total_questions = max(
+        total_answered = max(
             len(answers_df),
             1
         )
@@ -392,7 +370,7 @@ class FeatureExtractor:
         avg_response_time = round(
 
             total_response_time
-            / total_questions,
+            / total_answered,
 
             2
         )
@@ -413,10 +391,43 @@ class FeatureExtractor:
 
             1
         )
-        print(skills_performance)
-        print(strong_skills)
-        print(weak_skills)
-        print(difficulty_performance)
+
+        suspicion_score = 0
+
+        if accuracy_percent < 20:
+            suspicion_score += 30
+
+        if submission[
+            "duration_seconds"
+        ] < 60:
+            suspicion_score += 30
+
+        if submission[
+            "answered_questions"
+        ] < (
+            submission[
+                "total_questions"
+            ] * 0.5
+        ):
+            suspicion_score += 40
+
+        if avg_response_time > 0 \
+                and avg_response_time < 2:
+            suspicion_score += 20
+
+        attempt_status = "NORMAL"
+
+        if suspicion_score >= 60:
+
+            attempt_status = (
+                "SUSPICIOUS"
+            )
+
+        elif suspicion_score >= 30:
+
+            attempt_status = (
+                "LOW_CONFIDENCE"
+            )
 
         return {
 
@@ -445,6 +456,27 @@ class FeatureExtractor:
 
             "avg_response_time":
                 avg_response_time,
+
+            "answered_questions":
+                submission[
+                    "answered_questions"
+                ],
+
+            "skipped_questions":
+                submission[
+                    "skipped_questions"
+                ],
+
+            "total_questions":
+                submission[
+                    "total_questions"
+                ],
+
+            "attempt_status":
+                attempt_status,
+
+            "suspicion_score":
+                suspicion_score,
 
             "skills_performance":
                 skills_performance,

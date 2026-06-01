@@ -50,7 +50,9 @@ export const onGetSubmissionHistoryQuiz = async() : Promise<BackendResponse<MyRe
     return data.data
 }
 
-export const onGetAIInsightApi = async (quizSubmissionId: number): Promise<AIInsightResponse> => {
-  const data = await api.post(`/behavior/quiz-insight`, { quiz_submission_id: quizSubmissionId });
-  return data.data;
-};
+// export const onGetAIInsightApi = async (quizSubmissionId: number): Promise<AIInsightResponse> => {
+//     console.log(quizSubmissionId);
+    
+//   const data = await api.post(`/behavior/quiz-insight`, { quiz_submission_id: quizSubmissionId });
+//   return data.data;
+// };

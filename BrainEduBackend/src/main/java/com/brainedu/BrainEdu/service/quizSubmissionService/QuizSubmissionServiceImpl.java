@@ -1,6 +1,7 @@
 package com.brainedu.BrainEdu.service.quizSubmissionService;
 
 import com.brainedu.BrainEdu.config.ApiException;
+import com.brainedu.BrainEdu.dto.request.SubmitQuizRequest.java.*;
 import com.brainedu.BrainEdu.dto.request.SubmitQuizRequest.java.QuizAnswerRequest;
 import com.brainedu.BrainEdu.dto.response.QuizResponse.QuizReviewResponse;
 import com.brainedu.BrainEdu.dto.response.QuizSubmissionResponse.*;
@@ -10,9 +11,9 @@ import com.brainedu.BrainEdu.repository.*;
 import com.brainedu.BrainEdu.ultils.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.brainedu.BrainEdu.dto.request.SubmitQuizRequest.java.SubmitQuizRequest;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -23,6 +24,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class QuizSubmissionServiceImpl
         implements QuizSubmissionService {
+
+    private final UserRepository userRepository;
 
     private final QuizRepository quizRepository;
 

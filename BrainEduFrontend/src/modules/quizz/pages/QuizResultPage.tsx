@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { CheckCircle2, XCircle, AlertCircle, Clock, Award, Star, BookOpen, Lightbulb, MessageSquare } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertCircle, Clock, Award, Star, BookOpen, Lightbulb, MessageSquare, ShieldAlert, ShieldCheck } from 'lucide-react';
 import useGetReviewQuiz from '../hooks/useGetReviewQuiz';
 import useGetAIInsight from '../hooks/useGetAIInsight';
 
@@ -13,7 +13,7 @@ const QuizResultPage: React.FC = () => {
   const { data: aiInsightData, isPending: aiPending } = useGetAIInsight(submissionId);
   
   const result = data?.data;
-  const aiInsight = aiInsightData || aiInsightData;
+  const aiInsight = aiInsightData?.data || aiInsightData;
 
   if (!submissionId) {
     return (
@@ -98,6 +98,7 @@ const QuizResultPage: React.FC = () => {
   }
 
   const recommendedTopics = aiInsight?.recommended_topics || [];
+  const isReliabilityLow = aiInsight?.attempt_reliability === 'LOW';
 
   return (
     <div className="min-h-screen bg-[#f8fafc] p-6 font-sans antialiased text-gray-900">
@@ -166,6 +167,29 @@ const QuizResultPage: React.FC = () => {
             </div>
           ))}
         </div>
+
+        {aiInsight?.attempt_quality_summary && (
+          <div className={`border rounded-2xl p-5 flex items-start gap-4 shadow-sm ${
+            isReliabilityLow ? 'bg-amber-50/50 border-amber-100' : 'bg-blue-50/50 border-blue-100'
+          }`}>
+            <div className={`p-2.5 rounded-xl shrink-0 ${isReliabilityLow ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}`}>
+              {isReliabilityLow ? <ShieldAlert size={20} /> : <ShieldCheck size={20} />}
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-700">
+                Đánh giá chất lượng bài làm: 
+                <span className={`px-2 py-0.5 rounded font-extrabold text-[10px] ${
+                  isReliabilityLow ? 'bg-amber-200 text-amber-800' : 'bg-green-200 text-green-800'
+                }`}>
+                  {isReliabilityLow ? 'Độ tin cậy thấp (Low)' : 'Độ tin cậy cao (High)'}
+                </span>
+              </div>
+              <p className="text-xs text-gray-600 leading-relaxed font-medium">
+                {aiInsight.attempt_quality_summary}
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm space-y-6">
           <div className="flex items-center gap-2 text-sm font-bold text-gray-800 uppercase tracking-wider">

@@ -88,11 +88,16 @@ export type MyResultResponse = {
 }
 
 export type AIInsightResponse = {
+    attempt_reliability: string
+    attempt_quality_summary: string
     summary: string
-    strengths: string
+    strengths: string[]
     weaknesses: string[]
+    knowledge_gaps: string[]
+    improvement_areas: string[]
     recommended_topics: string[]
     next_actions: string[]
     study_plan: string[]
     mentor_feedback: string
+    confidence_level: string
 }

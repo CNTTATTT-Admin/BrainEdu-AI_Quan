@@ -2,9 +2,10 @@ import pandas as pd
 
 from app.database import engine
 
+
 def get_quiz_submission(
-    quiz_submission_id
-    ):
+        quiz_submission_id
+):
 
     query = """
 
@@ -36,8 +37,11 @@ def get_quiz_submission(
     """
 
     df = pd.read_sql(
+
         query,
+
         con=engine,
+
         params=(quiz_submission_id,)
     )
 
@@ -46,9 +50,10 @@ def get_quiz_submission(
 
     return df.iloc[0].to_dict()
 
-def get_quiz_answers(
-    quiz_submission_id
-    ):
+
+def get_quiz_submission_answers(
+        quiz_submission_id
+):
 
     query = """
 
@@ -56,9 +61,16 @@ def get_quiz_answers(
 
             ua.id,
 
-            ua.is_correct,
+            CASE
+                WHEN ua.is_correct = b'1'
+                THEN TRUE
+                ELSE FALSE
+            END AS is_correct,
 
-            ua.response_time,
+            COALESCE(
+                ua.response_time,
+                0
+            ) AS response_time,
 
             q.id AS question_id,
 
@@ -67,6 +79,8 @@ def get_quiz_answers(
             q.question_type,
 
             q.difficulty_level,
+
+            q.question_order,
 
             s.skill_name,
 
@@ -91,9 +105,12 @@ def get_quiz_answers(
         LEFT JOIN answers correct
             ON correct.question_id =
                 q.id
-        AND correct.is_correct = 1
+            AND correct.is_correct = 1
 
         WHERE ua.quiz_submission_id = %s
+
+        ORDER BY
+            q.question_order
 
     """
 

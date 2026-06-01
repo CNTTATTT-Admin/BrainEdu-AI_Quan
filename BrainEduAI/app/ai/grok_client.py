@@ -5,19 +5,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 class GroqClient:
-
     API_KEY = os.getenv(
         "GROQ_API_KEY"
     )
 
     client = OpenAI(
-
         api_key=API_KEY,
-
-        base_url=
-            "https://api.groq.com/openai/v1"
+        base_url="https://api.groq.com/openai/v1"
     )
 
     @staticmethod
@@ -27,36 +22,40 @@ class GroqClient:
             GroqClient.client
             .chat.completions.create(
 
-                model=
-                    "llama-3.3-70b-versatile",
+                model="llama-3.3-70b-versatile",
 
                 messages=[
-
                     {
-
-                        "role":
-                            "system",
-
+                        "role": "system",
                         "content":
-                            "You are an AI Learning Coach."
+                        """
+                        You are BrainEdu AI Learning Coach.
+
+                        You specialize in:
+
+                        - educational assessment
+                        - skill diagnosis
+                        - learning analytics
+                        - personalized coaching
+
+                        Always produce practical and evidence-based feedback.
+
+                        Never produce generic praise.
+
+                        Always infer strengths and weaknesses from quiz evidence.
+                        """
                     },
-
                     {
-
-                        "role":
-                            "user",
-
-                        "content":
-                            prompt
+                        "role": "user",
+                        "content": prompt
                     }
                 ],
 
-                temperature=0.3,
+                temperature=0.15,
 
                 response_format={
-                "type": "json_object"
+                    "type": "json_object"
                 }
-
             )
         )
 
