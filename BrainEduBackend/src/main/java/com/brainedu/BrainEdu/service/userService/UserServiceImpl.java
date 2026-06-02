@@ -6,6 +6,7 @@ import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateProfileRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateUserRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UserRequest;
 import com.brainedu.BrainEdu.dto.response.PagedResponse;
+import com.brainedu.BrainEdu.dto.response.UserResponse.InstructorResponse;
 import com.brainedu.BrainEdu.dto.response.UserResponse.UserResponse;
 import com.brainedu.BrainEdu.entity.User;
 import com.brainedu.BrainEdu.mapper.UserMapper;
@@ -77,6 +78,28 @@ public class UserServiceImpl
                 userPage.getSize(),
                 userPage.getTotalElements(),
                 userPage.getTotalPages()
+        );
+        }
+
+        @Override
+        // @Cacheable(
+        //         value = CacheNames.USERS,
+        //         key = "'instructors:' + #page + ':' + #size"
+        // )
+        public PagedResponse<InstructorResponse> getAllInstructors(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<InstructorResponse> instructorPage =
+                userRepository.findAllInstructors(
+                        pageable
+                );
+
+        return new PagedResponse<>(
+                instructorPage.getContent(),
+                instructorPage.getNumber(),
+                instructorPage.getSize(),
+                instructorPage.getTotalElements(),
+                instructorPage.getTotalPages()
         );
         }
     @CacheEvict(

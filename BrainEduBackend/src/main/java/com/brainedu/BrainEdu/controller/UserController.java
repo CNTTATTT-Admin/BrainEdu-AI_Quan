@@ -7,6 +7,7 @@ import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateProfileRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateUserRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UserRequest;
 import com.brainedu.BrainEdu.dto.response.PagedResponse;
+import com.brainedu.BrainEdu.dto.response.UserResponse.InstructorResponse;
 import com.brainedu.BrainEdu.dto.response.UserResponse.UserResponse;
 import com.brainedu.BrainEdu.service.userService.UserService;
 import lombok.RequiredArgsConstructor;
@@ -81,6 +82,27 @@ public class UserController {
                 @RequestParam(defaultValue = "10") int size
         ) {
         PagedResponse<UserResponse> pagedResponse = userService.getAllUsersExceptAdmin(page, size);
+
+        PaginationMeta meta = PaginationMeta.builder()
+                .page(pagedResponse.getPage())
+                .size(pagedResponse.getSize())
+                .totalElements(pagedResponse.getTotalElements())
+                .totalPages(pagedResponse.getTotalPages())
+                .build();
+
+        return ResponseFactory.success(
+                        "Users fetched successfully except admin",
+                        pagedResponse.getContent(),
+                        meta
+                );
+        }
+
+        @GetMapping("/instructors")
+        public ApiResponse<List<InstructorResponse>> getAllInstructors(
+                @RequestParam(defaultValue = "0") int page,
+                @RequestParam(defaultValue = "10") int size
+        ) {
+        PagedResponse<InstructorResponse> pagedResponse = userService.getAllInstructors(page, size);
 
         PaginationMeta meta = PaginationMeta.builder()
                 .page(pagedResponse.getPage())
