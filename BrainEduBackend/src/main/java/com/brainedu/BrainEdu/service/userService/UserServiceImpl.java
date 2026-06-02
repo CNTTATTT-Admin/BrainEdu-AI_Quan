@@ -5,6 +5,7 @@ import com.brainedu.BrainEdu.constant.CacheNames;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateProfileRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateUserRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UserRequest;
+import com.brainedu.BrainEdu.dto.response.PagedResponse;
 import com.brainedu.BrainEdu.dto.response.UserResponse.UserResponse;
 import com.brainedu.BrainEdu.entity.User;
 import com.brainedu.BrainEdu.mapper.UserMapper;
@@ -38,26 +39,46 @@ public class UserServiceImpl
     private final UserMapper userMapper;
 
     @Override
-    @Cacheable(
-            value = CacheNames.USERS,
-            key = "'all:' + #page + ':' + #size"
-    )
-    public Page<UserResponse> getAllUsers(
-            int page,
-            int size
-    ) {
+        // @Cacheable(
+        //         value = CacheNames.USERS,
+        //         key = "'all:' + #page + ':' + #size"
+        // )
+        public PagedResponse<UserResponse> getAllUsers(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
 
-        Pageable pageable =
-                PageRequest.of(
-                        page,
-                        size
-                );
-
-        return userRepository
+        Page<UserResponse> userPage = userRepository
                 .findAll(pageable)
                 .map(userMapper::toResponse);
-    }
 
+        return new PagedResponse<>(
+                userPage.getContent(),
+                userPage.getNumber(),
+                userPage.getSize(),
+                userPage.getTotalElements(),
+                userPage.getTotalPages()
+        );
+        }
+
+        @Override
+        // @Cacheable(
+        //         value = CacheNames.USERS,
+        //         key = "'except-admin:' + #page + ':' + #size"
+        // )
+        public PagedResponse<UserResponse> getAllUsersExceptAdmin(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<UserResponse> userPage = userRepository
+                .findAllExceptAdmin(pageable)
+                .map(userMapper::toResponse);
+
+        return new PagedResponse<>(
+                userPage.getContent(),
+                userPage.getNumber(),
+                userPage.getSize(),
+                userPage.getTotalElements(),
+                userPage.getTotalPages()
+        );
+        }
     @CacheEvict(
             value = CacheNames.USERS,
             allEntries = true

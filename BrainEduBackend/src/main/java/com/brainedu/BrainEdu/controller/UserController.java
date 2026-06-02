@@ -6,6 +6,7 @@ import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateProfileRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateUserRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UserRequest;
+import com.brainedu.BrainEdu.dto.response.PagedResponse;
 import com.brainedu.BrainEdu.dto.response.UserResponse.UserResponse;
 import com.brainedu.BrainEdu.service.userService.UserService;
 import lombok.RequiredArgsConstructor;
@@ -33,34 +34,25 @@ public class UserController {
     }
 
     @GetMapping
-    public ApiResponse<List<UserResponse>>
-    getAllUsers(
+        public ApiResponse<List<UserResponse>> getAllUsers(
+                @RequestParam(defaultValue = "0") int page,
+                @RequestParam(defaultValue = "10") int size
+        ) {
+        PagedResponse<UserResponse> pagedResponse = userService.getAllUsers(page, size);
 
-            @RequestParam(
-                    defaultValue = "0"
-            )
-            int page,
-
-            @RequestParam(
-                    defaultValue = "10"
-            )
-            int size
-    ) {
-
-        Page<UserResponse> users =
-                userService.getAllUsers(
-                        page,
-                        size
-                );
-
-        PaginationMeta meta = ResponseFactory.pagination(users);
+        PaginationMeta meta = PaginationMeta.builder()
+                .page(pagedResponse.getPage())
+                .size(pagedResponse.getSize())
+                .totalElements(pagedResponse.getTotalElements())
+                .totalPages(pagedResponse.getTotalPages())
+                .build();
 
         return ResponseFactory.success(
-                    "Users fetched successfully",
-                    users.getContent(),
-                    meta
+                        "Users fetched successfully",
+                        pagedResponse.getContent(),
+                        meta
                 );
-    }
+        }
 
     @GetMapping("/me")
     public ApiResponse<UserResponse>
@@ -83,7 +75,26 @@ public class UserController {
                 )
         );
     }
+        @GetMapping("/except-admin")
+        public ApiResponse<List<UserResponse>> getAllUsersExceptAdmin(
+                @RequestParam(defaultValue = "0") int page,
+                @RequestParam(defaultValue = "10") int size
+        ) {
+        PagedResponse<UserResponse> pagedResponse = userService.getAllUsersExceptAdmin(page, size);
 
+        PaginationMeta meta = PaginationMeta.builder()
+                .page(pagedResponse.getPage())
+                .size(pagedResponse.getSize())
+                .totalElements(pagedResponse.getTotalElements())
+                .totalPages(pagedResponse.getTotalPages())
+                .build();
+
+        return ResponseFactory.success(
+                        "Users fetched successfully except admin",
+                        pagedResponse.getContent(),
+                        meta
+                );
+        }
     @GetMapping("/{id}")
     public ApiResponse<UserResponse>
     getUserById(

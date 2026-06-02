@@ -12,6 +12,7 @@ import {
   ChevronRight,
   UserSquare2
 } from "lucide-react";
+import useGetAllUser from "../hooks/useGetAllUser";
 
 interface User {
   id: string;
@@ -28,20 +29,13 @@ export default function UsersManagement() {
   const [roleFilter, setRoleFilter] = useState<string>("ALL");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [currentPage, setCurrentPage] = useState(1);
+  const { data: allUser, isPending } = useGetAllUser()
+  const userData = allUser?.data || []
 
-  const users: User[] = [
-    { id: "U-101", name: "Trần Văn A", email: "an.tv@brainedu.vn", role: "INSTRUCTOR", status: "ACTIVE", joinedDate: "12/01/2026", coursesCount: 5 },
-    { id: "U-102", name: "Nguyễn Thị B", email: "bnguyen@gmail.com", role: "STUDENT", status: "ACTIVE", joinedDate: "02/02/2026" },
-    { id: "U-103", name: "Lê Hoàng C", email: "cle.instructor@brainedu.vn", role: "INSTRUCTOR", status: "ACTIVE", joinedDate: "20/02/2026", coursesCount: 3 },
-    { id: "U-104", name: "Phạm Minh Mẫn", email: "man.pm@brainedu.vn", role: "ADMIN", status: "ACTIVE", joinedDate: "01/01/2026" },
-    { id: "U-105", name: "Hoàng Thanh Tâm", email: "tamht.banned@gmail.com", role: "STUDENT", status: "BANNED", joinedDate: "15/03/2026" },
-    { id: "U-106", name: "Đỗ Thùy Linh", email: "linhdt@gmail.com", role: "STUDENT", status: "ACTIVE", joinedDate: "18/04/2026" },
-  ];
-
-  const filteredUsers = users.filter(user => {
+  const filteredUsers = userData.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          user.id.toLowerCase().includes(searchTerm.toLowerCase());
+                          user.id.toString().toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === "ALL" || user.role === roleFilter;
     const matchesStatus = statusFilter === "ALL" || user.status === statusFilter;
     return matchesSearch && matchesRole && matchesStatus;
@@ -83,7 +77,7 @@ export default function UsersManagement() {
               <option value="ALL">Tất cả vai trò</option>
               <option value="ADMIN">Quản trị viên</option>
               <option value="INSTRUCTOR">Giảng viên</option>
-              <option value="STUDENT">Học viên</option>
+              <option value="USER">Học viên</option>
             </select>
           </div>
 

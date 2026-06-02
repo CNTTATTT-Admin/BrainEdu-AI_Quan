@@ -22,6 +22,16 @@ export const rootRouter: RouteObject[] = [
     children: [{ index: true, lazy: lazyLoad(() => import("../pages/Users")) }]
   },
   {
+    path: "/admin/categories",
+    element: <ProtectedRoute allowedRoles={["ADMIN"]} />,
+    children: [{ index: true, lazy: lazyLoad(() => import("../pages/Categories.tsx")) }]
+  },
+  {
+    path: "/admin/all-courses",
+    element: <ProtectedRoute allowedRoles={["ADMIN"]} />,
+    children: [{ index: true, lazy: lazyLoad(() => import("../pages/Courses.tsx")) }]
+  },
+  {
     path: "/admin/instructors",
     element: <ProtectedRoute allowedRoles={["ADMIN"]} />,
     children: [{ index: true, lazy: lazyLoad(() => import("../pages/Instructors")) }]
