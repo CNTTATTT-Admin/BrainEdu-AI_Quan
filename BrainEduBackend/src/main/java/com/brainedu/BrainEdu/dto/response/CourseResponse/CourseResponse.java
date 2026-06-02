@@ -33,5 +33,9 @@ public class CourseResponse {
 
     private Float price;
 
+    private boolean isEnrolled;
+
+    private String courseType;
+
     private LocalDateTime createdAt;
 }

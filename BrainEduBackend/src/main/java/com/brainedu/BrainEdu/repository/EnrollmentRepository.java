@@ -22,4 +22,6 @@ public interface EnrollmentRepository
             Long userId,
             Long courseId
     );
+
+    boolean existsByUserIdAndCourseId(Long userId, Long courseId);
 }

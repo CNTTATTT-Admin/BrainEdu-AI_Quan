@@ -13,5 +13,7 @@ export type CoursesResponse = {
     instructorName: string,
     price: number,
     title: string,
-    estimatedDuration: string
+    estimatedDuration: string,
+    courseType: string,
+    enrolled: boolean
 }

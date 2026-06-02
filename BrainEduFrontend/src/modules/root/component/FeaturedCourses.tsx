@@ -29,7 +29,8 @@ const FeaturedCourses = () => {
                 key={course.id} 
                 to="/course" 
                 state={{ 
-                  courseId: course.id
+                  courseId: course.id,
+                  courseType: course.courseType
                 }}
             >
               <div key={course.id} className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex flex-col cursor-pointer">
@@ -51,9 +52,9 @@ const FeaturedCourses = () => {
                   <div className="flex items-center justify-between border-t border-gray-50 pt-3">
                     <div className="flex items-center gap-1 text-xs font-bold text-amber-500">
                       <Star size={14} fill="currentColor" />
-                      <span>{formatVND(course.price.toFixed(1))}</span>
+                      <span>5</span>
                     </div>
-                    <span className="text-sm font-bold text-[#0052cc]">{formatVND(course.price.toFixed(1))}</span>
+                    <span className="text-sm font-bold text-[#0052cc]">{course.courseType === "FREE" ? "MIỄN PHÍ" : formatVND(course.price.toFixed(1))}</span>
                   </div>
                 </div>
               </div>

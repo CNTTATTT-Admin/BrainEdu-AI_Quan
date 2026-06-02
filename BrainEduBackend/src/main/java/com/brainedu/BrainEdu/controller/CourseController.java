@@ -6,7 +6,10 @@ import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.CourseRequest.CourseRequest;
 import com.brainedu.BrainEdu.dto.request.CourseRequest.CreateCourseRequest;
 import com.brainedu.BrainEdu.dto.response.CourseResponse.CourseResponse;
+import com.brainedu.BrainEdu.dto.response.CourseResponse.MyCourseResponse;
 import com.brainedu.BrainEdu.service.courseService.CourseService;
+import com.brainedu.BrainEdu.service.enrollmentService.EnrollmentService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -69,7 +72,7 @@ public class CourseController {
         );
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     public ApiResponse<CourseResponse>
     getById(
             @PathVariable Long id
@@ -134,6 +137,16 @@ public class CourseController {
                 )
         );
     }
+
+    @GetMapping("/my-courses")
+        public ApiResponse<List<MyCourseResponse>>
+        getMyCourses() {
+
+        return ResponseFactory.success(
+                "My enrolled courses",
+                courseService.getMyCourses()
+        );
+        }
 
     @DeleteMapping("/{id}")
     public ApiResponse<String>

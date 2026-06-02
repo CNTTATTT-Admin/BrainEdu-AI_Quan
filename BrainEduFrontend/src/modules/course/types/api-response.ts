@@ -38,3 +38,16 @@ export type CategoryResponse = {
   categoryName: String,
   description: String
 }
+
+export type MyCourseResponse = {
+  enrollmentId: number,
+  courseId: number,
+  courseTitle: string,
+  thumbnail: string,
+  progressPercent: number,
+  completedLessons: number,
+  totalLessons: number,
+  nextLessonId: number,
+  nextLessonTitle: string,
+  status: string
+}

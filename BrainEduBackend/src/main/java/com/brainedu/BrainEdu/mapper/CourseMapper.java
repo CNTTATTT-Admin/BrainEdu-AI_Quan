@@ -8,23 +8,10 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface CourseMapper {
 
-    @Mapping(
-            target = "categoryId",
-            source = "category.id"
-    )
-    @Mapping(
-            target = "categoryName",
-            source = "category.categoryName"
-    )
-    @Mapping(
-            target = "instructorId",
-            source = "instructor.id"
-    )
-    @Mapping(
-            target = "instructorName",
-            source = "instructor.name"
-    )
-    CourseResponse toResponse(
-            Course course
-    );
+    @Mapping(target = "categoryId", source = "course.category.id")
+    @Mapping(target = "categoryName", source = "course.category.categoryName")
+    @Mapping(target = "instructorId", source = "course.instructor.id")
+    @Mapping(target = "instructorName", source = "course.instructor.name")
+    @Mapping(target = "isEnrolled", source = "isEnrolled")
+    CourseResponse toResponse(Course course, boolean isEnrolled);
 }

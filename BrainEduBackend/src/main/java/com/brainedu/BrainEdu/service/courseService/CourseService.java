@@ -2,9 +2,10 @@ package com.brainedu.BrainEdu.service.courseService;
 
 import com.brainedu.BrainEdu.dto.request.CourseRequest.*;
 import com.brainedu.BrainEdu.dto.response.CourseResponse.*;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
+
+import org.springframework.data.domain.Page;
 
 public interface CourseService {
 
@@ -32,4 +33,6 @@ public interface CourseService {
     String delete(
             Long id
     );
+
+    List<MyCourseResponse> getMyCourses();
 }
