@@ -6,6 +6,9 @@ import com.brainedu.BrainEdu.entity.User;
 import com.brainedu.BrainEdu.repository.UserRepository;
 import com.brainedu.BrainEdu.security.JwtService;
 import lombok.RequiredArgsConstructor;
+
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -53,6 +56,15 @@ public class TokenServiceImpl
                 .type("Bearer")
 
                 .expiresIn(86400L)
+
+                .user(
+                        UserInfoResponse.builder()
+                                .id(user.getId())
+                                .fullName(user.getName())
+                                .email(user.getEmail())
+                                .roles(user.getRole())
+                                .build()
+                        )
 
                 .build();
     }

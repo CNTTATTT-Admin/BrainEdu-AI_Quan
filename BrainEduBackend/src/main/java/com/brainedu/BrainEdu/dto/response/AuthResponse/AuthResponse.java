@@ -16,4 +16,6 @@ public class AuthResponse {
     private String type;
 
     private Long expiresIn;
+
+    private UserInfoResponse user;
 }

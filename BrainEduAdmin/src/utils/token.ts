@@ -1,7 +1,13 @@
 export const setToken = (token: string) => {
     localStorage.setItem(import.meta.env.VITE_TOKEN_KEY || "access_token", token);
 };
-
+export const setRole = (role: string) => {
+    localStorage.setItem(import.meta.env.VITE_ROLE_KEY || "role", role);
+};
+export const getRole = () => {
+    const role = localStorage.getItem(import.meta.env.VITE_ROLE_KEY || "role");
+    return role;
+};
 export const getToken = () => {
     const token = localStorage.getItem(import.meta.env.VITE_TOKEN_KEY || "access_token");
     return token;

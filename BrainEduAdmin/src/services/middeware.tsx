@@ -1,23 +1,27 @@
-import { Navigate, Outlet } from "react-router";
-import { getToken } from "../utils/token";
+import { Navigate, Outlet } from "react-router-dom";
+import { getRole, getToken } from "../utils/token";
 
-export const AdminRoute = ({ children }: { children: React.ReactNode }) => {
-    const token = getToken();
+interface ProtectedRouteProps {
+  allowedRoles?: string[];
+}
 
-    if (!token) {
-        return <Navigate to="/account/login" replace />;
-    }
-
-    return children;
-};
-
-
-export const ProtectedRoute = () => {
+export const ProtectedRoute = ({
+  allowedRoles = [],
+}: ProtectedRouteProps) => {
   const token = getToken();
 
   if (!token) {
     return <Navigate to="/account/login" replace />;
   }
 
+  const role = getRole() || ""
+
+  if (
+    allowedRoles.length > 0 &&
+    !allowedRoles.includes(role)
+  ) {
+    return <Navigate to="/" replace />;
+  }
+
   return <Outlet />;
-}
+};

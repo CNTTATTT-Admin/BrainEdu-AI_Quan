@@ -9,7 +9,14 @@ import {
   BookOpen, 
   FileVideo, 
   ClipboardList, 
-  ShieldCheck 
+  ShieldCheck,
+  Users,
+  GraduationCap,
+  Layers,
+  Award,
+  GitBranch,
+  Settings,
+  BrainCircuit
 } from 'lucide-react';
 import AppHoc from "../hocs/appHocs";
 import PageMeta from "../components/common/PageMeta";
@@ -17,8 +24,21 @@ import useGetMe from '../hooks/useGetMe';
 import useLogout from '../hooks/useLogOut';
 
 function MainLayout() {
-  const [currentRole, setCurrentRole] = useState<'ADMIN' | 'INSTRUCTOR'>('ADMIN');
-
+  const { data: currentUser, isPending } = useGetMe();
+  
+  const userRole = currentUser?.data?.role; 
+  const isAdmin = userRole === "ADMIN";
+  const isInstructor = userRole === "INSTRUCTOR";
+if (isPending || !userRole) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-slate-900 text-slate-400">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-2 border-slate-700 border-t-blue-500 animate-spin" />
+          <p className="text-xs font-medium tracking-wide">Đang xác thực quyền truy cập...</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="flex h-screen w-screen bg-slate-50 text-slate-800 overflow-hidden font-sans antialiased">
       <PageMeta title="Hệ thống quản trị - BrainEdu AI" />
@@ -30,6 +50,7 @@ function MainLayout() {
         </div>
 
         <nav className="flex-1 p-4 space-y-1 text-sm font-medium overflow-y-auto">
+          {/* Quyền chung cho cả ADMIN và INSTRUCTOR */}
           <NavLink 
             to="/admin/dashboard" 
             className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
@@ -38,20 +59,53 @@ function MainLayout() {
             Tổng quan
           </NavLink>
 
-          <NavLink 
-            to="/admin/courses" 
-            className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
-          >
-            <BookOpen size={18} />
-            Quản lý khóa học
-          </NavLink>
+          {/* CHỈ ADMIN mới nhìn thấy các nút này */}
+          {isAdmin && (
+            <>
+              <NavLink 
+                to="/admin/users" 
+                className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
+              >
+                <Users size={18} />
+                Quản lý người dùng
+              </NavLink>
 
+              <NavLink 
+                to="/admin/instructors" 
+                className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
+              >
+                <GraduationCap size={18} />
+                Quản lý giảng viên
+              </NavLink>
+
+              <NavLink 
+                to="/admin/all-courses" 
+                className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
+              >
+                <Layers size={18} />
+                Khóa học hệ thống
+              </NavLink>
+            </>
+          )}
+
+          {/* CHỈ INSTRUCTOR mới nhìn thấy nút này */}
+          {isInstructor && (
+            <NavLink 
+              to="/admin/my-courses" 
+              className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
+            >
+              <BookOpen size={18} />
+              Khóa học của tôi
+            </NavLink>
+          )}
+
+          {/* Quyền chung */}
           <NavLink 
             to="/admin/lessons" 
             className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
           >
             <FileVideo size={18} />
-            Quản lý bài học
+            Quản lý bài học & Quiz
           </NavLink>
 
           <NavLink 
@@ -59,31 +113,66 @@ function MainLayout() {
             className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
           >
             <ClipboardList size={18} />
-            Giao bài tập & Điểm
+            Bài tập & Tiến độ học
           </NavLink>
+
+          <NavLink 
+            to="/admin/ai-reports" 
+            className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
+          >
+            <BrainCircuit size={18} />
+            Báo cáo AI học viên
+          </NavLink>
+
+          {/* CHỈ ADMIN mới nhìn thấy các nút này */}
+          {isAdmin && (
+            <>
+              <NavLink 
+                to="/admin/categories" 
+                className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
+              >
+                <Layers size={18} />
+                Quản lý danh mục
+              </NavLink>
+
+              <NavLink 
+                to="/admin/skills" 
+                className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
+              >
+                <Award size={18} />
+                Quản lý kỹ năng
+              </NavLink>
+
+              <NavLink 
+                to="/admin/ai-roadmaps" 
+                className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
+              >
+                <GitBranch size={18} />
+                Quản lý lộ trình AI
+              </NavLink>
+
+              <NavLink 
+                to="/admin/settings" 
+                className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
+              >
+                <Settings size={18} />
+                Cấu hình hệ thống
+              </NavLink>
+            </>
+          )}
         </nav>
 
-        <div className="p-4 border-t border-slate-800">
-          <div className="bg-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-medium">Vai trò:</span>
-            <select 
-              value={currentRole} 
-              onChange={(e) => setCurrentRole(e.target.value as 'ADMIN' | 'INSTRUCTOR')}
-              className="bg-slate-900 text-xs font-semibold text-blue-400 border border-slate-700 rounded-lg px-2 py-1 focus:outline-none cursor-pointer"
-            >
-              <option value="ADMIN">Admin</option>
-              <option value="INSTRUCTOR">Giảng viên</option>
-            </select>
-          </div>
+        <div className="p-4 border-t border-slate-800 bg-slate-950/40 text-center text-xs text-slate-500 font-medium">
+          Quyền: <span className="text-blue-400 font-bold">{userRole || "---"}</span>
         </div>
       </aside>
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header currentRole={currentRole} />
+        <Header userRole={userRole} />
 
         <main className="flex-1 overflow-y-auto relative scroll-smooth p-6">
           <div className="max-w-7xl mx-auto min-h-full">
-            <Outlet context={{ currentRole }} />
+            <Outlet context={{ currentRole: userRole }}/>
           </div>
         </main>
       </div>
@@ -92,10 +181,10 @@ function MainLayout() {
 }
 
 interface HeaderProps {
-  currentRole: 'ADMIN' | 'INSTRUCTOR';
+  userRole: string | undefined;
 }
 
-const Header = ({ currentRole }: HeaderProps) => {
+const Header = ({ userRole }: HeaderProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -130,7 +219,7 @@ const Header = ({ currentRole }: HeaderProps) => {
         <span>Hệ thống quản trị</span>
         <span className="text-slate-300">/</span>
         <span className="text-slate-800 font-semibold bg-slate-100 px-2 py-0.5 rounded-md">
-          {currentRole === 'ADMIN' ? 'Ban quản trị' : 'Không gian giảng dạy'}
+          {userRole === 'ADMIN' ? 'Ban quản trị' : 'Không gian giảng dạy'}
         </span>
       </div>
 
@@ -161,7 +250,7 @@ const Header = ({ currentRole }: HeaderProps) => {
               />
               <div className="text-left hidden sm:block">
                 <p className="text-xs font-bold text-slate-800 leading-none max-w-[120px] truncate">
-                  {currentUser?.data.name || 'Người dùng'}
+                  {currentUser?.data?.name || 'Người dùng'}
                 </p>
               </div>
               <ChevronDown size={14} className={`text-slate-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
@@ -170,7 +259,7 @@ const Header = ({ currentRole }: HeaderProps) => {
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-slate-100 py-1.5 animate-in fade-in slide-in-from-top-1 duration-150">
                 <div className="px-4 py-2 border-b border-slate-50 mb-1">
-                  <p className="text-xs text-slate-400 font-medium truncate">{currentUser?.data.email || 'user@example.com'}</p>
+                  <p className="text-xs text-slate-400 font-medium truncate">{currentUser?.data?.email || 'user@example.com'}</p>
                 </div>
 
                 <NavLink to="/admin/profile" className="flex items-center gap-2.5 px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors">

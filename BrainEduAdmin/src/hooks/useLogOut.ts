@@ -16,7 +16,7 @@ const useLogout = () => {
             removeToken();
             setUserData(null);
 
-            navigate("/", { replace: true });
+            navigate("/account/login", { replace: true });
 
             setTimeout(() => {
                 queryClient.clear();
