@@ -1,6 +1,7 @@
 import type { BackendResponse } from "../../../libs/shared/types/backend-response";
 import api from "../../../services/axios";
-import type { UserInfo, LessonsResponse, QuizzResponse, CategoryResponse, InstructorInfo } from "../types/api-response";
+import type { LessonRequest } from "../types/api-request";
+import type { LessonsResponse, QuizzResponse } from "../types/api-response";
 
 
 export const onGetLessonsByCourseApi = async (
@@ -33,32 +34,7 @@ export const onGetQuizzesByLessonApi = async (
     return data.data;
 };
 
-export const onGetCategoriesApi = async (
-    page?: number, 
-    size?: number,
-    search?: string
-): Promise<BackendResponse<CategoryResponse[]>> => {
-    const data = await api.get("/fields", {
-        params: {
-            page,
-            size,
-            search: search || undefined
-        }
-    });
-    return data.data;
-};
-
-export const onGetInstructorApi = async (
-    page?: number, 
-    size?: number,
-    search?: string
-): Promise<BackendResponse<InstructorInfo[]>> => {
-    const data = await api.get("/users/instructors", {
-        params: {
-            page,
-            size,
-            search: search || undefined
-        }
-    });
+export const onCreateLessonApi = async (payload: LessonRequest): Promise<BackendResponse<LessonsResponse>> => {
+    const data = await api.post("/lessons", payload);
     return data.data;
 };

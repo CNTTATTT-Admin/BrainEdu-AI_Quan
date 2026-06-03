@@ -38,4 +38,6 @@ public class CourseResponse {
     private String courseType;
 
     private LocalDateTime createdAt;
+
+    private Long totalEnrolled;
 }

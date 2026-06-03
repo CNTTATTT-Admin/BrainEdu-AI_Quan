@@ -6,56 +6,99 @@ import {
   GraduationCap, 
   BookOpen, 
   Users, 
-  CheckCircle, 
-  XCircle, 
-  AlertCircle,
+  UserCheck,
+  UserX,
+  Trash2,
   Mail, 
   ChevronLeft, 
   ChevronRight,
-  UserPlus
+  UserPlus,
+  Edit
 } from "lucide-react";
-
-interface Instructor {
-  id: string;
-  name: string;
-  email: string;
-  expertise: string;
-  coursesCount: number;
-  studentsCount: number;
-  status: "APPROVED" | "PENDING" | "REJECTED";
-  joinedDate: string;
-}
+import useGetInstructor from "../hooks/useGetInstructor";
+import useBanUser from "../../user/hooks/useBanUser";
+import useActiveUser from "../../user/hooks/useActiveUser";
+import useDeleteUser from "../../user/hooks/useDeleteUser";
+import useUpdateUser from "../../user/hooks/useUpdateUser";
+import EditUserModal from "../../user/components/EditUserModal";
+import type { UpdateUserRequest, UserRequest } from "../../user/types/api-request";
 
 export default function InstructorsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [expertiseFilter, setExpertiseFilter] = useState<string>("ALL");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedInstructor, setSelectedInstructor] = useState<any>(null);
 
-  const instructors: Instructor[] = [
-    { id: "INS-001", name: "Triệu Quang Hoàng", email: "hoang.tq@brainedu.vn", expertise: "AI & Machine Learning", coursesCount: 4, studentsCount: 1250, status: "APPROVED", joinedDate: "10/01/2026" },
-    { id: "INS-002", name: "Nguyễn Tiến Đạt", email: "dat.nt@brainedu.vn", expertise: "Web Development", coursesCount: 6, studentsCount: 2400, status: "APPROVED", joinedDate: "15/01/2026" },
-    { id: "INS-003", name: "Phan Lê Minh", email: "minh.pl@gmail.com", expertise: "UI/UX Design", coursesCount: 1, studentsCount: 0, status: "PENDING", joinedDate: "01/06/2026" },
-    { id: "INS-004", name: "Hoàng Ngọc Hà", email: "ha.hn@brainedu.vn", expertise: "Data Science", coursesCount: 3, studentsCount: 890, status: "APPROVED", joinedDate: "02/03/2026" },
-    { id: "INS-005", name: "Vũ Đình Hùng", email: "hung.vd@gmail.com", expertise: "Mobile Development", coursesCount: 0, studentsCount: 0, status: "REJECTED", joinedDate: "28/05/2026" },
-  ];
+  const { data: instructorsData, isPending: isGetInstructorsPending } = useGetInstructor({ page: 0, size: 10, search: searchTerm });
+  const instructors = instructorsData?.data || [];
 
-  const expertises = Array.from(new Set(instructors.map(ins => ins.expertise)));
+  const { mutate: banUser, isPending: isBanPending } = useBanUser();
+  const { mutate: activeUser, isPending: isActivePending } = useActiveUser();
+  const { mutate: deleteUser, isPending: isDeletePending } = useDeleteUser();
+  const { mutate: updateUser, isPending: isUpdateUserPending } = useUpdateUser();
+
+  const expertises = Array.from(new Set(instructors.map(ins => ins.expertise).filter(Boolean)));
 
   const filteredInstructors = instructors.filter(ins => {
-    const matchesSearch = ins.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          ins.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          ins.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = ins.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          ins.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          ins.id?.toString().toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === "ALL" || ins.status === statusFilter;
     const matchesExpertise = expertiseFilter === "ALL" || ins.expertise === expertiseFilter;
     return matchesSearch && matchesStatus && matchesExpertise;
   });
+
+  const handleBanInstructor = (id: number) => {
+    if (window.confirm("Bạn có chắc chắn muốn khóa tài khoản giảng viên này không?")) {
+      banUser(id);
+    }
+  };
+
+  const handleActiveInstructor = (id: number) => {
+    if (window.confirm("Bạn có chắc chắn muốn kích hoạt lại tài khoản giảng viên này không?")) {
+      activeUser(id);
+    }
+  };
+
+  const handleDeleteInstructor = (id: number, name: string) => {
+    if (window.confirm(`Bạn có chắc chắn muốn xóa tài khoản của giảng viên "${name}" không?`)) {
+      deleteUser(id);
+    }
+  };
+
+  const handleEditInstructorClick = (ins: any) => {
+    setSelectedInstructor({
+      id: ins.id,
+      name: ins.fullName,
+      email: ins.email,
+      role: "INSTRUCTOR"
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditInstructorSubmit = (data: UpdateUserRequest) => {
+    if (!selectedInstructor) return;
+    updateUser({
+      id: selectedInstructor.id,
+      payload: data
+    }, {
+      onSuccess: () => {
+        setIsEditModalOpen(false);
+        setSelectedInstructor(null);
+      }
+    });
+  };
+
+  const isActionPending = isBanPending || isActivePending || isDeletePending || isUpdateUserPending;
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">Quản lý giảng viên</h1>
-          <p className="text-xs text-slate-500">Giám sát danh sách đối tác, xét duyệt hồ sơ đăng ký dạy mới và thống kê hiệu suất lớp học.</p>
+          <p className="text-xs text-slate-500">Giám sát danh sách đối tác, kiểm soát trạng thái hoạt động và quản trị tài khoản giảng viên.</p>
         </div>
         <button className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-colors self-start sm:self-auto">
           <UserPlus size={16} />
@@ -97,16 +140,15 @@ export default function InstructorsManagement() {
               className="bg-transparent text-xs font-medium text-slate-600 focus:outline-none cursor-pointer"
             >
               <option value="ALL">Tất cả trạng thái</option>
-              <option value="APPROVED">Đang hợp tác</option>
-              <option value="PENDING">Chờ xét duyệt</option>
-              <option value="REJECTED">Từ chối hồ sơ</option>
+              <option value="ACTIVE">Đang hoạt động</option>
+              <option value="BANNED">Đang khóa</option>
             </select>
           </div>
         </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden flex flex-col">
-        <div className="overflow-x-auto">
+        <div className={`overflow-x-auto ${(isGetInstructorsPending || isActionPending) ? "opacity-60 pointer-events-none" : ""}`}>
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100 text-slate-400 font-semibold uppercase tracking-wider">
@@ -114,7 +156,7 @@ export default function InstructorsManagement() {
                 <th className="px-6 py-3.5 text-center">Khóa học</th>
                 <th className="px-6 py-3.5 text-center">Tổng học viên</th>
                 <th className="px-6 py-3.5">Ngày gia nhập</th>
-                <th className="px-6 py-3.5">Trạng thái hồ sơ</th>
+                <th className="px-6 py-3.5">Trạng thái</th>
                 <th className="px-6 py-3.5 text-right">Hành động</th>
               </tr>
             </thead>
@@ -128,37 +170,35 @@ export default function InstructorsManagement() {
                           <GraduationCap size={16} />
                         </div>
                         <div className="space-y-0.5 min-w-0">
-                          <span className="text-slate-900 block font-bold truncate">{ins.name}</span>
+                          <span className="text-slate-900 block font-bold truncate">{ins.fullName}</span>
                           <span className="text-slate-400 text-[11px] block truncate">{ins.email}</span>
-                          <span className="text-[10px] text-slate-500 font-semibold bg-slate-100 px-1.5 py-0.2 rounded inline-block">
-                            {ins.expertise}
-                          </span>
+                          {ins.expertise && (
+                            <span className="text-[10px] text-slate-500 font-semibold bg-slate-100 px-1.5 py-0.2 rounded inline-block mt-0.5">
+                              {ins.expertise}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-center whitespace-nowrap">
                       <div className="flex items-center justify-center gap-1 text-slate-700 font-bold">
                         <BookOpen size={13} className="text-slate-400" />
-                        {ins.coursesCount}
+                        {ins.totalCourses}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-center whitespace-nowrap">
                       <div className="flex items-center justify-center gap-1 text-slate-700 font-bold">
                         <Users size={13} className="text-slate-400" />
-                        {ins.studentsCount.toLocaleString()}
+                        {ins.totalEnrollments}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-slate-500 whitespace-nowrap">{ins.joinedDate}</td>
+                    <td className="px-6 py-4 text-slate-500 whitespace-nowrap">{ins.createdAt}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        ins.status === "APPROVED" ? "bg-emerald-50 text-emerald-600" :
-                        ins.status === "PENDING" ? "bg-amber-50 text-amber-600 animate-pulse" :
-                        "bg-red-50 text-red-600"
+                        ins.status === "ACTIVE" ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"
                       }`}>
-                        {ins.status === "APPROVED" && <CheckCircle size={11} />}
-                        {ins.status === "PENDING" && <AlertCircle size={11} />}
-                        {ins.status === "REJECTED" && <XCircle size={11} />}
-                        {ins.status === "APPROVED" ? "Đang dạy" : ins.status === "PENDING" ? "Chờ duyệt" : "Từ chối"}
+                        <span className={`w-1 h-1 rounded-full ${ins.status === "ACTIVE" ? "bg-emerald-500" : "bg-red-500"}`} />
+                        {ins.status === "ACTIVE" ? "Hoạt động" : "Bị khóa"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right whitespace-nowrap">
@@ -167,16 +207,39 @@ export default function InstructorsManagement() {
                           <Mail size={14} />
                         </button>
                         
-                        {ins.status === "PENDING" && (
-                          <>
-                            <button className="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg transition-colors" title="Duyệt hồ sơ">
-                              <CheckCircle size={14} />
-                            </button>
-                            <button className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors" title="Từ chối hồ sơ">
-                              <XCircle size={14} />
-                            </button>
-                          </>
+                        <button 
+                          onClick={() => handleEditInstructorClick(ins)}
+                          className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors" 
+                          title="Chỉnh sửa thông tin"
+                        >
+                          <Edit size={14} />
+                        </button>
+
+                        {ins.status === "ACTIVE" ? (
+                          <button
+                            onClick={() => handleBanInstructor(ins.id)} 
+                            className="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-600 rounded-lg transition-colors" 
+                            title="Khóa tài khoản"
+                          >
+                            <UserX size={14} />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleActiveInstructor(ins.id)} 
+                            className="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg transition-colors" 
+                            title="Kích hoạt lại"
+                          >
+                            <UserCheck size={14} />
+                          </button>
                         )}
+
+                        <button
+                          onClick={() => handleDeleteInstructor(ins.id, ins.fullName)}
+                          className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors" 
+                          title="Xóa mềm giảng viên"
+                        >
+                          <Trash2 size={14} />
+                        </button>
 
                         <button className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg transition-colors">
                           <MoreVertical size={14} />
@@ -199,16 +262,33 @@ export default function InstructorsManagement() {
         <div className="px-6 py-3.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 bg-slate-50/30">
           <span>Hiển thị 1-{filteredInstructors.length} trong tổng số {filteredInstructors.length} giảng viên</span>
           <div className="flex items-center gap-1.5">
-            <button className="p-1 border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors" disabled>
+            <button 
+              disabled={currentPage === 1}
+              className="p-1 border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+            >
               <ChevronLeft size={16} />
             </button>
             <button className="px-2.5 py-1 bg-blue-600 text-white rounded-lg font-semibold shadow-sm">1</button>
-            <button className="p-1 border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors" disabled>
+            <button 
+              disabled={true}
+              className="p-1 border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+            >
               <ChevronRight size={16} />
             </button>
           </div>
         </div>
       </div>
+
+      <EditUserModal 
+        isOpen={isEditModalOpen} 
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedInstructor(null);
+        }} 
+        onSubmit={handleEditInstructorSubmit} 
+        isPending={isUpdateUserPending}
+        userData={selectedInstructor}
+      />
     </div>
   );
 }

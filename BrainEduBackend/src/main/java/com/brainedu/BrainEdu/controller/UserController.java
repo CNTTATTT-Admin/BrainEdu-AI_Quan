@@ -10,8 +10,11 @@ import com.brainedu.BrainEdu.dto.response.PagedResponse;
 import com.brainedu.BrainEdu.dto.response.UserResponse.InstructorResponse;
 import com.brainedu.BrainEdu.dto.response.UserResponse.UserResponse;
 import com.brainedu.BrainEdu.service.userService.UserService;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -76,6 +79,15 @@ public class UserController {
                 )
         );
     }
+        @PutMapping("/{id}")
+        public ResponseEntity<UserResponse> updateUserByAdmin(
+                @PathVariable Long id,
+                @Valid @RequestBody UpdateProfileRequest request
+        ) {
+        UserResponse response = userService.updateUserByAdmin(id, request);
+        return ResponseEntity.ok(response);
+        }
+        
         @GetMapping("/except-admin")
         public ApiResponse<List<UserResponse>> getAllUsersExceptAdmin(
                 @RequestParam(defaultValue = "0") int page,
@@ -130,25 +142,20 @@ public class UserController {
                 );
     }
 
-    @PutMapping("/{id}")
-    public ApiResponse<UserResponse>
-    updateUser(
-            @PathVariable
-            Long id,
-
-            @RequestBody
-            UpdateUserRequest request
-    ) {
-
+    @PutMapping("/{id}/ban")
+        public ApiResponse<UserResponse> banUser(@PathVariable Long id) {
         return ResponseFactory.success(
-                "User updated successfully",
-                        userService.updateUser(
-                                id,
-                                request
-                        )
-                );
+                "User has been banned successfully",
+                userService.banUser(id)
+        );
+        }
+     @PutMapping("/{id}/active")
+        public ApiResponse<UserResponse> activeUser(@PathVariable Long id) {
+        return ResponseFactory.success(
+                "User has been activated successfully",
+                userService.activeUser(id)
+        );
     }
-
     @DeleteMapping("/{id}")
     public ApiResponse<String>
     deleteUser(

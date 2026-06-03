@@ -26,18 +26,18 @@ public interface UserRepository
             u.name,
             u.email,
             COUNT(DISTINCT c.id),
-            COUNT(e.id)
+            COUNT(e.id),
+            str(u.status)
         )
         FROM User u
-        LEFT JOIN Course c
-            ON c.instructor.id = u.id
-        LEFT JOIN Enrollment e
-            ON e.course.id = c.id
+        LEFT JOIN Course c ON c.instructor.id = u.id
+        LEFT JOIN Enrollment e ON e.course.id = c.id
         WHERE u.role = 'INSTRUCTOR'
         GROUP BY
             u.id,
             u.name,
-            u.email
+            u.email,
+            u.status
     """)
     Page<InstructorResponse> findAllInstructors(Pageable pageable);
 }

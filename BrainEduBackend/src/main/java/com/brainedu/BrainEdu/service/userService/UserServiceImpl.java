@@ -1,5 +1,6 @@
 package com.brainedu.BrainEdu.service.userService;
 
+import com.brainedu.BrainEdu.common.enums.UserStatus;
 import com.brainedu.BrainEdu.config.ApiException;
 import com.brainedu.BrainEdu.constant.CacheNames;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateProfileRequest;
@@ -102,10 +103,10 @@ public class UserServiceImpl
                 instructorPage.getTotalPages()
         );
         }
-    @CacheEvict(
-            value = CacheNames.USERS,
-            allEntries = true
-    )
+//     @CacheEvict(
+//             value = CacheNames.USERS,
+//             allEntries = true
+//     )
     @Override
     public UserResponse createUser(
             UserRequest request
@@ -120,9 +121,10 @@ public class UserServiceImpl
                 )
         );
 
-        if (user.getRole() == null) {
-
-            user.setRole("USER");
+        if (request.getRole() == null || request.getRole().trim().isEmpty()) {
+                user.setRole("USER");
+        } else {
+                user.setRole(request.getRole().trim().toUpperCase());
         }
 
         User savedUser =
@@ -132,7 +134,49 @@ public class UserServiceImpl
                 savedUser
         );
     }
+        @Override
+                public UserResponse banUser(Long id) {
+                User user = userRepository.findById(id)
+                        .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
+                user.setStatus(UserStatus.BANNED);
+                
+                User updatedUser = userRepository.save(user);
+                return userMapper.toResponse(updatedUser);
+        }
+
+        @Override
+        public UserResponse activeUser(Long id) {
+                User user = userRepository.findById(id)
+                        .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+                user.setStatus(UserStatus.ACTIVE);
+                
+                User updatedUser = userRepository.save(user);
+                return userMapper.toResponse(updatedUser);
+        }
+
+        @Override
+        public UserResponse updateUserByAdmin(Long id, UpdateProfileRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+        if (request.getName() != null && !request.getName().trim().isEmpty()) {
+                user.setName(request.getName().trim());
+        }
+
+        if (request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
+                user.setEmail(request.getEmail().trim());
+        }
+        
+        if (request.getRole() != null && !request.getRole().trim().isEmpty()) {
+                user.setRole(request.getRole().trim().toUpperCase());
+        }
+
+        User updatedUser = userRepository.save(user);
+
+        return userMapper.toResponse(updatedUser);
+        }
     private User getCurrentUser() {
 
         String email =
@@ -232,32 +276,6 @@ public class UserServiceImpl
                     )
             }
     )
-    @Override
-    public UserResponse updateUser(
-            Long id,
-            UpdateUserRequest request
-    ) {
-
-        User user =
-                userRepository
-                        .findById(id)
-                        .orElseThrow(
-                                () -> new ApiException(
-                                        "User not found"
-                                )
-                        );
-
-        user.setRole(
-                request.getRole()
-        );
-
-        User updatedUser =
-                userRepository.save(user);
-
-        return userMapper.toResponse(
-                updatedUser
-        );
-    }
 
     @CacheEvict(
             value = CacheNames.USERS,

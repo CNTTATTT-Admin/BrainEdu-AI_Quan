@@ -1,11 +1,13 @@
 package com.brainedu.BrainEdu.dto.request.CourseRequest;
 
+import com.brainedu.BrainEdu.common.enums.CourseType;
+
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
 public class CourseRequest {
-    @NotBlank
+    @NotNull
     @Positive
     private Long categoryId;
 
@@ -29,4 +31,6 @@ public class CourseRequest {
     private Float difficultyScore;
 
     private Float price;
+
+    private CourseType courseType;
 }

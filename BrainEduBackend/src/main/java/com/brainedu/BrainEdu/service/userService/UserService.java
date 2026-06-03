@@ -24,10 +24,8 @@ public interface UserService {
     PagedResponse<UserResponse> getAllUsersExceptAdmin(int page, int size);
     PagedResponse<InstructorResponse> getAllInstructors(int page, int size);
 
-    UserResponse updateUser(
-            Long id,
-            UpdateUserRequest request
-    );
-
     String deleteUser(Long id);
+    UserResponse banUser(Long id);
+    UserResponse activeUser(Long id);
+    UserResponse updateUserByAdmin(Long id, UpdateProfileRequest request);
 }

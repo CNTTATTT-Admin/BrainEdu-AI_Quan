@@ -13,11 +13,14 @@ import {
   CheckSquare,
   Award
 } from "lucide-react";
-import useGetAllCourses from "../hooks/useGetAllCourses";
+import useGetAllCourses from "../../course/hooks/useGetAllCourses";
 import useGetLessons from "../hooks/useGetLessons";
 import useGetQuizzes from "../hooks/useGetQuizzes";
 import Pagination from "../../../components/common/Pagination";
-import type { CoursesResponse } from "../../root/types/api-response";
+import type { CoursesResponse } from "../../course/types/api-response";
+import useCreateLesson from "../hooks/useCreateLesson";
+import type { LessonRequest } from "../types/api-request";
+import { CreateLessonModal } from "../components/CreateLessonModal";
 
 export type LessonsResponse = {
   id: number;
@@ -138,6 +141,19 @@ const LessonsManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [activeLessonId, setActiveLessonId] = useState<number | null>(null);
 
+  const [isLessonModalOpen, setIsLessonModalOpen] = useState<boolean>(false);
+
+  const { mutate: createLesson, isPending: isCreateLessonPending } = useCreateLesson();
+
+  const handleCreateLessonSubmit = (payload: LessonRequest) => {
+    console.log(payload);
+    
+    createLesson(payload, {
+      onSuccess: () => {
+        setIsLessonModalOpen(false);
+      },
+    });
+  };
   const { data: coursesData } = useGetAllCourses({ page: 0, size: 100 });
   const courseList = coursesData?.data || [];
 
@@ -172,7 +188,9 @@ const LessonsManagement: React.FC = () => {
           <p className="text-xs text-slate-500">Cấu trúc nội dung bài giảng video và quản lý phân hệ bài tập trắc nghiệm hệ thống gắn liền với từng bài học.</p>
         </div>
         {selectedCourseId && (
-          <button className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-colors self-start sm:self-auto">
+          <button 
+            onClick={() => setIsLessonModalOpen(true)}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-colors self-start sm:self-auto">
             <Plus size={16} />
             Thêm bài học mới
           </button>
@@ -329,6 +347,15 @@ const LessonsManagement: React.FC = () => {
               />
             </div>
           )}
+
+          <CreateLessonModal
+            isOpen={isLessonModalOpen}
+            onClose={() => setIsLessonModalOpen(false)}
+            onSubmit={handleCreateLessonSubmit}
+            isPending={isCreateLessonPending}
+            courseId={Number(selectedCourseId)}
+            existingLessons={lessons} 
+          />
         </div>
       )}
     </div>

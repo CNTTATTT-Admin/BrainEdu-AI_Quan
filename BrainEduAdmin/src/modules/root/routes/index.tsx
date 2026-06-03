@@ -9,7 +9,7 @@ export const rootRouter: RouteObject[] = [
   },
   {
     path: "/admin/lessons",
-    lazy: lazyLoad(() => import("../pages/Lessons"))
+    lazy: lazyLoad(() => import("../../lesson/pages/Lessons.tsx"))
   },
   {
     path: "/admin/assignments",
@@ -19,7 +19,7 @@ export const rootRouter: RouteObject[] = [
   {
     path: "/admin/users",
     element: <ProtectedRoute allowedRoles={["ADMIN"]} />,
-    children: [{ index: true, lazy: lazyLoad(() => import("../pages/Users")) }]
+    children: [{ index: true, lazy: lazyLoad(() => import("../../user/pages/Users.tsx")) }]
   },
   {
     path: "/admin/categories",
@@ -29,12 +29,12 @@ export const rootRouter: RouteObject[] = [
   {
     path: "/admin/all-courses",
     element: <ProtectedRoute allowedRoles={["ADMIN"]} />,
-    children: [{ index: true, lazy: lazyLoad(() => import("../pages/Courses.tsx")) }]
+    children: [{ index: true, lazy: lazyLoad(() => import("../../course/pages/Courses.tsx")) }]
   },
   {
     path: "/admin/instructors",
     element: <ProtectedRoute allowedRoles={["ADMIN"]} />,
-    children: [{ index: true, lazy: lazyLoad(() => import("../pages/Instructors")) }]
+    children: [{ index: true, lazy: lazyLoad(() => import("../../instructor/pages/Instructors.tsx")) }]
   },
 
   {

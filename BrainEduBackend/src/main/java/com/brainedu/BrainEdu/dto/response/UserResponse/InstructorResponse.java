@@ -17,4 +17,6 @@ public class InstructorResponse {
     private Long totalCourses;
 
     private Long totalEnrollments;
+
+    private String status;
 }

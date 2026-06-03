@@ -1,5 +1,5 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { onGetLessonsByCourseApi } from '../services/api';
+import { onGetLessonsByCourseApi } from '../../root/services/api';
 
 interface UseGetLessonsParams {
     courseId: string;

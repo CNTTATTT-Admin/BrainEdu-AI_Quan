@@ -19,6 +19,7 @@ import com.brainedu.BrainEdu.repository.LessonRepository;
 import com.brainedu.BrainEdu.repository.UserRepository;
 import com.brainedu.BrainEdu.ultils.CurrentUserService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -117,7 +118,9 @@ public class CourseServiceImpl
                                         course.getId()
                                 );
 
-                        return courseMapper.toResponse(course, isEnrolled);
+                        Long totalEnrolled = enrollmentRepository.countByCourseId(course.getId());
+
+                        return courseMapper.toResponse(course, isEnrolled, totalEnrolled);
                 });
         }
 
@@ -255,6 +258,7 @@ public class CourseServiceImpl
                 .toList();
         }
     @Override
+        @Transactional 
         public CourseResponse update(Long id, CourseRequest request) {
 
         Course course = courseRepository.findById(id)
@@ -263,24 +267,30 @@ public class CourseServiceImpl
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new ApiException("Category not found"));
 
+        User instructor = userRepository.findById(request.getInstructorId())
+                .orElseThrow(() -> new ApiException("Instructor not found"));
+
         course.setCategory(category);
+        course.setInstructor(instructor);
         course.setTitle(request.getTitle());
         course.setDescription(request.getDescription());
         course.setLevel(request.getLevel());
-        course.setEstimatedDuration(request.getEstimatedDuration());
+        
+        course.setEstimatedDuration(request.getEstimatedDuration() * 3600);
+        
         course.setThumbnail(request.getThumbnail());
         course.setDifficultyScore(request.getDifficultyScore());
         course.setPrice(request.getPrice());
+        course.setCourseType(request.getCourseType());
 
         courseRepository.save(course);
 
         User currentUser = currentUserService.getCurrentUser();
 
-        boolean isEnrolled =
-                enrollmentRepository.existsByUserIdAndCourseId(
-                        currentUser.getId(),
-                        course.getId()
-                );
+        boolean isEnrolled = enrollmentRepository.existsByUserIdAndCourseId(
+                currentUser.getId(),
+                course.getId()
+        );
 
         return courseMapper.toResponse(course, isEnrolled);
         }

@@ -10,26 +10,31 @@ import {
   Mail, 
   ChevronLeft, 
   ChevronRight,
-  UserSquare2
+  UserSquare2,
+  Trash2,
+  Edit
 } from "lucide-react";
-import useGetAllUser from "../hooks/useGetAllUser";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: "ADMIN" | "INSTRUCTOR" | "STUDENT";
-  status: "ACTIVE" | "BANNED";
-  joinedDate: string;
-  coursesCount?: number;
-}
+import useGetAllUser from "..//hooks/useGetAllUser";
+import AddUserModal from "../components/AddUserModal";
+import EditUserModal from "../components/EditUserModal";
+import useCreateUser from "../hooks/useCreateUser";
+import type { UpdateUserRequest, UserRequest } from "../types/api-request";
+import { formatDate } from "../../../utils/helper";
+import useBanUser from "../hooks/useBanUser";
+import useActiveUser from "../hooks/useActiveUser";
+import useDeleteUser from "../hooks/useDeleteUser";
+import useUpdateUser from "../hooks/useUpdateUser";
 
 export default function UsersManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("ALL");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [currentPage, setCurrentPage] = useState(1);
-  const { data: allUser, isPending } = useGetAllUser()
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+
+  const { data: allUser, isPending: isGetUsersPending } = useGetAllUser()
   const userData = allUser?.data || []
 
   const filteredUsers = userData.filter(user => {
@@ -41,6 +46,59 @@ export default function UsersManagement() {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
+  const { mutate: createUser, isPending: isCreateUserPending } = useCreateUser()
+  const { mutate: updateUser, isPending: isUpdateUserPending } = useUpdateUser()
+  
+  const handleAddUserSubmit = (data: UserRequest) => {
+    createUser(data, {
+      onSuccess: () => {
+        setIsModalOpen(false); 
+      }
+    });
+  };
+  
+  const { mutate: banUser, isPending: isBanPending } = useBanUser();
+  const { mutate: activeUser, isPending: isActivePending } = useActiveUser();
+  const { mutate: deleteUser, isPending: isDeletePending } = useDeleteUser();
+
+  const handleBanUser = (id: number) => {
+    if (window.confirm("Bạn có chắc chắn muốn khóa tài khoản này không?")) {
+      banUser(id);
+    }
+  };
+
+  const handleActiveUser = (id: number) => {
+    if (window.confirm("Bạn có chắc chắn muốn kích hoạt lại tài khoản này không?")) {
+      activeUser(id);
+    }
+  };
+
+  const handleDeleteUser = (id: number, name: string) => {
+    if (window.confirm(`Bạn có chắc chắn muốn xóa tài khoản của "${name}" không?`)) {
+      deleteUser(id);
+    }
+  };
+
+  const handleEditUserClick = (user: any) => {
+    setSelectedUser(user);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditUserSubmit = (data: UpdateUserRequest) => {
+    if (!selectedUser) return;
+    updateUser({ 
+      id: selectedUser.id, 
+      payload: data 
+    }, {
+      onSuccess: () => {
+        setIsEditModalOpen(false);
+        setSelectedUser(null);
+      }
+    });
+  };
+
+  const isActionPending = isBanPending || isActivePending || isDeletePending || isUpdateUserPending;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -48,7 +106,9 @@ export default function UsersManagement() {
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">Quản lý người dùng</h1>
           <p className="text-xs text-slate-500">Phân quyền, kiểm soát trạng thái hoạt động và quản trị tài khoản toàn hệ thống.</p>
         </div>
-        <button className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-colors self-start sm:self-auto">
+        <button
+          onClick={() => setIsModalOpen(true)} 
+          className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-colors self-start sm:self-auto">
           <UserPlus size={16} />
           Thêm người dùng mới
         </button>
@@ -96,7 +156,7 @@ export default function UsersManagement() {
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden flex flex-col">
-        <div className="overflow-x-auto">
+        <div className={`overflow-x-auto ${(isGetUsersPending || isActionPending) ? "opacity-60 pointer-events-none" : ""}`}>
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100 text-slate-400 font-semibold uppercase tracking-wider">
@@ -136,7 +196,7 @@ export default function UsersManagement() {
                         <span className="text-[10px] text-slate-400 block mt-0.5 ml-1">{user.coursesCount} Khóa học</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-slate-500 whitespace-nowrap">{user.joinedDate}</td>
+                    <td className="px-6 py-4 text-slate-500 whitespace-nowrap">{formatDate(user.createdAt)}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
                         user.status === "ACTIVE" ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"
@@ -150,15 +210,37 @@ export default function UsersManagement() {
                         <button className="p-1.5 bg-slate-50 hover:bg-slate-100 text-slate-500 rounded-lg transition-colors" title="Gửi Email">
                           <Mail size={14} />
                         </button>
+
+                        <button 
+                          onClick={() => handleEditUserClick(user)}
+                          className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors" 
+                          title="Chỉnh sửa thông tin"
+                        >
+                          <Edit size={14} />
+                        </button>
+
                         {user.status === "ACTIVE" ? (
-                          <button className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors" title="Khóa tài khoản">
+                          <button
+                            onClick={() => handleBanUser(user.id)} 
+                            className="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-600 rounded-lg transition-colors" title="Khóa tài khoản">
                             <UserX size={14} />
                           </button>
                         ) : (
-                          <button className="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg transition-colors" title="Kích hoạt lại">
+                          <button
+                            onClick={() => handleActiveUser(user.id)} 
+                            className="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg transition-colors" title="Kích hoạt lại">
                             <UserCheck size={14} />
                           </button>
                         )}
+                        
+                        <button
+                          onClick={() => handleDeleteUser(user.id, user.name)}
+                          className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors" 
+                          title="Xóa mềm người dùng"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+
                         <button className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg transition-colors">
                           <MoreVertical size={14} />
                         </button>
@@ -196,6 +278,22 @@ export default function UsersManagement() {
           </div>
         </div>
       </div>
+      <AddUserModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onSubmit={handleAddUserSubmit} 
+        isPending={isCreateUserPending}
+      />
+      <EditUserModal 
+        isOpen={isEditModalOpen} 
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedUser(null);
+        }} 
+        onSubmit={handleEditUserSubmit} 
+        isPending={isUpdateUserPending}
+        userData={selectedUser}
+      />
     </div>
   );
 }
