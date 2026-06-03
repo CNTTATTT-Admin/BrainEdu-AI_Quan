@@ -6,18 +6,22 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AssignmentSubmissionRepository
         extends JpaRepository<
-                AssignmentSubmission,
-                Long
-                > {
+        AssignmentSubmission,
+        Long> {
 
-    Page<AssignmentSubmission>
-    findByAssignmentId(
+    List<AssignmentSubmission>
+    findByAssignmentId(Long assignmentId);
+
+    List<AssignmentSubmission>
+    findByStudentId(Long studentId);
+
+    Optional<AssignmentSubmission>
+    findByAssignmentIdAndStudentId(
             Long assignmentId,
-            Pageable pageable);
-
-    Page<AssignmentSubmission>
-    findByStudentId(Long studentId, Pageable pageable);
+            Long studentId
+    );
 }

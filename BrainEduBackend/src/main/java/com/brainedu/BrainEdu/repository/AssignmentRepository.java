@@ -10,12 +10,9 @@ import java.util.List;
 public interface AssignmentRepository
         extends JpaRepository<Assignment, Long> {
 
-    Page<Assignment> findByInstructorId(
-            Long instructorId,
-            Pageable pageable
-    );
+    List<Assignment>
+    findByCourseId(Long courseId);
 
-    List<Assignment> findByCourseId(
-            Long courseId
-    );
+    List<Assignment>
+    findByInstructorId(Long instructorId);
 }

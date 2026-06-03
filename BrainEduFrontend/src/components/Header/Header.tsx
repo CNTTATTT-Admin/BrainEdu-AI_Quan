@@ -96,6 +96,10 @@ const Header = () => {
                   <User size={16} className="text-gray-400" />
                   Khóa học của tôi
                 </NavLink>
+                <NavLink to="/my-assignment" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                  <User size={16} className="text-gray-400" />
+                  Bài tập của tôi
+                </NavLink>
                 <NavLink to="/quiz-history" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                   <User size={16} className="text-gray-400" />
                   Lịch sử nộp bài

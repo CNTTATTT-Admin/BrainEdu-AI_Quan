@@ -1,0 +1,53 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { 
+  onDeleteQuestionApi, 
+  onGetAnswersByQuestionApi,
+  onDeleteAnswerApi 
+} from "../services/api";
+
+const useDeleteQuestionAndAnswers = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate, error, isPending, isError } = useMutation({
+    mutationKey: ["delete-question-and-answers"],
+    mutationFn: async (questionId: number) => {
+      try {
+        try {
+          const answersRes = await onGetAnswersByQuestionApi(questionId);
+          const answersList = answersRes?.data || [];
+          
+          if (answersList.length > 0) {
+            const deleteAnswerPromises = answersList.map((ans: any) => 
+              onDeleteAnswerApi(ans.id)
+            );
+            await Promise.all(deleteAnswerPromises);
+          }
+        } catch (fetchAnsErr) {
+          console.warn("Could not fetch or clean up answers before deleting question", fetchAnsErr);
+        }
+
+        const questionDeleteRes = await onDeleteQuestionApi(questionId);
+        return questionDeleteRes.data;
+      } catch (err: any) {
+        console.error("=== BACKEND DELETE QUESTION ERROR RESPONSE ===");
+        if (err.response) {
+          console.error("Status Code:", err.response.status);
+          console.error("Data Body:", err.response.data);
+        } else {
+          console.error("Message Error:", err.message);
+        }
+        console.error("=============================================");
+        throw err;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lessons-by-course"] });
+      queryClient.invalidateQueries({ queryKey: ["quizzes-by-lesson"] });
+    },
+    retry: 0,
+  });
+
+  return { mutate, error, isError, isPending };
+};
+
+export default useDeleteQuestionAndAnswers;

@@ -1,7 +1,7 @@
 import type { BackendResponse } from "../../../libs/shared/types/backend-response";
 import api from "../../../services/axios";
-import type { LessonRequest } from "../types/api-request";
-import type { LessonsResponse, QuizzResponse } from "../types/api-response";
+import type { AnswerRequest, LessonRequest, QuestionRequest, QuizRequest } from "../types/api-request";
+import type { LessonsResponse, QuestionResponse, QuizzResponse, SkillResponse } from "../types/api-response";
 
 
 export const onGetLessonsByCourseApi = async (
@@ -17,6 +17,19 @@ export const onGetLessonsByCourseApi = async (
             search: search || undefined
         }
     });
+    return data.data;
+};
+
+export const onGetSkillsApi = async (
+): Promise<BackendResponse<SkillResponse[]>> => {
+    const data = await api.get(`/skills`);
+    return data.data;
+};
+
+export const onGetQuestionByQuizApi = async (
+    quizId: number
+): Promise<BackendResponse<QuestionResponse[]>> => {
+    const data = await api.get(`/questions/quiz/${quizId}`);
     return data.data;
 };
 
@@ -38,3 +51,47 @@ export const onCreateLessonApi = async (payload: LessonRequest): Promise<Backend
     const data = await api.post("/lessons", payload);
     return data.data;
 };
+
+export const onCreateQuizApi = async (payload: QuizRequest): Promise<BackendResponse<QuizzResponse>> => {
+    const data = await api.post("/quizzes", payload);
+    return data.data;
+};
+
+export const onUpdateQuestionApi = async ({questionId, payload}: { questionId: number, payload: QuestionRequest }): Promise<BackendResponse<any>> => {
+    const data = await api.put(`/questions/${questionId}`, payload);
+    return data.data;
+}
+
+export const onCreateQuestionApi = async (
+  payload: QuestionRequest
+): Promise<BackendResponse<{ id: number }>> => {
+  const data = await api.post("/questions", payload);
+  return data.data;
+};
+
+export const onCreateSingleAnswerApi = async (
+  payload: AnswerRequest
+): Promise<BackendResponse<any>> => {
+  const data = await api.post("/answers", payload);
+  return data.data;
+};
+
+export const onDeleteQuestionApi = async (questionId: number): Promise<BackendResponse<any>> => {
+  const data = await api.delete(`/questions/${questionId}`);
+  return data.data;
+}
+
+export const onGetAnswersByQuestionApi = async (questionId: number): Promise<BackendResponse<any>> => {
+  const data = await api.get(`/answers/question/${questionId}`);
+  return data.data;
+}
+
+export const onDeleteAnswerApi = async (answerId: number): Promise<BackendResponse<any>> => {
+  const data = await api.delete(`/answers/${answerId}`);
+  return data.data;
+}
+
+export const onUpdateAnswerApi = async (answerId: number, payload: AnswerRequest): Promise<BackendResponse<any>> => {
+  const data = await api.put(`/answers/${answerId}`, payload);
+  return data.data;
+}

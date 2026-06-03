@@ -9,7 +9,7 @@ export const rootRouter: RouteObject[] = [
   },
   {
     path: "/admin/lessons",
-    lazy: lazyLoad(() => import("../../lesson/pages/Lessons.tsx"))
+    lazy: lazyLoad(() => import("../../lesson/pages/LessonsManagement.tsx"))
   },
   {
     path: "/admin/assignments",

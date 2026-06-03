@@ -1,9 +1,13 @@
 package com.brainedu.BrainEdu.entity;
 
+import com.brainedu.BrainEdu.common.enums.AssignmentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+
+import com.brainedu.BrainEdu.common.enums.AssignmentTarget;
+import com.brainedu.BrainEdu.common.enums.AssignmentType;
 
 import java.time.LocalDateTime;
 
@@ -17,40 +21,43 @@ import java.time.LocalDateTime;
 """)
 
 @Where(clause = "deleted = false")
-@Getter
-@Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class Assignment extends BaseEntity {
 
     @Id
-    @GeneratedValue(
-            strategy = GenerationType.IDENTITY
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "course_id")
     private Course course;
 
     @ManyToOne
-    @JoinColumn(name = "instructor_id")
     private User instructor;
 
     private String title;
 
-    @Column(
-            columnDefinition = "TEXT"
-    )
     private String description;
 
-    @Column(name = "due_date")
-    private LocalDateTime dueDate;
+    @Enumerated(EnumType.STRING)
+    private AssignmentType type;
 
-    @Column(name = "max_score")
+    @Enumerated(EnumType.STRING)
+    private AssignmentTarget target;
+
+    @ManyToOne
+    private Quiz quiz;
+
+    private String attachmentUrl;
+
     private Float maxScore;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private LocalDateTime startAt;
+
+    private LocalDateTime dueDate;
+
+    @Enumerated(EnumType.STRING)
+    private AssignmentStatus status;
 }

@@ -1,15 +1,13 @@
 package com.brainedu.BrainEdu.dto.response.AssignmentResponse;
 
+import com.brainedu.BrainEdu.common.enums.SubmissionStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class AssignmentSubmissionResponse {
+public class SubmissionResponse {
 
     private Long id;
 
@@ -21,19 +19,17 @@ public class AssignmentSubmissionResponse {
 
     private String studentName;
 
-    private String textAnswer;
+    private String answerText;
 
-    private String fileUrl;
+    private String attachmentUrl;
 
     private Float score;
 
     private String feedback;
 
-    private String gradedBy;
+    private SubmissionStatus status;
 
     private LocalDateTime submittedAt;
 
     private LocalDateTime gradedAt;
-
-    private String status;
 }

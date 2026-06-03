@@ -18,3 +18,21 @@ export type QuizzResponse = {
     duration: number,
     passingScore: number
 }
+
+export type SkillResponse = {
+  categoryId: number
+  categoryName: string
+  description: string
+  id: number
+  skillName: string
+}
+
+export type QuestionResponse = {
+  id: number,
+  quizId: number;
+  skillId: number;
+  questionText: string;
+  difficultyLevel: string;
+  questionType: string;
+  weightScore: number;
+};

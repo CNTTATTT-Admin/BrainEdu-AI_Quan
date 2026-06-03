@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { X, Loader2, FileText, Video, Layers, Clock } from "lucide-react";
+import { X, Save } from "lucide-react";
 import type { LessonsResponse } from "../types/api-response";
 
 interface CreateLessonModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (formData: any) => void;
+  onSubmit: (payload: any) => void;
   isPending: boolean;
   courseId: number;
   existingLessons: LessonsResponse[];
@@ -19,186 +19,129 @@ export const CreateLessonModal: React.FC<CreateLessonModalProps> = ({
   courseId,
   existingLessons,
 }) => {
-  const [formData, setFormData] = useState({
-    courseId: courseId,
-    title: "",
-    content: "",
-    videoUrl: "",
-    lessonOrder: 1,
-    estimatedTime: 30,
-    difficulty: "BEGINNER",
-  });
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [estimatedTime, setEstimatedTime] = useState(30);
+  const [difficulty, setDifficulty] = useState("EASY");
 
   useEffect(() => {
     if (isOpen) {
-      const nextOrder = existingLessons.length > 0 
-        ? Math.max(...existingLessons.map(l => l.lessonOrder ?? 0)) + 1 
-        : 1;
-
-      setFormData({
-        courseId: courseId,
-        title: "",
-        content: "",
-        videoUrl: "",
-        lessonOrder: nextOrder,
-        estimatedTime: 30,
-        difficulty: "BEGINNER",
-      });
+      setTitle("");
+      setContent("");
+      setVideoUrl("");
+      setEstimatedTime(30);
+      setDifficulty("EASY");
     }
-  }, [isOpen, courseId, existingLessons]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "lessonOrder" || name === "estimatedTime" ? Number(value) : value,
-    }));
-  };
+  const nextOrder = existingLessons.length > 0 
+    ? Math.max(...existingLessons.map((l) => l.lessonOrder || 0)) + 1 
+    : 1;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    if (!title.trim()) return;
+
+    onSubmit({
+      courseId,
+      title: title.trim(),
+      content: content.trim(),
+      videoUrl: videoUrl.trim(),
+      lessonOrder: nextOrder,
+      estimatedTime: Number(estimatedTime),
+      difficulty,
+    });
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-      <div className="bg-white w-full max-w-lg rounded-2xl border border-slate-200 shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
-        
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs animate-fadeIn">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-lg overflow-hidden">
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
           <div>
-            <h2 className="text-sm font-bold text-slate-900">Thêm bài học mới</h2>
-            <p className="text-[11px] text-slate-500">Khởi tạo nội dung bài giảng cho khóa học ID: #{courseId}</p>
+            <h3 className="text-sm font-bold text-slate-900">Thêm bài học mới</h3>
+            <p className="text-[11px] text-slate-500">Tự động cấu hình số thứ tự tiếp theo: Bài số {nextOrder}</p>
           </div>
-          <button
-            onClick={onClose}
-            type="button"
-            className="p-1.5 hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-lg transition-colors"
-          >
+          <button onClick={onClose} disabled={isPending} className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-400 transition-colors">
             <X size={16} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 text-xs flex-1">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="space-y-1.5">
-            <label className="font-bold text-slate-600 block">Tiêu đề bài học <span className="text-red-500">*</span></label>
+            <label className="text-[11px] font-bold text-slate-500 uppercase">Tiêu đề bài học</label>
             <input
               type="text"
-              name="title"
               required
-              placeholder="Nhập tiêu đề bài học (ví dụ: Tổng quan về React Hooks)..."
-              value={formData.title}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 bg-slate-50/50"
+              disabled={isPending}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500 bg-slate-50/50"
+              placeholder="Nhập tên bài học..."
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="font-bold text-slate-600 block flex items-center gap-1">
-                <Layers size={12} className="text-slate-400" />
-                Thứ tự bài học <span className="text-red-500">*</span>
-              </label>
+              <label className="text-[11px] font-bold text-slate-500 uppercase">Thời lượng (Phút)</label>
               <input
                 type="number"
-                name="lessonOrder"
-                required
-                min={0}
-                value={formData.lessonOrder}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 bg-slate-50/50 font-semibold text-blue-600"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="font-bold text-slate-600 block flex items-center gap-1">
-                <Clock size={12} className="text-slate-400" />
-                Thời lượng ước tính (Phút) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                name="estimatedTime"
                 required
                 min={1}
-                value={formData.estimatedTime}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 bg-slate-50/50"
+                disabled={isPending}
+                value={estimatedTime}
+                onChange={(e) => setEstimatedTime(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500 bg-slate-50/50"
               />
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1.5 sm:col-span-2">
-              <label className="font-bold text-slate-600 block flex items-center gap-1">
-                <Video size={12} className="text-slate-400" />
-                Đường dẫn Video bài giảng (URL)
-              </label>
-              <input
-                type="url"
-                name="videoUrl"
-                placeholder="https://example.com/video/lecture-1"
-                value={formData.videoUrl}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 bg-slate-50/50"
-              />
-            </div>
-
-            <div className="space-y-1.5 sm:col-span-2">
-              <label className="font-bold text-slate-600 block">Độ khó bài học</label>
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-bold text-slate-500 uppercase">Độ khó</label>
               <select
-                name="difficulty"
-                value={formData.difficulty}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 bg-slate-50/50 font-medium text-slate-700 cursor-pointer"
+                disabled={isPending}
+                value={difficulty}
+                onChange={(e) => setDifficulty(e.target.value)}
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-500 bg-slate-50/50"
               >
-                <option value="BEGINNER">Cơ bản (Beginner)</option>
-                <option value="INTERMEDIATE">Trung cấp (Intermediate)</option>
-                <option value="ADVANCED">Nâng cao (Advanced)</option>
+                <option value="EASY">Dễ (Easy)</option>
+                <option value="MEDIUM">Trung bình (Medium)</option>
+                <option value="HARD">Khó (Hard)</option>
               </select>
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="font-bold text-slate-600 block flex items-center gap-1">
-              <FileText size={12} className="text-slate-400" />
-              Giáo trình / Nội dung bài học <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              name="content"
-              required
-              rows={4}
-              placeholder="Nhập nội dung tài liệu, văn bản hướng dẫn chi tiết của bài học..."
-              value={formData.content}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 bg-slate-50/50 resize-none leading-relaxed"
+            <label className="text-[11px] font-bold text-slate-500 uppercase">Đường dẫn Video bài giảng</label>
+            <input
+              type="url"
+              disabled={isPending}
+              value={videoUrl}
+              onChange={(e) => setVideoUrl(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500 bg-slate-50/50"
+              placeholder="https://example.com/video"
             />
           </div>
 
-          <div className="px-6 py-3 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-2 -mx-6 -mb-6 mt-4">
-            <button
-              type="button"
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-slate-500 uppercase">Nội dung / Giáo trình</label>
+            <textarea
+              rows={4}
               disabled={isPending}
-              onClick={onClose}
-              className="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 rounded-xl font-semibold transition-colors disabled:opacity-50"
-            >
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500 bg-slate-50/50"
+              placeholder="Nội dung bài học..."
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <button type="button" onClick={onClose} disabled={isPending} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold transition-colors">
               Hủy bỏ
             </button>
-            <button
-              type="submit"
-              disabled={isPending}
-              className="flex items-center justify-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold shadow-sm transition-colors min-w-[100px] disabled:bg-blue-400"
-            >
-              {isPending ? (
-                <>
-                  <Loader2 size={12} className="animate-spin" />
-                  Đang xử lý
-                </>
-              ) : (
-                "Lưu cấu trúc"
-              )}
+            <button type="submit" disabled={isPending} className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold transition-colors shadow-sm">
+              <Save size={14} />
+              {isPending ? "Đang lưu..." : "Lưu bài học"}
             </button>
           </div>
         </form>

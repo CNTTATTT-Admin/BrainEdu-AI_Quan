@@ -38,6 +38,18 @@ public class SecurityConfig {
                         ).permitAll()
 
                         .requestMatchers(
+                                "/api/v1/assignments/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                "/api/v1/assignment-recipients/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                "/api/v1/submissions/**"
+                        ).permitAll()
+
+                        .requestMatchers(
                                 "/api/v1/users/me"
                         ).hasAnyRole(
                                 "USER",
@@ -179,7 +191,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/v1/instructor/**"
                         )
-                        .hasRole("INSTRUCTOR")
+                        .hasAnyRole("INSTRUCTOR", "ADMIN")
                         .requestMatchers(
                                 "/api/v1/student/**"
                         )

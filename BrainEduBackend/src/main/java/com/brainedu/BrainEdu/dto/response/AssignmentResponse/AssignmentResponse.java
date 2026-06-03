@@ -1,33 +1,41 @@
 package com.brainedu.BrainEdu.dto.response.AssignmentResponse;
 
+import com.brainedu.BrainEdu.common.enums.AssignmentStatus;
+import com.brainedu.BrainEdu.common.enums.AssignmentTarget;
+import com.brainedu.BrainEdu.common.enums.AssignmentType;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class AssignmentResponse {
 
     private Long id;
-
-    private Long courseId;
-
-    private String courseTitle;
-
-    private Long instructorId;
-
-    private String instructorName;
 
     private String title;
 
     private String description;
 
-    private LocalDateTime dueDate;
+    private AssignmentType type;
+
+    private AssignmentTarget target;
+
+    private Long courseId;
+
+    private String courseName;
+
+    private Long quizId;
+
+    private String quizTitle;
 
     private Float maxScore;
 
-    private LocalDateTime createdAt;
+    private LocalDateTime startAt;
+
+    private LocalDateTime dueDate;
+
+    private AssignmentStatus status;
+
+    private Integer totalRecipients;
 }

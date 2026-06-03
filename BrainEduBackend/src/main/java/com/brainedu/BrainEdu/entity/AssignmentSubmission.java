@@ -1,5 +1,6 @@
 package com.brainedu.BrainEdu.entity;
 
+import com.brainedu.BrainEdu.common.enums.SubmissionStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,44 +16,31 @@ import java.time.LocalDateTime;
 public class AssignmentSubmission {
 
     @Id
-    @GeneratedValue(
-            strategy = GenerationType.IDENTITY
-    )
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "assignment_id")
     private Assignment assignment;
 
     @ManyToOne
-    @JoinColumn(name = "student_id")
     private User student;
 
-    @Column(
-            name = "text_answer",
-            columnDefinition = "LONGTEXT"
-    )
-    private String textAnswer;
+    @Column(columnDefinition = "TEXT")
+    private String answerText;
 
-    @Column(name = "file_url")
-    private String fileUrl;
+    private String attachmentUrl;
 
     private Float score;
 
-    @Column(
-            columnDefinition = "TEXT"
-    )
+    @Column(columnDefinition = "TEXT")
     private String feedback;
 
-    @ManyToOne
-    @JoinColumn(name = "graded_by")
-    private User gradedBy;
-
-    @Column(name = "submitted_at")
     private LocalDateTime submittedAt;
 
-    @Column(name = "graded_at")
     private LocalDateTime gradedAt;
 
-    private String status;
+    @ManyToOne
+    private User gradedBy;
+
+    @Enumerated(EnumType.STRING)
+    private SubmissionStatus status;
 }

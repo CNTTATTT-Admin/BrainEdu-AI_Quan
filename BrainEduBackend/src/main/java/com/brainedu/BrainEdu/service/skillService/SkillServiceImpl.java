@@ -71,11 +71,10 @@ public class SkillServiceImpl
     }
 
     @Override
-    @Cacheable(
-            value = "skills"
-    )
+//     @Cacheable(
+//             value = "skills"
+//     )
     public Page<SkillResponse> getAll(int page, int size) {
-        System.out.println("DB HIT");
         Pageable pageable = PageRequest.of(page, size);
         return skillRepository.findAll(pageable)
                 .map(
