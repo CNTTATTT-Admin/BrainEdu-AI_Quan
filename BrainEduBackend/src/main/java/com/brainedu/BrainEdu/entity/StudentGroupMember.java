@@ -10,9 +10,10 @@ import lombok.Setter;
 @Table(name = "student_group_members")
 @Getter
 @Setter
-public class StudentGroupMember {
+public class StudentGroupMember extends BaseEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne

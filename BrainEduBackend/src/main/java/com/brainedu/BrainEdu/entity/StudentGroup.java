@@ -5,9 +5,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.*;
 @Entity
 @Table(name = "student_groups")
-public class StudentGroup {
+public class StudentGroup extends BaseEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;

@@ -1,11 +1,11 @@
 package com.brainedu.BrainEdu.dto.request.AssignmentRequest;
 
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class SubmitAssignmentRequest {
-
-    private String answerText;
-
-    private String attachmentUrl;
+    Long assignmentId;
+    String answerText;
+    MultipartFile file;
 }

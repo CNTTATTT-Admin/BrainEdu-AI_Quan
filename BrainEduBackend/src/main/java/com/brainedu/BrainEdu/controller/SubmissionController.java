@@ -7,7 +7,9 @@ import com.brainedu.BrainEdu.dto.request.AssignmentRequest.SubmitAssignmentReque
 import com.brainedu.BrainEdu.dto.response.AssignmentResponse.SubmissionResponse;
 import com.brainedu.BrainEdu.service.assignmentService.SubmissionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -19,21 +21,17 @@ public class SubmissionController {
     private final SubmissionService service;
 
     @PostMapping(
-            "/assignment/{assignmentId}"
+            value = "/assignment/{assignmentId}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public ApiResponse<SubmissionResponse>
-    submit(
+    public ApiResponse<SubmissionResponse> submit(
             @PathVariable Long assignmentId,
-            @RequestBody
-            SubmitAssignmentRequest request
+            @RequestParam(required = false) String answerText,
+            @RequestPart(required = false) MultipartFile file
     ) {
-
         return ResponseFactory.success(
                 "Submitted",
-                service.submit(
-                        assignmentId,
-                        request
-                )
+                service.submit(assignmentId, answerText, file)
         );
     }
 

@@ -130,7 +130,6 @@ class RecommendationService:
             )
         )
 
-
         roadmap = (
 
             RoadmapGenerator
@@ -138,6 +137,7 @@ class RecommendationService:
                 ranked_courses[:5]
             )
         )
+        print(roadmap)
 
         return {
 
