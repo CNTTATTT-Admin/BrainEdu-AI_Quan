@@ -1,6 +1,7 @@
 package com.brainedu.BrainEdu.service.assignmentService;
 
 import com.brainedu.BrainEdu.common.enums.AssignmentStatus;
+import com.brainedu.BrainEdu.common.enums.SubmissionStatus;
 import com.brainedu.BrainEdu.dto.request.AssignmentRequest.AssignmentRequest;
 import com.brainedu.BrainEdu.dto.request.AuthRequest.*;
 import com.brainedu.BrainEdu.dto.response.AssignmentResponse.AssignmentResponse;
@@ -30,13 +31,13 @@ public class AssignmentServiceImpl
 
     private final CourseRepository courseRepository;
 
+    private final AssignmentSubmissionRepository submissionRepository;
+
     private final QuizRepository quizRepository;
 
     private final UserRepository userRepository;
 
     private final EnrollmentRepository enrollmentRepository;
-
-    private final StudentGroupRepository groupRepository;
 
     private final StudentGroupMemberRepository memberRepository;
 
@@ -200,21 +201,46 @@ public class AssignmentServiceImpl
     }
 
     @Override
-    public List<AssignmentResponse>
-    getMyAssignments() {
+    @Transactional(readOnly = true)
+    public List<AssignmentResponse> getMyAssignments() {
 
         Long userId =
                 currentUserService.getCurrentUserId();
 
-        return recipientRepository
-                .findByStudentId(userId)
-                .stream()
-                .map(
-                        AssignmentRecipient::getAssignment
-                )
-                .map(
-                        assignmentMapper::toResponse
-                )
+        List<AssignmentRecipient> recipients =
+                recipientRepository.findByStudentId(userId);
+
+        return recipients.stream()
+                .map(recipient -> {
+
+                    Assignment assignment = recipient.getAssignment();
+
+                    AssignmentSubmission submission =
+                            submissionRepository
+                                    .findByAssignmentIdAndStudentId(
+                                            assignment.getId(),
+                                            userId
+                                    )
+                                    .orElse(null);
+
+                    AssignmentResponse response =
+                            assignmentMapper.toResponse(assignment);
+
+                    // submission status
+                    response.setSubmissionStatus(
+                            submission != null
+                                    ? submission.getStatus()
+                                    : SubmissionStatus.NOT_SUBMITTED
+                    );
+
+                    // score + feedback
+                    if (submission != null) {
+                        response.setScore(submission.getScore());
+                        response.setFeedback(submission.getFeedback());
+                    }
+
+                    return response;
+                })
                 .toList();
     }
 

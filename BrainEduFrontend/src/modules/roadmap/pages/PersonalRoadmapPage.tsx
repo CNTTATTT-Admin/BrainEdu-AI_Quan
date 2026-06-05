@@ -5,20 +5,35 @@ import RoadmapWhyFit from '../component/AIGen/RoadmapWhyFit';
 import RoadmapCTA from '../component/AIGen/RoadmapCTA';
 import useGetPersonalRoadmap from '../hooks/useGetPersonalRoadmap';
 import useGetMe from '../../../hooks/useGetMe';
+import type { RecommendedRoadmap } from '../component/AIGen/RoadmapTimeline';
+
 const PersonalRoadmapPage: React.FC = () => {
   const { data: meData, isPending: isMePending } = useGetMe();
   const { data: roadmapData, isPending: isRoadmapPending } = useGetPersonalRoadmap(meData?.data?.id);
 
   const isPending = isMePending || isRoadmapPending;
-  const roadmapList = roadmapData?.recommended_roadmap || [];
+  const roadmapList: RecommendedRoadmap[] = roadmapData?.recommended_roadmap || [];
   const targetJob = roadmapData?.user_profile?.target_job || "Fullstack Developer";
 
-  const totalLessons = roadmapList.length;
-  const timeline = Math.ceil(
-    roadmapList.reduce((sum, item) => sum + (item.estimated_duration || 0), 0) / 40
-  ) || 0;
+  const allCourses = roadmapList.flatMap(stage => stage.courses || []);
 
-  const uniqueSkills = new Set(roadmapList.flatMap(item => item.skills || []));
+  const totalLessons = allCourses.length;
+
+  const totalDuration = allCourses.reduce((sum, course) => {
+    const duration = course.estimated_duration || (course as any).extimated_duration || 0;
+    return sum + duration;
+  }, 0);
+  
+  // Ước tính số tuần/tháng học tập chia theo định mức (ví dụ: chia cho 40 giờ mỗi tuần/tháng)
+  const timeline = Math.ceil(totalDuration / 40) || 0;
+
+  // Đếm tổng số kỹ năng không lặp lại từ tất cả các khóa học
+  const uniqueSkills = new Set(
+    allCourses.flatMap(course => {
+      if (!course.skills || course.skills === "None") return [];
+      return course.skills.split('|').map(s => s.trim());
+    })
+  );
   const skillNumber = uniqueSkills.size;
 
   return (

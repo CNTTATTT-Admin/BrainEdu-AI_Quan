@@ -125,7 +125,7 @@ const CourseLearnPage = () => {
   };
 
   const handleCancelEnroll = () => {
-    navigate('/courses');
+    navigate('/all-course');
   };
 
   if (isCourseLoading) {

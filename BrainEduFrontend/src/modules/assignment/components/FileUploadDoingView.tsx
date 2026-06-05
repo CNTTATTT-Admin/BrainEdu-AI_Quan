@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { UploadCloud, File, X, CheckSquare, ArrowLeft } from "lucide-react";
 import type { MyAssignmentResponse } from "../types/api-response";
+import useSubmitAssignment from "../hooks/useSubmitAssignment";
 
 interface FileUploadDoingViewProps {
   assignment: MyAssignmentResponse;
@@ -10,8 +11,8 @@ interface FileUploadDoingViewProps {
 
 const FileUploadDoingView: React.FC<FileUploadDoingViewProps> = ({ assignment, onBack, onSubmitSuccess }) => {
   const [file, setFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { mutate, isPending } = useSubmitAssignment();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -35,17 +36,21 @@ const FileUploadDoingView: React.FC<FileUploadDoingViewProps> = ({ assignment, o
       return;
     }
 
-    setIsUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      console.log("Uploading file for Assignment ID:", assignment.id, file.name);
-      onSubmitSuccess();
-    } catch (error) {
-      console.error("Upload failed", error);
-    } finally {
-      setIsUploading(false);
-    }
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("answerText", "");
+
+    mutate(
+      { assignmentId: assignment.id, payload: formData },
+      {
+        onSuccess: () => {
+          onSubmitSuccess();
+        },
+        onError: (err: any) => {
+          alert(err?.response?.data?.message || "Nộp bài thất bại!");
+        }
+      }
+    );
   };
 
   return (
@@ -101,10 +106,10 @@ const FileUploadDoingView: React.FC<FileUploadDoingViewProps> = ({ assignment, o
         </button>
         <button
           onClick={handleSubmit}
-          disabled={isUploading || !file}
+          disabled={isPending || !file}
           className="flex-1 py-2.5 bg-purple-600 hover:bg-purple-700 disabled:bg-slate-200 disabled:text-slate-400 text-white rounded-xl text-xs font-bold shadow-sm shadow-purple-600/10 transition-all flex items-center justify-center gap-1.5"
         >
-          <CheckSquare size={14} /> {isUploading ? "Đang xử lý tải lên..." : `Xác nhận nộp file (${assignment.maxScore}đ)`}
+          <CheckSquare size={14} /> {isPending ? "Đang xử lý tải lên..." : `Xác nhận nộp file (${assignment.maxScore}đ)`}
         </button>
       </div>
     </div>

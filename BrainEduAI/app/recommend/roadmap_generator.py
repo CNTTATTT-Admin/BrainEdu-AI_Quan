@@ -76,7 +76,10 @@ class RoadmapGenerator:
                     course.get(
                         "description"
                     ),
-
+                "thumbnail":
+                    course.get(
+                        "thumbnail"
+                    ),
                 "category":
                     course.get(
                         "category"

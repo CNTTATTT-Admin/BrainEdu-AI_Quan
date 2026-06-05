@@ -5,6 +5,7 @@ import com.brainedu.BrainEdu.common.response.PaginationMeta;
 import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.CourseRequest.CourseRequest;
 import com.brainedu.BrainEdu.dto.request.CourseRequest.CreateCourseRequest;
+import com.brainedu.BrainEdu.dto.request.FilterRequest.CourseFilterRequest;
 import com.brainedu.BrainEdu.dto.response.CourseResponse.CourseResponse;
 import com.brainedu.BrainEdu.dto.response.CourseResponse.MyCourseResponse;
 import com.brainedu.BrainEdu.service.courseService.CourseService;
@@ -40,37 +41,22 @@ public class CourseController {
     }
 
     @GetMapping
-    public ApiResponse<List<CourseResponse>>
-    getAll(
-
-            @RequestParam(
-                    defaultValue = "0"
-            )
-            int page,
-
-            @RequestParam(
-                    defaultValue = "10"
-            )
-            int size
-    ) {
+        public ApiResponse<List<CourseResponse>> getAll(
+                CourseFilterRequest request
+        ) {
 
         Page<CourseResponse> courses =
-                courseService.getAll(
-                        page,
-                        size
-                );
+                courseService.getAll(request);
 
         PaginationMeta meta =
-                ResponseFactory.pagination(
-                        courses
-                );
+                ResponseFactory.pagination(courses);
 
         return ResponseFactory.success(
                 "Courses fetched successfully",
                 courses.getContent(),
                 meta
         );
-    }
+        }
 
     @GetMapping("/{id:\\d+}")
     public ApiResponse<CourseResponse>

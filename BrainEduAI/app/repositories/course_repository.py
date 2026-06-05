@@ -13,6 +13,7 @@ def get_all_courses():
             c.title,
             c.description,
             c.short_description,
+            c.thumbnail,
             c.tags,
             c.level,
             c.difficulty_score,

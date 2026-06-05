@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FileEdit, Send, ArrowLeft } from "lucide-react";
 import type { MyAssignmentResponse } from "../types/api-response";
+import useSubmitAssignment from "../hooks/useSubmitAssignment";
 
 interface EssayDoingViewProps {
   assignment: MyAssignmentResponse;
@@ -10,7 +11,7 @@ interface EssayDoingViewProps {
 
 const EssayDoingView: React.FC<EssayDoingViewProps> = ({ assignment, onBack, onSubmitSuccess }) => {
   const [essayContent, setEssayContent] = useState<string>("");
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const { mutate, isPending } = useSubmitAssignment();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,15 +20,20 @@ const EssayDoingView: React.FC<EssayDoingViewProps> = ({ assignment, onBack, onS
       return;
     }
 
-    setIsSubmitting(true);
-    try {
-      console.log("Submitting Essay for Assignment ID:", assignment.id, { content: essayContent });
-      onSubmitSuccess();
-    } catch (error) {
-      console.error("Submit essay failed", error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    const formData = new FormData();
+    formData.append("answerText", essayContent.trim());
+
+    mutate(
+      { assignmentId: assignment.id, payload: formData },
+      {
+        onSuccess: () => {
+          onSubmitSuccess();
+        },
+        onError: (err: any) => {
+          alert(err?.response?.data?.message || "Nộp bài thất bại!");
+        }
+      }
+    );
   };
 
   return (
@@ -58,10 +64,10 @@ const EssayDoingView: React.FC<EssayDoingViewProps> = ({ assignment, onBack, onS
         </button>
         <button
           type="submit"
-          disabled={isSubmitting || !essayContent.trim()}
+          disabled={isPending || !essayContent.trim()}
           className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white rounded-xl text-xs font-bold shadow-sm shadow-blue-600/10 transition-colors flex items-center justify-center gap-1.5"
         >
-          <Send size={13} /> {isSubmitting ? "Đang gửi..." : `Nộp bài chấm điểm (Tối đa ${assignment.maxScore}đ)`}
+          <Send size={13} /> {isPending ? "Đang gửi..." : `Nộp bài chấm điểm (Tối đa ${assignment.maxScore}đ)`}
         </button>
       </div>
     </form>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { CheckCircle2, XCircle, AlertCircle, Clock, Award, Star, BookOpen, Lightbulb, MessageSquare, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertCircle, Clock, Award, Star, BookOpen, Lightbulb, MessageSquare, ShieldAlert, ShieldCheck, Loader2 } from 'lucide-react';
 import useGetReviewQuiz from '../hooks/useGetReviewQuiz';
 import useGetAIInsight from '../hooks/useGetAIInsight';
 
@@ -9,8 +9,8 @@ const QuizResultPage: React.FC = () => {
   const navigate = useNavigate();
   const { submissionId } = location?.state || {};
 
-  const { data, isPending } = useGetReviewQuiz(submissionId);
-  const { data: aiInsightData, isPending: aiPending } = useGetAIInsight(submissionId);
+  const { data, isPending: isQuizPending } = useGetReviewQuiz(submissionId);
+  const { data: aiInsightData, isPending: isAiPending } = useGetAIInsight(submissionId);
   
   const result = data?.data;
   const aiInsight = aiInsightData?.data || aiInsightData;
@@ -27,6 +27,17 @@ const QuizResultPage: React.FC = () => {
             Quay về trang chủ
           </button>
         </div>
+      </div>
+    );
+  }
+
+  if (isQuizPending || isAiPending) {
+    return (
+      <div className="min-h-screen bg-[#f8fafc] flex flex-col items-center justify-center font-sans gap-3">
+        <Loader2 className="animate-spin text-[#0052cc]" size={32} />
+        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider animate-pulse">
+          Đang tổng hợp kết quả và phân tích từ AI Tutor...
+        </p>
       </div>
     );
   }
@@ -197,84 +208,80 @@ const QuizResultPage: React.FC = () => {
             Phân tích từ AI Tutor
           </div>
 
-          {aiPending ? (
-            <div className="h-48 w-full bg-gray-50 rounded-2xl animate-pulse border border-gray-100" />
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              <div className="lg:col-span-8 border border-gray-100 rounded-2xl p-6 space-y-5">
-                <p className="text-sm italic text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-100">
-                  "{aiInsight?.mentor_feedback || aiInsight?.summary || 'Chưa có nhận xét tổng quan từ AI.'}"
-                </p>
-                
-                <div className="space-y-4">
-                  {dynamicAnalysisData.map((bar: any, i: number) => (
-                    <div key={i} className="space-y-1.5">
-                      <div className="flex justify-between text-xs font-bold text-gray-700">
-                        <span>{bar.name}</span>
-                        <span>{bar.value}%</span>
-                      </div>
-                      <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-                        <div 
-                          className={`h-full ${bar.color} rounded-full transition-all duration-500`} 
-                          style={{ width: `${bar.value}%` }} 
-                        />
-                      </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div className="lg:col-span-8 border border-gray-100 rounded-2xl p-6 space-y-5">
+              <p className="text-sm italic text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-100">
+                "{aiInsight?.mentor_feedback || aiInsight?.summary || 'Chưa có nhận xét tổng quan từ AI.'}"
+              </p>
+              
+              <div className="space-y-4">
+                {dynamicAnalysisData.map((bar: any, i: number) => (
+                  <div key={i} className="space-y-1.5">
+                    <div className="flex justify-between text-xs font-bold text-gray-700">
+                      <span>{bar.name}</span>
+                      <span>{bar.value}%</span>
                     </div>
-                  ))}
+                    <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full ${bar.color} rounded-full transition-all duration-500`} 
+                        style={{ width: `${bar.value}%` }} 
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="lg:col-span-4 space-y-4">
+              <div className="bg-green-50 border border-green-100 rounded-2xl p-5 space-y-2">
+                <div className="flex items-center gap-2 text-xs font-bold text-green-700 uppercase tracking-wide">
+                  <Star size={14} /> Điểm mạnh
+                </div>
+                <div className="text-xs text-green-600 leading-relaxed space-y-1.5">
+                  {aiInsight?.strengths && aiInsight.strengths.length > 0 ? (
+                    aiInsight.strengths.map((str: string, index: number) => (
+                      <p key={index}>• {str}</p>
+                    ))
+                  ) : (
+                    <p>Hệ thống đang phân tích điểm mạnh của bạn.</p>
+                  )}
                 </div>
               </div>
 
-              <div className="lg:col-span-4 space-y-4">
-                <div className="bg-green-50 border border-green-100 rounded-2xl p-5 space-y-2">
-                  <div className="flex items-center gap-2 text-xs font-bold text-green-700 uppercase tracking-wide">
-                    <Star size={14} /> Điểm mạnh
-                  </div>
-                  <div className="text-xs text-green-600 leading-relaxed space-y-1.5">
-                    {aiInsight?.strengths && aiInsight.strengths.length > 0 ? (
-                      aiInsight.strengths.map((str: string, index: number) => (
-                        <p key={index}>• {str}</p>
-                      ))
-                    ) : (
-                      <p>Hệ thống đang phân tích điểm mạnh của bạn.</p>
-                    )}
-                  </div>
+              <div className="bg-red-50 border border-red-100 rounded-2xl p-5 space-y-2 relative">
+                <div className="flex items-center gap-2 text-xs font-bold text-red-700 uppercase tracking-wide">
+                  <AlertCircle size={14} /> Cần cải thiện
                 </div>
-
-                <div className="bg-red-50 border border-red-100 rounded-2xl p-5 space-y-2 relative">
-                  <div className="flex items-center gap-2 text-xs font-bold text-red-700 uppercase tracking-wide">
-                    <AlertCircle size={14} /> Cần cải thiện
-                  </div>
-                  <div className="text-xs text-red-600 leading-relaxed space-y-1.5">
-                    {aiInsight?.weaknesses && aiInsight.weaknesses.length > 0 ? (
-                      aiInsight.weaknesses.map((weak: string, index: number) => (
-                        <p key={index}>• {weak}</p>
-                      ))
-                    ) : (
-                      <p>Hệ thống chưa ghi nhận điểm cần cải thiện yếu.</p>
-                    )}
-                  </div>
-                  <div className="absolute right-[-10px] bottom-2 w-8 h-8 rounded-full bg-[#0052cc] flex items-center justify-center text-white shadow-md cursor-pointer">
-                    <MessageSquare size={14} />
-                  </div>
+                <div className="text-xs text-red-600 leading-relaxed space-y-1.5">
+                  {aiInsight?.weaknesses && aiInsight.weaknesses.length > 0 ? (
+                    aiInsight.weaknesses.map((weak: string, index: number) => (
+                      <p key={index}>• {weak}</p>
+                    ))
+                  ) : (
+                    <p>Hệ thống chưa ghi nhận điểm cần cải thiện yếu.</p>
+                  )}
                 </div>
+                <div className="absolute right-[-10px] bottom-2 w-8 h-8 rounded-full bg-[#0052cc] flex items-center justify-center text-white shadow-md cursor-pointer">
+                  <MessageSquare size={14} />
+                </div>
+              </div>
 
-                <div className="bg-purple-50 border border-purple-100 rounded-2xl p-5 space-y-2">
-                  <div className="flex items-center gap-2 text-xs font-bold text-purple-700 uppercase tracking-wide">
-                    <Lightbulb size={14} /> Bước tiếp theo từ AI
-                  </div>
-                  <div className="text-xs text-purple-600 leading-relaxed space-y-1.5">
-                    {aiInsight?.next_actions && aiInsight.next_actions.length > 0 ? (
-                      aiInsight.next_actions.map((step: string, index: number) => (
-                        <p key={index}>• {step}</p>
-                      ))
-                    ) : (
-                      <p>Hãy tiếp tục luyện tập theo lộ trình đề xuất.</p>
-                    )}
-                  </div>
+              <div className="bg-purple-50 border border-purple-100 rounded-2xl p-5 space-y-2">
+                <div className="flex items-center gap-2 text-xs font-bold text-purple-700 uppercase tracking-wide">
+                  <Lightbulb size={14} /> Bước tiếp theo từ AI
+                </div>
+                <div className="text-xs text-purple-600 leading-relaxed space-y-1.5">
+                  {aiInsight?.next_actions && aiInsight.next_actions.length > 0 ? (
+                    aiInsight.next_actions.map((step: string, index: number) => (
+                      <p key={index}>• {step}</p>
+                    ))
+                  ) : (
+                    <p>Hãy tiếp tục luyện tập theo lộ trình đề xuất.</p>
+                  )}
                 </div>
               </div>
             </div>
-          )}
+          </div>
         </div>
 
         {recommendedTopics.length > 0 && (

@@ -23,17 +23,24 @@ class EmbeddingService:
         text = str(text)
 
         if text in embedding_cache:
-            return embedding_cache[text]
+            cached = embedding_cache[text]
+
+            # 🔥 FIX: ensure list (NOT numpy)
+            if hasattr(cached, "tolist"):
+                return cached.tolist()
+
+            return cached
 
         embedding = model.encode(
             text,
             normalize_embeddings=True
         )
 
-        embedding_cache[text] = embedding
+        # 🔥 FIX: convert numpy -> list ngay khi tạo
+        embedding_list = embedding.tolist()
 
-        save_embedding_cache(
-            embedding_cache
-        )
+        embedding_cache[text] = embedding_list
 
-        return embedding
+        save_embedding_cache(embedding_cache)
+
+        return embedding_list

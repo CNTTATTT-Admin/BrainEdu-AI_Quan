@@ -3,6 +3,7 @@ package com.brainedu.BrainEdu.dto.response.AssignmentResponse;
 import com.brainedu.BrainEdu.common.enums.AssignmentStatus;
 import com.brainedu.BrainEdu.common.enums.AssignmentTarget;
 import com.brainedu.BrainEdu.common.enums.AssignmentType;
+import com.brainedu.BrainEdu.common.enums.SubmissionStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -37,5 +38,11 @@ public class AssignmentResponse {
 
     private AssignmentStatus status;
 
+    private SubmissionStatus submissionStatus;
+
     private Integer totalRecipients;
+
+    private Float score;
+
+    private String feedback;
 }

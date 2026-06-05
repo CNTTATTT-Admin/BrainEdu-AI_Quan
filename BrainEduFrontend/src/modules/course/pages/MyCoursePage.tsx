@@ -6,6 +6,7 @@ import { NavLink } from 'react-router';
 const MyCoursesContent = () => {
   const { data: myCourses, isPending } = useGetMyCourse();
   const myCourseList: MyCourseResponse[] = myCourses?.data || [];
+  console.log(myCourseList);
   
   const [activeTab, setActiveTab] = useState<'studying' | 'completed' | 'favorite'>('studying');
 

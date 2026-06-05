@@ -4,6 +4,7 @@ import com.brainedu.BrainEdu.common.enums.CourseStatus;
 import com.brainedu.BrainEdu.common.enums.CourseType;
 import com.brainedu.BrainEdu.config.ApiException;
 import com.brainedu.BrainEdu.dto.request.CourseRequest.*;
+import com.brainedu.BrainEdu.dto.request.FilterRequest.CourseFilterRequest;
 import com.brainedu.BrainEdu.dto.response.CourseResponse.*;
 import com.brainedu.BrainEdu.entity.Category;
 import com.brainedu.BrainEdu.entity.Course;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -101,27 +103,38 @@ public class CourseServiceImpl
         }
 
     @Override
-        public Page<CourseResponse> getAll(int page, int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
+        public Page<CourseResponse> getAll(CourseFilterRequest request) {
 
         User user = currentUserService.getCurrentUser();
-
         Long userId = user.getId();
 
-        return courseRepository.findAll(pageable)
-                .map(course -> {
+        Sort sort = request.getSortDirection().equalsIgnoreCase("asc")
+                ? Sort.by(request.getSortBy()).ascending()
+                : Sort.by(request.getSortBy()).descending();
 
-                        boolean isEnrolled =
-                                enrollmentRepository.existsByUserIdAndCourseId(
-                                        userId,
-                                        course.getId()
-                                );
+        Pageable pageable =
+                PageRequest.of(
+                        request.getPage(),
+                        request.getSize(),
+                        sort
+                );
 
-                        Long totalEnrolled = enrollmentRepository.countByCourseId(course.getId());
+        Page<Course> courses =
+                courseRepository.findAll(
+                        CourseSpecification.filter(request),
+                        pageable
+                );
 
-                        return courseMapper.toResponse(course, isEnrolled, totalEnrolled);
-                });
+        return courses.map(course -> {
+
+                boolean isEnrolled =
+                        enrollmentRepository.existsByUserIdAndCourseId(userId, course.getId());
+
+                Long totalEnrolled =
+                        enrollmentRepository.countByCourseId(course.getId());
+
+                return courseMapper.toResponse(course, isEnrolled, totalEnrolled);
+        });
         }
 
         @Override

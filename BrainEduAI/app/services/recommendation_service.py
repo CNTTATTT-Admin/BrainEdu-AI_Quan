@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from app.repositories.course_repository import (
     get_all_courses
 )
@@ -36,114 +38,98 @@ class RecommendationService:
     @staticmethod
     def recommend(user_id):
 
+        events_df = get_user_behaviors(user_id)
+        print("EVENTS SIZE:", len(events_df))
+        print(events_df.head(5))
+        print(events_df["metadata"].head(10))
+        features = FeatureExtractor.feature_extractor(events_df)
+        print("FEATURES:", features)
+        profile = UserProfileBuilder.build(features)
 
-        events_df = (
-            get_user_behaviors(
-                user_id
-            )
-        )
+        profile_text = UserProfileBuilder.build_embedding_text(profile)
 
+        user_embedding = EmbeddingService.create_embedding(profile_text)
 
-        features = (
-            FeatureExtractor
-            .feature_extractor(
-                events_df
-            )
-        )
-
-
-        profile = (
-            UserProfileBuilder
-            .build(
-                features
-            )
-        )
-
-
-        profile_text = (
-            UserProfileBuilder
-            .build_embedding_text(
-                profile
-            )
-        )
-
-
-        user_embedding = (
-            EmbeddingService
-            .create_embedding(
-                profile_text
-            )
-        )
-
-
-        courses_df = (
-            get_all_courses()
-        )
+        courses_df = get_all_courses()
 
         prepared_courses = []
-
 
         for _, row in courses_df.iterrows():
 
             course = row.to_dict()
 
-            course_text = (
-                build_course_text(
-                    course
-                )
-            )
+            course_text = build_course_text(course)
 
-            course_embedding = (
-                EmbeddingService
-                .create_embedding(
-                    course_text
-                )
-            )
+            course_embedding = EmbeddingService.create_embedding(course_text)
 
             prepared_courses.append({
-
                 **course,
-
-                "embedding":
-                    course_embedding,
-
-                "skills":
-                    str(
-                        course.get(
-                            "skills",
-                            ""
-                        )
-                    )
+                "embedding": course_embedding,
+                "skills": str(course.get("skills", ""))
             })
 
-
-        ranked_courses = (
-
-            RankingEngine
-            .rank_courses(
-
-                user_embedding,
-
-                prepared_courses,
-
-                profile
-            )
+        ranked_courses = RankingEngine.rank_courses(
+            user_embedding,
+            prepared_courses,
+            profile
         )
 
-        roadmap = (
+        # =========================
+        # GROUP BY CATEGORY (FIXED)
+        # =========================
+        category_groups = defaultdict(list)
 
-            RoadmapGenerator
-            .generate(
-                ranked_courses[:5]
+        for course in ranked_courses:
+
+            category = course.get("category")
+
+            if not category:
+                category = "General"
+
+            category_groups[category].append(course)
+
+        # =========================
+        # BUILD ROADMAP (SMART VERSION)
+        # =========================
+        roadmap = []
+
+        weak_skills = profile.get("weak_skills", [])
+
+        for idx, (category, courses) in enumerate(category_groups.items()):
+
+            sorted_courses = sorted(
+                courses,
+                key=lambda x: x["match_score"],
+                reverse=True
             )
-        )
-        print(roadmap)
+
+            # 🔥 boost nếu category liên quan weak_skills
+            boost = 1.2 if any(
+                ws.lower() in category.lower()
+                for ws in weak_skills
+            ) else 1.0
+
+            roadmap.append({
+                "step": idx + 1,
+
+                "category": category,
+
+                "title": f"{category} Learning Path",
+
+                "description": f"Personalized path for {category}",
+
+                "boost_factor": boost,
+
+                "courses": sorted_courses[:3]
+            })
+
+        roadmap = sorted(
+            roadmap,
+            key=lambda x: x["boost_factor"],
+            reverse=True
+        )[:3]
 
         return {
-
-            "user_profile":
-                profile,
-
-            "recommended_roadmap":
-                roadmap
+            "user_profile": profile,
+            "recommended_roadmap": roadmap
         }

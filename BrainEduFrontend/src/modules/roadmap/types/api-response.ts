@@ -30,20 +30,28 @@ export type UserProfile = {
   target_job?: string;
 }
 
+type CourseRecommend = {
+  id: number;
+  title: string;
+  description: string;
+  tags: string;
+  level: string;
+  extimated_duration: number;
+  category: string;
+  price: number;
+  skills: string;
+  lesson_titles: string;
+}
 export type RecommendedRoadmap = {
   step: number;
-  courseId: number;
-  description: string;
-  course: string;
   category: string;
-  level: string;
-  estimated_duration: number;
-  skills: string[];
-  lesson_overview: string[];
-  match_score?: number; 
+  title: string;
+  description: string;
+  thumbnail: string;
+  courses: CourseRecommend[]
 }
 
 export type RecommendedResponse = {
   user_profile: UserProfile;
-  recommended_roadmap: RecommendedRoadmap[];
+  recommended_roadmap: RecommendedRoadmap;
 }

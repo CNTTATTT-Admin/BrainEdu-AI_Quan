@@ -106,13 +106,18 @@ const MainCourseCard: React.FC<MainCourseCardProps> = ({
             )}
           </div>
 
-          <button className={`text-xs font-bold py-2 px-4 rounded-xl transition ${
-            isRegistered 
-              ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-2xs' 
-              : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
-          }`}>
-            {isRegistered ? 'Học tiếp' : 'Xem chi tiết'}
-          </button>
+          <NavLink
+            to="/course"
+            state={{courseId: courseId}}
+          >
+            <button className={`text-xs font-bold py-2 px-4 rounded-xl transition ${
+              isRegistered 
+                ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-2xs' 
+                : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+            }`}>
+              {isRegistered ? 'Học tiếp' : 'Xem chi tiết'}
+            </button>
+          </NavLink>
         </div>
       </div>
     </div>

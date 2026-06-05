@@ -12,5 +12,8 @@ export type MyAssignmentResponse = {
   startAt: string;
   dueDate: string;
   status: "DRAFT" | "PUBLISHED" | "CLOSED";
+  submissionStatus: "SUBMITTED" | "NOT_SUBMITTED" | "GRADED";
   totalRecipients: number | null;
+  score: number | null;
+  feedback: string | null
 }

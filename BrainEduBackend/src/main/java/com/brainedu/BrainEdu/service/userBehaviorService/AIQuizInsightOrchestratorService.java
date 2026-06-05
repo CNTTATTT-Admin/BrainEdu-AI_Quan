@@ -2,6 +2,7 @@ package com.brainedu.BrainEdu.service.userBehaviorService;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import org.springframework.web.client.RestTemplate;
@@ -15,7 +16,8 @@ public class AIQuizInsightOrchestratorService {
 
     private final RestTemplate
             restTemplate;
-
+        @Value("${ai.service.url}")
+        private String aiServiceUrl;
     public Object analyzeQuiz(
 
             Long userId,
@@ -38,7 +40,7 @@ public class AIQuizInsightOrchestratorService {
 
         return restTemplate.postForObject(
 
-                "http://localhost:8000/analyze/quiz",
+                aiServiceUrl + "/analyze/quiz",
 
                 request,
 

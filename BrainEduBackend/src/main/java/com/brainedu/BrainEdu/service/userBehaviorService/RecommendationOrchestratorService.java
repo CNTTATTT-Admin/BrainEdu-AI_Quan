@@ -1,6 +1,8 @@
 package com.brainedu.BrainEdu.service.userBehaviorService;
 
 import com.brainedu.BrainEdu.dto.request.AIRecommendationRequest.AIRecommendationRequest;
+
+import org.springframework.beans.factory.annotation.Value;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -18,6 +20,9 @@ public class RecommendationOrchestratorService {
     private final RestTemplate
             restTemplate;
 
+        @Value("${ai.service.url}")
+                private String aiServiceUrl;
+
     public Object generateRoadmap(
             Long userId
     ) {
@@ -31,10 +36,8 @@ public class RecommendationOrchestratorService {
         );
 
         return restTemplate.postForObject(
-                "http://localhost:8000/recommend/roadmap",
-
+                aiServiceUrl + "/recommend/roadmap",
                 request,
-
                 Object.class
         );
     }

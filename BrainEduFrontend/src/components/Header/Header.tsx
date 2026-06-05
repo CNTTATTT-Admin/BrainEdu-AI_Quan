@@ -1,15 +1,34 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, LogOut, User, Settings, ChevronDown } from 'lucide-react';
+import { Search, LogOut, User, Settings, ChevronDown, BookOpen, FileText, History } from 'lucide-react';
 import useGetMe from '../../hooks/useGetMe';
 import useLogout from '../../hooks/useLogOut';
 import { NavLink } from 'react-router';
+import useSearchCourse from "../../hooks/useSearchCourse";
+import SearchResultDropdown from '../common/SearchResultDropdown';
 const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { data: currentUser, isPending } = useGetMe();
-  
-  const { mutate: logout } = useLogout()
+  const { mutate: logout } = useLogout();
+
+  const [search, setSearch] = useState("");
+  const [debounced, setDebounced] = useState("");
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebounced(search);
+    }, 300);
+
+    return () => clearTimeout(t);
+  }, [search]);
+
+
+  const { data } = useSearchCourse(debounced);
+
+  const courses = data?.data || [];
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -32,6 +51,33 @@ const Header = () => {
     });
   };
 
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+    `transition-colors duration-200 relative py-1 font-medium ${
+      isActive 
+        ? 'text-[#0052cc] font-bold after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-[2px] after:bg-[#0052cc] after:rounded-full' 
+        : 'text-gray-600 hover:text-[#0052cc]'
+    }`;
+
+  const dropdownLinkClass = ({ isActive }: { isActive: boolean }) =>
+    `flex items-center gap-3 px-4 py-2 text-sm transition-colors duration-150 ${
+      isActive 
+        ? 'text-[#0052cc] bg-blue-50/50 font-semibold' 
+        : 'text-gray-700 hover:bg-gray-50'
+    }`;
+
   return (
     <header className="w-full h-16 bg-[#f8f9fa] border-b border-gray-100 flex items-center justify-between px-8 select-none relative z-50 shadow-xl">
       <div className="flex items-center gap-8">
@@ -41,28 +87,38 @@ const Header = () => {
           </div>
         </NavLink>
 
-        <nav className="flex items-center gap-6 text-sm font-medium text-gray-600">
-          <NavLink to="/quizz" className={({ isActive }) => isActive ? "text-[#0052cc] relative py-5 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-[#0052cc]" : "hover:text-gray-900 transition-colors py-5"}>
-            Khóa học
-          </NavLink>
-          <NavLink to="/pathways">Lộ trình</NavLink>
-          <NavLink to="/personal-roadmap">Lộ trình cá nhân</NavLink>
-          <NavLink to="/all-course">Danh sách khóa học</NavLink>
-          <NavLink to="/community">Cộng đồng</NavLink>
-          <NavLink to="/support">Hỗ trợ</NavLink>
+        <nav className="flex items-center gap-6 text-sm">
+          <NavLink to="/pathways" className={navLinkClass}>Lộ trình</NavLink>
+          <NavLink to="/personal-roadmap" className={navLinkClass}>Lộ trình cá nhân</NavLink>
+          <NavLink to="/all-course" className={navLinkClass}>Danh sách khóa học</NavLink>
+          <NavLink to="/community" className={navLinkClass}>Cộng đồng</NavLink>
+          <NavLink to="/support" className={navLinkClass}>Hỗ trợ</NavLink>
         </nav>
       </div>
 
       <div className="flex items-center gap-6">
-        <div className="relative w-80">
+        <div ref={searchRef} className="relative w-80">
           <span className="absolute inset-y-0 left-4 flex items-center text-gray-400">
             <Search size={16} />
           </span>
+
           <input
-            type="text"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setOpen(true);
+            }}
+            onFocus={() => setOpen(true)}
             placeholder="Tìm kiếm khóa học..."
-            className="w-full h-10 pl-10 pr-4 bg-[#edf2f7] text-sm text-gray-700 rounded-full focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder-gray-400"
+            className="w-full h-10 pl-10 pr-4 bg-[#edf2f7] text-sm rounded-full"
           />
+
+          {open && debounced && (
+            <SearchResultDropdown
+              courses={courses}
+              onClose={() => setOpen(false)}
+            />
+          )}
         </div>
 
         {isPending ? (
@@ -88,20 +144,20 @@ const Header = () => {
                   <p className="text-xs text-gray-500 truncate">{currentUser?.data.email || 'user@example.com'}</p>
                 </div>
 
-                <NavLink to="/profile" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                <NavLink to="/profile" className={dropdownLinkClass}>
                   <User size={16} className="text-gray-400" />
                   Trang cá nhân
                 </NavLink>
-                <NavLink to="/my-course" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                  <User size={16} className="text-gray-400" />
+                <NavLink to="/my-course" className={dropdownLinkClass}>
+                  <BookOpen size={16} className="text-gray-400" />
                   Khóa học của tôi
                 </NavLink>
-                <NavLink to="/my-assignment" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                  <User size={16} className="text-gray-400" />
+                <NavLink to="/my-assignment" className={dropdownLinkClass}>
+                  <FileText size={16} className="text-gray-400" />
                   Bài tập của tôi
                 </NavLink>
-                <NavLink to="/quiz-history" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                  <User size={16} className="text-gray-400" />
+                <NavLink to="/quiz-history" className={dropdownLinkClass}>
+                  <History size={16} className="text-gray-400" />
                   Lịch sử nộp bài
                 </NavLink>
                 <a href="#" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
