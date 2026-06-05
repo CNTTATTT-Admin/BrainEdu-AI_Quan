@@ -26,6 +26,7 @@ services:
       - redis_data:/data
 
   # Backend: Java Spring Boot
+  # Backend: Java Spring Boot
   backend:
     build: ./BrainEduBackend
     container_name: brainedu-backend
@@ -40,6 +41,8 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
       - JWT_SECRET=${JWT_SECRET}
       - AI_SERVICE_URL=http://host.docker.internal:8000
     extra_hosts:

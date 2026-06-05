@@ -205,9 +205,9 @@ const Header = () => {
             <NavLink to="/account/login" className="text-[#0052cc] hover:underline px-4 py-2">
               Đăng nhập
             </NavLink>
-            <button className="bg-[#0052cc] text-white px-6 py-2 rounded-full hover:bg-[#0043a8] transition-colors shadow-sm">
+            <NavLink to="account/register" className="bg-[#0052cc] text-white px-6 py-2 rounded-full hover:bg-[#0043a8] transition-colors shadow-sm">
               Đăng ký
-            </button>
+            </NavLink>
           </div>
         )}
       </div>

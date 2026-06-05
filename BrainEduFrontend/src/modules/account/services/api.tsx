@@ -12,6 +12,12 @@ export const onLogInApi = async(
     })
     return data.data
 }
+
+export const onSendOtp = async(email: string): Promise<BackendResponse<any>> => {
+    const data = await api.post("auth/otp/send", email)
+    return data.data
+}
+
 export const onVerifyApi = async (
     payload: { email: string; otp: string, type: string }
 ) : Promise<BackendResponse<any>> => {
@@ -55,14 +61,6 @@ export const onResetPasswordApi = async (
 export const onRegisterApi = async(
     payload: RegisterRequest
 ) : Promise<BackendResponse<RegisterResponse>> => {
-    console.log(payload)
-    const {email, name, password, username, confirmPassword: confirmPassword} = payload
-    const data = await api.post("/auth/register", {
-        email,
-        name, 
-        password,
-        username,
-        confirmPassword
-    })
+    const data = await api.post("/auth/register", payload)
     return data.data
 }

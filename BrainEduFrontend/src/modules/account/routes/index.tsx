@@ -7,6 +7,10 @@ export const authRouter = [
       {
         path: "/account/login",
         lazy: lazyLoad(() => import("../pages/LoginPage"))
+      },
+      {
+        path: "/account/register",
+        lazy: lazyLoad(() => import("../pages/SignupPage"))
       }
     ]
   }
