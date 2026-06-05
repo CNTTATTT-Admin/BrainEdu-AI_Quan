@@ -70,16 +70,18 @@ public class SecurityConfig {
                                 "/api/v1/quiz-analyses/**"
                         ).permitAll()
 
-                        // PUBLIC GET
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/v1/fields/**"
                         ).permitAll()
 
-                        // ADMIN POST PUT DELETE
                         .requestMatchers(
                                 "/api/v1/fields/**"
                         ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                "/api/v1/notifications/**"
+                        ).permitAll()
 
                         .requestMatchers(
                                 HttpMethod.GET,
