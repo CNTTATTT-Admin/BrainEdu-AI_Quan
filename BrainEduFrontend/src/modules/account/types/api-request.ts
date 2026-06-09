@@ -11,3 +11,9 @@ export type RegisterRequest = {
     confirmPassword: string;
     // agree: boolean;
 }
+
+export interface ForgotPasswordRequest {
+  email: string;
+  otpCode: string;
+  newPassword: string;
+}

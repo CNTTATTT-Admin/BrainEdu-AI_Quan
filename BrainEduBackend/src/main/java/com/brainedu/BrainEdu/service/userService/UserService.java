@@ -1,11 +1,14 @@
 package com.brainedu.BrainEdu.service.userService;
 import java.util.List;
 
+import com.brainedu.BrainEdu.dto.request.UserRequest.TopStudentRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateProfileRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateUserRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UserRequest;
 import com.brainedu.BrainEdu.dto.response.PagedResponse;
 import com.brainedu.BrainEdu.dto.response.UserResponse.InstructorResponse;
+import com.brainedu.BrainEdu.dto.response.UserResponse.TopInstructorResponse;
+import com.brainedu.BrainEdu.dto.response.UserResponse.TopStudentResponse;
 import com.brainedu.BrainEdu.dto.response.UserResponse.UserResponse;
 import org.springframework.data.domain.Page;
 
@@ -28,4 +31,6 @@ public interface UserService {
     UserResponse banUser(Long id);
     UserResponse activeUser(Long id);
     UserResponse updateUserByAdmin(Long id, UpdateProfileRequest request);
+    Page<TopStudentResponse> getTopStudents(TopStudentRequest request);
+    Page<TopInstructorResponse> getTopInstructors(TopStudentRequest request);
 }

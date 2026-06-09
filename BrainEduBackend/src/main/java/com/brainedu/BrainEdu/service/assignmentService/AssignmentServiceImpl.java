@@ -6,6 +6,7 @@ import com.brainedu.BrainEdu.dto.request.AssignmentRequest.AssignmentRequest;
 import com.brainedu.BrainEdu.dto.request.AuthRequest.*;
 import com.brainedu.BrainEdu.dto.response.AssignmentResponse.AssignmentResponse;
 import com.brainedu.BrainEdu.dto.response.AuthResponse.*;
+import com.brainedu.BrainEdu.dto.response.UserResponse.UserResponse;
 import com.brainedu.BrainEdu.entity.*;
 import com.brainedu.BrainEdu.mapper.AssignmentMapper;
 import com.brainedu.BrainEdu.repository.*;
@@ -16,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -284,5 +287,51 @@ public class AssignmentServiceImpl
         assignmentRepository.deleteById(
                 id
         );
+    }
+
+    @Override
+        @Transactional(readOnly = true)
+        public List<AssignmentResponse> getByCourseForInstructor(Long courseId) {
+        Long instructorId = currentUserService.getCurrentUserId();
+
+        List<Object[]> results = assignmentRepository
+                .findByCourseIdAndCourseInstructorIdWithSubmissionCount(courseId, instructorId);
+
+        return results.stream()
+                .map(result -> {
+                        Assignment assignment = (Assignment) result[0];
+                        Long submissionCount = (Long) result[1];
+
+                        AssignmentResponse response = assignmentMapper.toResponse(assignment);
+                        response.setSubmissionCount(submissionCount.intValue());
+                        
+                        return response;
+                })
+                .toList();
+        }
+
+    public List<UserResponse> getUnassignedStudentsByCourseAndInstructor(Long courseId, Long assignmentId) {
+        boolean assignmentExists = assignmentRepository.existsById(assignmentId);
+        if (!assignmentExists) {
+            throw new NoSuchElementException("Không tìm thấy bài tập với ID: " + assignmentId);
+        }
+
+        Long currentInstructor = currentUserService.getCurrentUserId();
+
+        List<User> students = enrollmentRepository.findUnassignedStudentsByInstructor(
+                courseId, 
+                currentInstructor, 
+                assignmentId
+        );
+        
+        return students.stream()
+                .map(student -> {
+                    UserResponse dto = new UserResponse();
+                    dto.setId(student.getId());
+                    dto.setName(student.getName());
+                    dto.setEmail(student.getEmail());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 }

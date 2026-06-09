@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.util.List;
 
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -50,6 +51,7 @@ public class Roadmap extends BaseEntity {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    @BatchSize(size = 20)
     @OrderBy("orderIndex ASC")
     private List<RoadmapCourse> roadmapCourses;
 

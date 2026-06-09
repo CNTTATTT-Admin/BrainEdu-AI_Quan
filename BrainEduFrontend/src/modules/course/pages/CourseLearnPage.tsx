@@ -8,6 +8,7 @@ import useGetLessonProgressMe from '../hooks/useGetLessonProgressMe';
 import { useAnalytics } from '../../../hooks/useAnalytics';
 import useGetCourseDetail from '../hooks/useGetCourseDetail';
 import useEnrollCourse from '../hooks/useEnrollCourse';
+import CourseReviewSection from '../component/CourseDetail/CourseReviewSection';
 
 export type LessonResponse = {
   id: number;
@@ -113,17 +114,14 @@ const CourseLearnPage = () => {
   const { mutate: enrollCourse, isPending: isEnrolling } = useEnrollCourse();
 
   const handleConfirmEnroll = async () => {
-    if (courseType === 'FREE') {
-      enrollCourse(courseId, {
-        onSuccess: () => {
-          setLocalEnrolled(true);
-        }
-      });
-    } else {
-      navigate(`/courses/${courseId}/checkout`);
-    }
+      if (courseType === 'FREE') {
+          enrollCourse(courseId, {
+              onSuccess: () => setLocalEnrolled(true)
+          });
+      } else {
+          navigate(`/checkout`, { state: { courseId, price: courseDetail?.price } });
+      }
   };
-
   const handleCancelEnroll = () => {
     navigate('/all-course');
   };
@@ -162,6 +160,7 @@ const CourseLearnPage = () => {
               </div>
             )}
             <TabsContent content={currentLesson?.content || "Không có mô tả cho bài học này."} />
+            <CourseReviewSection courseId={courseId}/>
           </div>
           
           <div className="lg:col-span-4">

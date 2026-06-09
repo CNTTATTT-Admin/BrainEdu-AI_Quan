@@ -20,3 +20,26 @@ export type CoursesResponse = {
     rating: number,
     reviewsCount: number
 }
+
+export type TopStudent = {
+    studentId: number,
+    studentName: string,
+    studentAvatar: string,
+    averageCompletionPercent: number,
+    averageAssignmentScore: number,
+    averageQuizScore: number,
+    overallPerformanceScore: number,
+    completedCourses: number;
+    totalLearningTime: number;    
+    completedLessons: number;
+    enrolledCourses: number;
+    totalQuizzesTaken: number;
+}
+
+export type TopInstructor = {
+    instructorId: number,
+    instructorName: string,
+    instructorAvatar: string,
+    totalCourses: number,
+    totalStudentsEnrolled: number
+}

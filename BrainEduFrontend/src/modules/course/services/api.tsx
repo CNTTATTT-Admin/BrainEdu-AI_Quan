@@ -1,8 +1,8 @@
 import type { BackendResponse } from "../../../libs/shared/types/backend-response";
 import api from "../../../services/axios";
 import type { CoursesResponse } from "../../root/types/api-response";
-import type { LessonProgressRequest } from "../types/api-request";
-import type { CategoryResponse, CourseCategoryResponse, LessonResponse, MyCourseResponse, ProgressItem } from "../types/api-response";
+import type { CourseRatingRequest, LessonProgressRequest } from "../types/api-request";
+import type { CategoryResponse, CourseCategoryResponse, CourseRatingResponse, LessonResponse, MyCourseResponse, ProgressItem } from "../types/api-response";
 export const onGetLessonsApi = async(
     courseId: Number
 ) : Promise<BackendResponse<LessonResponse[]>> => {
@@ -46,6 +46,22 @@ export const onSaveLessonProgressMeApi = async(data: LessonProgressRequest) : Pr
 
 export const onEnrollCourseApi = async(courseId: number) : Promise<BackendResponse<ProgressItem[]>> => {
     const response = await api.post(`/enrollments`, { courseId })
+
+    return response.data
+}
+
+export const onPaymentApi = async (userId: number, courseId: number): Promise<BackendResponse<PaymentResponse>> => {
+    const response = await api.post(`/payments/create?userId=${userId}&courseId=${courseId}`)
+    return response.data
+}
+export const onRateCourseApi = async(courseId: number, payload: CourseRatingRequest) : Promise<BackendResponse<CourseRatingResponse[]>> => {
+    const response = await api.post(`/courses/${courseId}/reviews`, payload)
+
+    return response.data
+}
+
+export const onGetRateCourseApi = async(courseId: number) : Promise<BackendResponse<CourseRatingResponse[]>> => {
+    const response = await api.get(`/courses/${courseId}/reviews`)
 
     return response.data
 }

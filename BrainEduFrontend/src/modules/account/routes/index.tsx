@@ -11,6 +11,10 @@ export const authRouter = [
       {
         path: "/account/register",
         lazy: lazyLoad(() => import("../pages/SignupPage"))
+      },
+      {
+        path: "/account/forgot-password",
+        lazy: lazyLoad(() => import("../pages/ForgotPassword"))
       }
     ]
   }

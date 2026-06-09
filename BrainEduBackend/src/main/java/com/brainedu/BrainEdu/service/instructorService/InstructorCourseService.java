@@ -2,6 +2,7 @@ package com.brainedu.BrainEdu.service.instructorService;
 
 import com.brainedu.BrainEdu.dto.request.CourseRequest.CreateCourseRequest;
 import com.brainedu.BrainEdu.dto.response.CourseResponse.CourseResponse;
+import com.brainedu.BrainEdu.dto.response.UserResponse.EnrolledStudentResponse;
 
 import java.util.List;
 
@@ -21,4 +22,6 @@ public interface InstructorCourseService {
     String deleteCourse(
             Long id
     );
+
+    List<EnrolledStudentResponse> getStudentsEnrolledInCourse(Long courseId);
 }

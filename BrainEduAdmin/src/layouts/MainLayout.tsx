@@ -50,7 +50,6 @@ if (isPending || !userRole) {
         </div>
 
         <nav className="flex-1 p-4 space-y-1 text-sm font-medium overflow-y-auto">
-          {/* Quyền chung cho cả ADMIN và INSTRUCTOR */}
           <NavLink 
             to="/admin/dashboard" 
             className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
@@ -59,7 +58,6 @@ if (isPending || !userRole) {
             Tổng quan
           </NavLink>
 
-          {/* CHỈ ADMIN mới nhìn thấy các nút này */}
           {isAdmin && (
             <>
               <NavLink 
@@ -88,7 +86,6 @@ if (isPending || !userRole) {
             </>
           )}
 
-          {/* CHỈ INSTRUCTOR mới nhìn thấy nút này */}
           {isInstructor && (
             <NavLink 
               to="/admin/my-courses" 
@@ -100,6 +97,14 @@ if (isPending || !userRole) {
           )}
 
           {/* Quyền chung */}
+          <NavLink 
+            to="/admin/roadmaps" 
+            className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
+          >
+            <ClipboardList size={18} />
+            Quản lý lộ trình học
+          </NavLink>
+
           <NavLink 
             to="/admin/lessons" 
             className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
@@ -116,14 +121,6 @@ if (isPending || !userRole) {
             Bài tập & Tiến độ học
           </NavLink>
 
-          <NavLink 
-            to="/admin/ai-reports" 
-            className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
-          >
-            <BrainCircuit size={18} />
-            Báo cáo AI học viên
-          </NavLink>
-
           {/* CHỈ ADMIN mới nhìn thấy các nút này */}
           {isAdmin && (
             <>
@@ -135,7 +132,7 @@ if (isPending || !userRole) {
                 Quản lý danh mục
               </NavLink>
 
-              <NavLink 
+              {/* <NavLink 
                 to="/admin/skills" 
                 className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
               >
@@ -157,7 +154,7 @@ if (isPending || !userRole) {
               >
                 <Settings size={18} />
                 Cấu hình hệ thống
-              </NavLink>
+              </NavLink> */}
             </>
           )}
         </nav>

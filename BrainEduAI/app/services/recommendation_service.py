@@ -74,9 +74,6 @@ class RecommendationService:
             profile
         )
 
-        # =========================
-        # GROUP BY CATEGORY (FIXED)
-        # =========================
         category_groups = defaultdict(list)
 
         for course in ranked_courses:
@@ -88,9 +85,6 @@ class RecommendationService:
 
             category_groups[category].append(course)
 
-        # =========================
-        # BUILD ROADMAP (SMART VERSION)
-        # =========================
         roadmap = []
 
         weak_skills = profile.get("weak_skills", [])
@@ -103,7 +97,6 @@ class RecommendationService:
                 reverse=True
             )
 
-            # 🔥 boost nếu category liên quan weak_skills
             boost = 1.2 if any(
                 ws.lower() in category.lower()
                 for ws in weak_skills

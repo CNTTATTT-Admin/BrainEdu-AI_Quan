@@ -4,10 +4,8 @@ import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.common.response.PaginationMeta;
 import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.RoadmapRequest.*;
-import com.brainedu.BrainEdu.dto.request.RoadmapRequest.RoadmapRequest;
 import com.brainedu.BrainEdu.dto.response.PagedResponse;
 import com.brainedu.BrainEdu.dto.response.RoadmapResponse.*;
-import com.brainedu.BrainEdu.dto.response.RoadmapResponse.RoadmapResponse;
 import com.brainedu.BrainEdu.service.roadmapService.RoadmapService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,37 +39,22 @@ public class RoadmapController {
     }
 
     @GetMapping
-    public ApiResponse<List<RoadmapResponse>>
-    getAll(
+        public ApiResponse<List<RoadmapResponse>> getAll(
+                @RequestParam(defaultValue = "0") int page,
+                @RequestParam(defaultValue = "10") int size,
+                @RequestParam(required = false) Long categoryId
+        ) {
 
-            @RequestParam(
-                    defaultValue = "0"
-            )
-            int page,
+        Page<RoadmapResponse> roadmaps = roadmapService.getAll(page, size, categoryId);
 
-            @RequestParam(
-                    defaultValue = "10"
-            )
-            int size
-    ) {
-
-        Page<RoadmapResponse> roadmaps =
-                roadmapService.getAll(
-                        page,
-                        size
-                );
-
-        PaginationMeta meta =
-                ResponseFactory.pagination(
-                        roadmaps
-                );
+        PaginationMeta meta = ResponseFactory.pagination(roadmaps);
 
         return ResponseFactory.success(
                 "Roadmaps fetched successfully",
                 roadmaps.getContent(),
                 meta
         );
-    }
+        }
 
     @GetMapping("/{id}")
         public ApiResponse<RoadmapDetailResponse>

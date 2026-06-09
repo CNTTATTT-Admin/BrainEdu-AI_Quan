@@ -5,10 +5,14 @@ import useGetLessons from "../hooks/useGetLessons";
 import Pagination from "../../../components/common/Pagination";
 import type { CoursesResponse } from "../../course/types/api-response";
 import useCreateLesson from "../hooks/useCreateLesson";
+import useUpdateLesson from "../hooks/useUpdateLesson";
 import { CreateLessonModal } from "../components/CreateLessonModal";
+import { UpdateLessonModal } from "../components/EditLessonModal";
 import { LessonListTable } from "../components/LessonListTable";
 import { CreateQuizForm } from "../components/CreateQuizForm";
 import { ManageQuestionsLayout } from "../components/ManageQuestionsLayout";
+import type { LessonsResponse } from "../types/api-response";
+import type { LessonRequest } from "../types/api-request";
 
 const LessonsManagement: React.FC = () => {
   const [selectedCourseId, setSelectedCourseId] = useState<string>("");
@@ -17,10 +21,14 @@ const LessonsManagement: React.FC = () => {
   const [activeLessonId, setActiveLessonId] = useState<number | null>(null);
 
   const [isLessonModalOpen, setIsLessonModalOpen] = useState<boolean>(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [editingLesson, setEditingLesson] = useState<LessonsResponse | null>(null);
+  
   const [lessonForNewQuiz, setLessonForNewQuiz] = useState<{ id: number; title: string } | null>(null);
   const [lessonForQuestions, setLessonForQuestions] = useState<{ id: number; title: string; quizId: number } | null>(null);
 
   const { mutate: createLesson, isPending: isCreateLessonPending } = useCreateLesson();
+  const { mutate: updateLesson, isPending: isUpdateLessonPending } = useUpdateLesson();
 
   const { data: coursesData } = useGetAllCourses({ page: 0, size: 100 });
   const courseList = coursesData?.data || [];
@@ -42,6 +50,24 @@ const LessonsManagement: React.FC = () => {
         refetchLessons();
       },
     });
+  };
+
+  const handleUpdateLessonSubmit = (lessonId: number, payload: LessonRequest) => {
+    updateLesson(
+      { lessonId, payload },
+      {
+        onSuccess: () => {
+          setIsEditModalOpen(false);
+          setEditingLesson(null);
+          refetchLessons();
+        },
+      }
+    );
+  };
+
+  const handleOpenUpdateLesson = (lesson: LessonsResponse) => {
+    setEditingLesson(lesson);
+    setIsEditModalOpen(true);
   };
 
   const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -167,6 +193,7 @@ const LessonsManagement: React.FC = () => {
               setActiveLessonId={setActiveLessonId}
               onOpenCreateQuiz={(id, title) => setLessonForNewQuiz({ id, title })}
               onOpenManageQuestions={(id, title, quizId) => setLessonForQuestions({ id, title, quizId })}
+              onOpenUpdateLesson={(lesson) => handleOpenUpdateLesson(lesson)}
             />
           </div>
 
@@ -191,6 +218,17 @@ const LessonsManagement: React.FC = () => {
             isPending={isCreateLessonPending}
             courseId={Number(selectedCourseId)}
             existingLessons={lessons}
+          />
+
+          <UpdateLessonModal
+            isOpen={isEditModalOpen}
+            onClose={() => {
+              setIsEditModalOpen(false);
+              setEditingLesson(null);
+            }}
+            onSubmit={handleUpdateLessonSubmit}
+            isPending={isUpdateLessonPending}
+            lessonData={editingLesson}
           />
         </div>
       )}

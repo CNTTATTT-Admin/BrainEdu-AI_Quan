@@ -95,3 +95,13 @@ export const onUpdateAnswerApi = async (answerId: number, payload: AnswerRequest
   const data = await api.put(`/answers/${answerId}`, payload);
   return data.data;
 }
+
+export const onUpdateLessonApi = async ({lessonId, payload}: {lessonId: number, payload: LessonRequest}): Promise<BackendResponse<LessonsResponse>> => {
+  const data = await api.put(`/lessons/${lessonId}`, payload);
+  return data.data;
+}
+
+export const onDeleteLessonApi = async (lessonId: number): Promise<BackendResponse<LessonsResponse>> => {
+  const data = await api.delete(`/lessons/${lessonId}`);
+  return data.data;
+}

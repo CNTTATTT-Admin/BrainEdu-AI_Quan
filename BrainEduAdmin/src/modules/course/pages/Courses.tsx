@@ -135,7 +135,7 @@ const AllCoursesManagement: React.FC = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      {/* <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="bg-white p-4 rounded-2xl border border-slate-200/60 shadow-sm flex items-center gap-4">
           <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
             <BookOpen size={20} />
@@ -163,7 +163,7 @@ const AllCoursesManagement: React.FC = () => {
             <p className="text-xl font-bold text-slate-800">{totalEnrolled}</p>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="bg-white p-4 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
@@ -216,7 +216,6 @@ const AllCoursesManagement: React.FC = () => {
                 <th className="px-6 py-3.5">Phân loại / Trình độ</th>
                 <th className="px-6 py-3.5 text-center">Giá bán</th>
                 <th className="px-6 py-3.5 text-center">Học viên</th>
-                <th className="px-6 py-3.5">Trạng thái</th>
                 <th className="px-6 py-3.5 text-right">Hành động</th>
               </tr>
             </thead>
@@ -266,18 +265,7 @@ const AllCoursesManagement: React.FC = () => {
                     <td className="px-6 py-4 text-center whitespace-nowrap font-bold text-slate-600">
                       {course.totalEnrolled || 0}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        course.status === "APPROVED" ? "bg-emerald-50 text-emerald-600" :
-                        course.status === "PENDING" ? "bg-amber-50 text-amber-600 animate-pulse" :
-                        "bg-red-50 text-red-600"
-                      }`}>
-                        {course.status === "APPROVED" && <CheckCircle size={11} />}
-                        {course.status === "PENDING" && <AlertCircle size={11} />}
-                        {course.status === "REJECTED" && <XCircle size={11} />}
-                        {course.status === "APPROVED" ? "Đang chạy" : course.status === "PENDING" ? "Chờ duyệt" : "Từ chối"}
-                      </span>
-                    </td>
+                    
                     <td className="px-6 py-4 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-1.5">
                         <button 

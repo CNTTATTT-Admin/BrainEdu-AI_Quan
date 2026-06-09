@@ -1,4 +1,5 @@
 import type { BackendResponse } from "../libs/shared/types/backend-response";
+import type { NotificationRequest } from "../types/api-request";
 import type {  NotificationResponse, UserRecord } from "../types/api-response";
 import type { EventName, TrackingEvent } from "../types/tracking.types";
 import api from "./axios";
@@ -28,6 +29,11 @@ export const onGetNotificationApi = async (): Promise<BackendResponse<Notificati
 export const onReadNotificationApi = async(id: number): Promise<BackendResponse<NotificationResponse[]>> => {
     const data = await api.patch(`/notifications/${id}/read`, id)
     return data.data
+}
+
+export const onCreateNotification = async (payload: NotificationRequest): Promise<BackendResponse<any>> => {
+    const data = await api.post("/notifications", payload);
+    return data.data;
 }
 
 export const onReadAllNotificationApi = async(): Promise<BackendResponse<NotificationResponse[]>> => {

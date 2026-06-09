@@ -1,6 +1,6 @@
 import type { BackendResponse } from "../../../libs/shared/types/backend-response";
 import api from "../../../services/axios";
-import type { UserInfo, LessonsResponse, QuizzResponse, CategoryResponse, InstructorInfo } from "../types/api-response";
+import type { UserInfo, LessonsResponse, QuizzResponse, CategoryResponse, InstructorInfo, DashboardResponse, InstructorStatsResponse, SubmissionPendingResponse } from "../types/api-response";
 
 
 export const onGetLessonsByCourseApi = async (
@@ -60,5 +60,20 @@ export const onGetInstructorApi = async (
             search: search || undefined
         }
     });
+    return data.data;
+};
+
+export const onGetDashboardApi = async (): Promise<BackendResponse<DashboardResponse>> => {
+    const data = await api.get("/admin/dashboard/stats");
+    return data.data;
+};
+
+export const onGetInstructorDashboardApi = async (): Promise<BackendResponse<InstructorStatsResponse>> => {
+    const data = await api.get("/admin/dashboard/instructor-stats");
+    return data.data;
+};
+
+export const onGetAssignmentPending = async (): Promise<BackendResponse<SubmissionPendingResponse[]>> => {
+    const data = await api.get("/submissions/pending");
     return data.data;
 };

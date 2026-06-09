@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { onGetRoadpApi } from '../services/api'
 
-const useGetRoadmap = (enabled: boolean = true) => {
+const useGetRoadmap = (categoryId?: number, enabled: boolean = true) => {
     const { data, error, isPending, isError, refetch, isFetched } = useQuery({
-        queryKey: ["roadmap"],
-        queryFn: () => onGetRoadpApi(),
+        queryKey: ["roadmap", categoryId],
+        queryFn: () => onGetRoadpApi(categoryId),
         enabled,
         retry: 0,
     }) 

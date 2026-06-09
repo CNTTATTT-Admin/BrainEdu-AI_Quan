@@ -45,4 +45,6 @@ public class AssignmentResponse {
     private Float score;
 
     private String feedback;
+
+    private Integer submissionCount;
 }

@@ -45,3 +45,43 @@ export type InstructorInfo = {
     expertise: string,
     joinedDate: string
 }
+
+type KPIResponse = {
+    totalCourses: number,
+    currentMonthUsers: number,
+    userGrowthPercent: number,
+    currentMonthInstructors: number,
+    instructorGrowthPercent: number,
+    currentMonthRevenue: number,
+    revenueGrowthPercent: number
+}
+
+type WeekluRevenueResponse = {
+    label: string,
+    amount: number,
+    percentage: number
+}
+export type DashboardResponse = {
+    kpi: KPIResponse,
+    weeklyRevenue: WeekluRevenueResponse[]
+}
+
+export type InstructorStatsResponse = {
+    totalCourses: number,
+    totalStudents: number,
+    pendingAssignments: number
+}
+
+export type SubmissionPendingResponse = {
+    submissionId: number,
+    assignmentId: number,
+    studentName: string,
+    studentEmail: string,
+    courseTitle: string,
+    assignmentTitle: string,
+    submittedAt: string,
+    status: 'SUBMITTED',
+    answerText: string;     
+    attachmentUrl: string | null;
+    studentId: number;
+}

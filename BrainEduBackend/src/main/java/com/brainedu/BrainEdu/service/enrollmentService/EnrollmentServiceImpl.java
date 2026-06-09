@@ -1,5 +1,7 @@
 package com.brainedu.BrainEdu.service.enrollmentService;
 
+import com.brainedu.BrainEdu.common.enums.EnrollmentStatus;
+import com.brainedu.BrainEdu.common.enums.PaymentStatus;
 import com.brainedu.BrainEdu.config.ApiException;
 import com.brainedu.BrainEdu.dto.request.EnrollmentRequest.*;
 import com.brainedu.BrainEdu.dto.response.EnrollmentResponse.*;
@@ -9,6 +11,7 @@ import com.brainedu.BrainEdu.entity.User;
 import com.brainedu.BrainEdu.mapper.EnrollmentMapper;
 import com.brainedu.BrainEdu.repository.CourseRepository;
 import com.brainedu.BrainEdu.repository.EnrollmentRepository;
+import com.brainedu.BrainEdu.repository.PaymentRepository;
 import com.brainedu.BrainEdu.repository.UserRepository;
 import com.brainedu.BrainEdu.service.enrollmentService.*;
 import com.brainedu.BrainEdu.ultils.CurrentUserService;
@@ -39,65 +42,36 @@ public class EnrollmentServiceImpl
 
     private final CurrentUserService
             currentUserService;
+    private final PaymentRepository 
+                paymentRepository;
 
     @Override
-    public EnrollmentResponse enroll(
-            EnrollmentRequest request
-    ) {
+        public EnrollmentResponse enroll(EnrollmentRequest request) {
 
         User user = currentUserService.getCurrentUser();
 
-        Course course =
-                courseRepository.findById(
-                                request.getCourseId()
-                        )
-                        .orElseThrow(
-                                () -> new ApiException(
-                                        "Course not found"
-                                )
-                        );
+        Course course = courseRepository.findById(request.getCourseId())
+                .orElseThrow(() -> new ApiException("Course not found"));
 
-        boolean alreadyEnrolled =
-                enrollmentRepository
-                        .findByUserIdAndCourseId(
-                                user.getId(),
-                                course.getId()
-                        )
-                        .isPresent();
+        boolean alreadyEnrolled = enrollmentRepository
+                .findByUserIdAndCourseId(user.getId(), course.getId())
+                .isPresent();
 
         if (alreadyEnrolled) {
-
-            throw new ApiException(
-                    "Already enrolled"
-            );
+                throw new ApiException("Already enrolled");
         }
 
-        Enrollment enrollment =
-                Enrollment.builder()
+        Enrollment enrollment = Enrollment.builder()
+                .user(user)
+                .course(course)
+                .completionPercent(0F)
+                .status(course.isFree() ? EnrollmentStatus.ACTIVE : EnrollmentStatus.PENDING_PAYMENT)
+                .enrolledAt(LocalDateTime.now())
+                .build();
 
-                        .user(user)
-
-                        .course(course)
-
-                        .completionPercent(0F)
-
-                        .status("IN_PROGRESS")
-
-                        .enrolledAt(
-                                LocalDateTime.now()
-                        )
-
-                        .build();
-
-        enrollmentRepository.save(
-                enrollment
-        );
-
-        return enrollmentMapper.toResponse(
-                enrollment
-        );
-    }
-
+        enrollmentRepository.save(enrollment);
+        return enrollmentMapper.toResponse(enrollment);
+        }
     @Override
     public List<EnrollmentResponse> myCourses() {
 
@@ -148,23 +122,15 @@ public class EnrollmentServiceImpl
     }
 
     @Override
-    public String cancel(
-            Long id
-    ) {
+        public String cancel(Long id) {
 
-        Enrollment enrollment =
-                enrollmentRepository
-                        .findById(id)
-                        .orElseThrow(
-                                () -> new ApiException(
-                                        "Enrollment not found"
-                                )
-                        );
+        Enrollment enrollment = enrollmentRepository.findById(id)
+                .orElseThrow(() -> new ApiException("Enrollment not found"));
 
-        enrollmentRepository.delete(
-                enrollment
-        );
+        enrollment.setStatus(EnrollmentStatus.REJECTED);
+
+        enrollmentRepository.save(enrollment);
 
         return "Enrollment cancelled";
-    }
+        }
 }

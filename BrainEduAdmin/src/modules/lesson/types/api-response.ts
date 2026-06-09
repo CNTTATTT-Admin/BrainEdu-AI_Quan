@@ -6,6 +6,8 @@ export type LessonsResponse = {
   content: string;
   videoUrl: string;
   lessonOrder: number;
+  estimatedTime: number,
+  difficulty: string
 };
 
 export type QuizzResponse = {

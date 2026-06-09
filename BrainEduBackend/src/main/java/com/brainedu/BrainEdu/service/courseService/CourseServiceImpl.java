@@ -8,12 +8,17 @@ import com.brainedu.BrainEdu.dto.request.FilterRequest.CourseFilterRequest;
 import com.brainedu.BrainEdu.dto.response.CourseResponse.*;
 import com.brainedu.BrainEdu.entity.Category;
 import com.brainedu.BrainEdu.entity.Course;
+import com.brainedu.BrainEdu.entity.CourseReview;
+import com.brainedu.BrainEdu.entity.CourseReviewHistory;
 import com.brainedu.BrainEdu.entity.Enrollment;
 import com.brainedu.BrainEdu.entity.Lesson;
 import com.brainedu.BrainEdu.entity.User;
 import com.brainedu.BrainEdu.mapper.CourseMapper;
+import com.brainedu.BrainEdu.mapper.CourseReviewMapper;
 import com.brainedu.BrainEdu.repository.CategoryRepository;
 import com.brainedu.BrainEdu.repository.CourseRepository;
+import com.brainedu.BrainEdu.repository.CourseReviewHistoryRepository;
+import com.brainedu.BrainEdu.repository.CourseReviewRepository;
 import com.brainedu.BrainEdu.repository.EnrollmentRepository;
 import com.brainedu.BrainEdu.repository.LessonProgressRepository;
 import com.brainedu.BrainEdu.repository.LessonRepository;
@@ -57,6 +62,9 @@ public class CourseServiceImpl
                 lessonRepository;
         private final LessonProgressRepository
                 lessonProgressRepository;
+        private final CourseReviewRepository courseReviewRepository;
+        private final CourseReviewHistoryRepository courseReviewHistoryRepository;
+        private final CourseReviewMapper courseReviewMapper;
         
 
     @Override
@@ -102,7 +110,7 @@ public class CourseServiceImpl
         return courseMapper.toResponse(course, false);
         }
 
-    @Override
+        @Override
         public Page<CourseResponse> getAll(CourseFilterRequest request) {
 
         User user = currentUserService.getCurrentUser();
@@ -112,18 +120,16 @@ public class CourseServiceImpl
                 ? Sort.by(request.getSortBy()).ascending()
                 : Sort.by(request.getSortBy()).descending();
 
-        Pageable pageable =
-                PageRequest.of(
-                        request.getPage(),
-                        request.getSize(),
-                        sort
-                );
+        Pageable pageable = PageRequest.of(
+                request.getPage(),
+                request.getSize(),
+                sort
+        );
 
-        Page<Course> courses =
-                courseRepository.findAll(
-                        CourseSpecification.filter(request),
-                        pageable
-                );
+        Page<Course> courses = courseRepository.findAll(
+                CourseSpecification.filter(request),
+                pageable
+        );
 
         return courses.map(course -> {
 
@@ -133,7 +139,10 @@ public class CourseServiceImpl
                 Long totalEnrolled =
                         enrollmentRepository.countByCourseId(course.getId());
 
-                return courseMapper.toResponse(course, isEnrolled, totalEnrolled);
+                int totalLessons = 
+                        lessonRepository.countByCourseId(course.getId());
+
+                return courseMapper.toResponse(course, isEnrolled, totalEnrolled, totalLessons);
         });
         }
 
@@ -262,9 +271,7 @@ public class CourseServiceImpl
                                                 : null
                                 )
 
-                                .status(
-                                        enrollment.getStatus()
-                                )
+                                .status(enrollment.getStatus().name())
 
                                 .build();
                 })
@@ -325,5 +332,72 @@ public class CourseServiceImpl
         courseRepository.delete(course);
 
         return "Course deleted successfully";
+    }
+
+    @Override
+    @Transactional
+    public CourseReviewResponse upsertReview(Long courseId, Long userId, CourseReviewRequest request) {
+        boolean isEnrolled = enrollmentRepository.existsByUserIdAndCourseId(userId, courseId);
+        if (!isEnrolled) {
+            throw new ApiException("You must be enrolled in this course to leave a review");
+        }
+
+        CourseReview review = courseReviewRepository
+                .findByCourseIdAndUserId(courseId, userId)
+                .orElse(null);
+
+        if (review == null) {
+            Course course = courseRepository.findById(courseId)
+                    .orElseThrow(() -> new ApiException("Course not found"));
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new ApiException("User not found"));
+
+            review = CourseReview.builder()
+                    .course(course)
+                    .user(user)
+                    .rating(request.getRating())
+                    .comment(request.getComment())
+                    .build();
+            
+            courseReviewRepository.save(review);
+        } else {
+            CourseReviewHistory historyLog = CourseReviewHistory.builder()
+                    .courseReview(review)
+                    .oldRating(review.getRating())
+                    .oldComment(review.getComment())
+                    .build();
+            courseReviewHistoryRepository.save(historyLog);
+
+            review.setRating(request.getRating());
+            review.setComment(request.getComment());
+            
+            courseReviewRepository.save(review);
+        }
+
+        return courseReviewMapper.toResponse(review);
+    }
+
+    @Override
+    public Page<CourseReviewResponse> getReviewsByCourse(Long courseId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return courseReviewRepository.findByCourseId(courseId, pageable)
+                .map(courseReviewMapper::toResponse);
+    }
+
+    @Override
+    public Page<TopCourseResponse> getTopCourses(TopCourseRequest request) {
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        Page<Object[]> rawResults = courseRepository.findTopCoursesOverview(pageable);
+
+        return rawResults.map(row -> TopCourseResponse.builder()
+                .courseId(row[0] != null ? ((Number) row[0]).longValue() : null)
+                .courseTitle(row[1] != null ? row[1].toString() : null)
+                .courseThumbnail(row[2] != null ? row[2].toString() : null)
+                .coursePrice(row[3] != null ? ((Number) row[3]).floatValue() : 0.0f)
+                .instructorName(row[4] != null ? row[4].toString() : null)
+                .totalStudentsEnrolled(row[5] != null ? ((Number) row[5]).longValue() : 0L)
+                .averageRating(row[6] != null ? ((Number) row[6]).doubleValue() : 0.0)
+                .totalReviews(row[7] != null ? ((Number) row[7]).longValue() : 0L)
+                .build());
     }
 }

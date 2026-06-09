@@ -28,9 +28,6 @@ class QuizAnalysisService:
             quiz_submission_id
     ):
 
-        # =========================
-        # LOAD SUBMISSION
-        # =========================
 
         submission = (
             get_quiz_submission(
@@ -44,9 +41,6 @@ class QuizAnalysisService:
                 f"Quiz submission {quiz_submission_id} not found"
             )
 
-        # =========================
-        # LOAD ANSWERS
-        # =========================
 
         answers_df = (
             get_quiz_submission_answers(
@@ -59,9 +53,6 @@ class QuizAnalysisService:
             answers_df.columns.tolist()
         )
 
-        # =========================
-        # FEATURE EXTRACTION
-        # =========================
 
         features = (
             FeatureExtractor
@@ -73,9 +64,6 @@ class QuizAnalysisService:
             )
         )
 
-        # =========================
-        # DEBUG
-        # =========================
 
         print("\n========== QUIZ FEATURES ==========\n")
 
@@ -133,9 +121,6 @@ class QuizAnalysisService:
             )
         )
 
-        # =========================
-        # BUILD PROMPT
-        # =========================
 
         prompt = (
             build_quiz_prompt(
@@ -143,9 +128,6 @@ class QuizAnalysisService:
             )
         )
 
-        # =========================
-        # CALL GROQ
-        # =========================
 
         content = (
             GroqClient.generate(
@@ -153,9 +135,6 @@ class QuizAnalysisService:
             )
         )
 
-        # =========================
-        # CLEAN RESPONSE
-        # =========================
 
         content = (
             content
@@ -170,9 +149,6 @@ class QuizAnalysisService:
             .strip()
         )
 
-        # =========================
-        # PARSE JSON
-        # =========================
 
         try:
 

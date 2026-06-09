@@ -3,11 +3,13 @@ package com.brainedu.BrainEdu.service.instructorService;
 import com.brainedu.BrainEdu.config.ApiException;
 import com.brainedu.BrainEdu.dto.request.CourseRequest.*;
 import com.brainedu.BrainEdu.dto.response.CourseResponse.*;
+import com.brainedu.BrainEdu.dto.response.UserResponse.EnrolledStudentResponse;
 import com.brainedu.BrainEdu.entity.Category;
 import com.brainedu.BrainEdu.entity.Course;
 import com.brainedu.BrainEdu.entity.User;
 import com.brainedu.BrainEdu.repository.CategoryRepository;
 import com.brainedu.BrainEdu.repository.CourseRepository;
+import com.brainedu.BrainEdu.repository.EnrollmentRepository;
 import com.brainedu.BrainEdu.repository.UserRepository;
 import com.brainedu.BrainEdu.service.instructorService.*;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +29,7 @@ public class InstructorCourseServiceImpl
     private final CategoryRepository categoryRepository;
 
     private final UserRepository userRepository;
-
+        private final EnrollmentRepository enrollmentRepository;
     @Override
     public CourseResponse createCourse(
             CreateCourseRequest request
@@ -177,5 +180,30 @@ public class InstructorCourseServiceImpl
         courseRepository.delete(course);
 
         return "Course deleted successfully";
+    }
+
+    @Override
+    public List<EnrolledStudentResponse> getStudentsEnrolledInCourse(Long courseId) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        if (!course.getInstructor().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("You do not have permission to view students of this course");
+        }
+
+        return enrollmentRepository.findByCourseIdWithUser(courseId).stream().map(enrollment -> {
+            User student = enrollment.getUser();
+            return EnrolledStudentResponse.builder()
+                    .id(student.getId())
+                    .name(student.getName())
+                    .email(student.getEmail())
+                    .avatar(student.getAvatar())
+                    .enrolledAt(enrollment.getEnrolledAt())
+                    .completionPercent(enrollment.getCompletionPercent())
+                    .enrollmentStatus(enrollment.getStatus().name())
+                    .build();
+        }).collect(Collectors.toList());
     }
 }

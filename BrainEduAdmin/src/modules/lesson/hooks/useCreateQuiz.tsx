@@ -10,6 +10,9 @@ const useCreateQuiz = () => {
             queryClient.invalidateQueries({ queryKey: ["lessons-by-course"] });
             queryClient.invalidateQueries({ queryKey: ["quizzes-by-lesson"] });
         },
+        onError: (err) => {
+            console.log(err);
+        },
         retry: 0,
     }) 
     

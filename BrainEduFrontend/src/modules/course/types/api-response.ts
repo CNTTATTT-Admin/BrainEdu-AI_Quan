@@ -51,3 +51,23 @@ export type MyCourseResponse = {
   nextLessonTitle: string,
   status: string
 }
+
+export type CourseRatingResponse = {
+  id: number;
+  courseId: number;
+  courseTitle: string;
+  studentId: number;
+  studentName: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type PaymentResponse = {
+  paymentId: number,
+  txnRef: string,
+  amount: number,
+  paymentUrl: string,
+  status: string
+}

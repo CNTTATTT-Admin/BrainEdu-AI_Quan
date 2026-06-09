@@ -1,4 +1,4 @@
-import {createBrowserRouter} from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import { Suspense } from "react";
 import AuthLayout from "../layouts/AuthLayout";
 import Fallback from "../components/common/Fallback";
@@ -10,7 +10,7 @@ import { courseRouter } from "../modules/course/routes";
 import { quizzRouter } from "../modules/quizz/routes";
 import { pathwayRouter } from "../modules/roadmap/routes";
 import { assignmentRouter } from "../modules/assignment/routes";
-// eslint-disable-next-line react-refresh/only-export-components
+
 const AuthLayoutWithSuspense = () => (
   <Suspense fallback={<Fallback />}>
     <AuthLayout />
@@ -20,15 +20,16 @@ const AuthLayoutWithSuspense = () => (
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <ProtectedRoute />,
+    element: <MainLayout />,
     children: [
+      ...rootRouter, 
+      ...courseRouter,
+      ...pathwayRouter,
+
       {
-        element: <MainLayout />,
+        element: <ProtectedRoute />,
         children: [
-          ...rootRouter,
-          ...courseRouter,
           ...quizzRouter,
-          ...pathwayRouter,
           ...assignmentRouter
         ]
       }
@@ -37,4 +38,4 @@ const router = createBrowserRouter([
   ...authRouter
 ]);
 
-export default router
+export default router;

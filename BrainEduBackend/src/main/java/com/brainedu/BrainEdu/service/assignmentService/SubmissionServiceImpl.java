@@ -4,6 +4,7 @@ import com.brainedu.BrainEdu.common.enums.SubmissionStatus;
 import com.brainedu.BrainEdu.dto.request.AssignmentRequest.GradeSubmissionRequest;
 import com.brainedu.BrainEdu.dto.request.AssignmentRequest.SubmitAssignmentRequest;
 import com.brainedu.BrainEdu.dto.request.AuthRequest.*;
+import com.brainedu.BrainEdu.dto.response.AssignmentResponse.PendingAssignmentResponse;
 import com.brainedu.BrainEdu.dto.response.AssignmentResponse.SubmissionResponse;
 import com.brainedu.BrainEdu.dto.response.AuthResponse.*;
 import com.brainedu.BrainEdu.entity.*;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.brainedu.BrainEdu.common.enums.AssignmentType.ESSAY;
 
@@ -219,4 +221,30 @@ public class SubmissionServiceImpl
                 )
                 .toList();
     }
+
+    @Override
+        public List<PendingAssignmentResponse> getPendingAssignments() {
+        Long instructorId = currentUserService.getCurrentUserId();
+        
+        List<AssignmentSubmission> submissions = submissionRepository.findPendingSubmissionsByInstructor(
+                instructorId, 
+                SubmissionStatus.SUBMITTED
+        );
+        
+        return submissions.stream()
+                .map(sub -> PendingAssignmentResponse.builder()
+                        .submissionId(sub.getId())
+                        .assignmentId(sub.getAssignment().getId())
+                        .studentName(sub.getStudent().getName())
+                        .studentId(sub.getStudent().getId())
+                        .studentEmail(sub.getStudent().getEmail())
+                        .courseTitle(sub.getAssignment().getCourse().getTitle())
+                        .assignmentTitle(sub.getAssignment().getTitle())
+                        .submittedAt(sub.getSubmittedAt())
+                        .status(sub.getStatus().name())
+                        .answerText(sub.getAnswerText()) 
+                        .attachmentUrl(sub.getAttachmentUrl()) 
+                        .build())
+                .collect(Collectors.toList());
+        }
 }

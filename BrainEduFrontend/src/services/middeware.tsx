@@ -16,7 +16,7 @@ export const ProtectedRoute = () => {
   const token = getToken();
 
   if (!token) {
-    return <Navigate to="/account/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <Outlet />;

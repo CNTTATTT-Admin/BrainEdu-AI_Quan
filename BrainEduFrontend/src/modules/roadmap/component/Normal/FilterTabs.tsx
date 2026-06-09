@@ -1,26 +1,25 @@
 import React from 'react';
 
-interface FilterTabsProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
+interface TabItem {
+  id: number | 'all';
+  name: string;
 }
 
-const FilterTabs: React.FC<FilterTabsProps> = ({ activeTab, setActiveTab }) => {
-  const tabs = [
-    { id: 'all', label: 'Tất cả' },
-    { id: 'programming', label: 'Lập trình' },
-    { id: 'data-science', label: 'Khoa học dữ liệu' },
-    { id: 'ai', label: 'Trí tuệ nhân tạo' },
-    { id: 'design', label: 'Thiết kế' },
-  ];
+interface FilterTabsProps {
+  activeTab: number | 'all';
+  setActiveTab: (tabId: number | 'all') => void;
+  tabs: TabItem[];
+}
 
+const FilterTabs: React.FC<FilterTabsProps> = ({ activeTab, setActiveTab, tabs }) => {
   return (
     <div className="flex flex-wrap gap-2.5 mb-10">
-      {tabs.map((tab) => {
+      {tabs?.map((tab) => {
         const isActive = activeTab === tab.id;
         return (
           <button
             key={tab.id}
+            type="button"
             onClick={() => setActiveTab(tab.id)}
             className={`text-xs font-bold px-4 py-2.5 rounded-full transition-all ${
               isActive
@@ -28,7 +27,7 @@ const FilterTabs: React.FC<FilterTabsProps> = ({ activeTab, setActiveTab }) => {
                 : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
             }`}
           >
-            {tab.label}
+            {tab.name}
           </button>
         );
       })}

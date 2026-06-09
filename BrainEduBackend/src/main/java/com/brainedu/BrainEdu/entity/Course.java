@@ -93,4 +93,8 @@ public class Course extends BaseEntity {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    public boolean isFree() {
+    return price == null || price == 0;
+}
 }

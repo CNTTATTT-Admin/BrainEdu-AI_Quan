@@ -35,4 +35,10 @@ Page<CourseResponse> getAll(CourseFilterRequest request);
     );
 
     List<MyCourseResponse> getMyCourses();
+
+    CourseReviewResponse upsertReview(Long courseId, Long userId, CourseReviewRequest request);
+
+    Page<CourseReviewResponse> getReviewsByCourse(Long courseId, int page, int size);
+
+    Page<TopCourseResponse> getTopCourses(TopCourseRequest request);
 }

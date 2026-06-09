@@ -6,11 +6,15 @@ import com.brainedu.BrainEdu.dto.response.QuizResponse.*;
 import com.brainedu.BrainEdu.entity.Lesson;
 import com.brainedu.BrainEdu.entity.Question;
 import com.brainedu.BrainEdu.entity.Quiz;
+import com.brainedu.BrainEdu.entity.User;
 import com.brainedu.BrainEdu.mapper.QuizMapper;
 import com.brainedu.BrainEdu.repository.LessonRepository;
 import com.brainedu.BrainEdu.repository.QuestionRepository;
 import com.brainedu.BrainEdu.repository.QuizRepository;
+import com.brainedu.BrainEdu.repository.QuizSubmissionRepository;
 import com.brainedu.BrainEdu.service.quizService.*;
+import com.brainedu.BrainEdu.ultils.CurrentUserService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +38,8 @@ public class QuizServiceImpl
 
     private final QuizMapper
             quizMapper;
+    private final CurrentUserService currentUserService;
+    private final QuizSubmissionRepository quizSubmissionRepository;
 
     @Override
     public QuizResponse create(
@@ -112,22 +118,26 @@ public class QuizServiceImpl
     }
 
     @Override
-    public Page<QuizResponse> getByLesson(
-            Long lessonId,
-            int page,
-            int size
-    ) {
+        public Page<QuizResponse> getByLesson(
+                Long lessonId,
+                int page,
+                int size
+        ) {
         Pageable pageable = PageRequest.of(page, size);
+        User user = currentUserService.getCurrentUser();
 
         return quizRepository
                 .findByLessonId(
                         lessonId,
                         pageable
                 )
-                .map(
-                        quizMapper::toResponse
-                );
-    }
+                .map(quiz -> {
+                        QuizResponse response = quizMapper.toResponse(quiz);
+                        boolean hasSubmitted = quizSubmissionRepository.existsByUserIdAndQuizId(user.getId(), quiz.getId());
+                        response.setIsSubmitted(hasSubmitted);
+                        return response;
+                });
+        }
 
     @Override
     public List<QuizQuestionAnswerResponse>

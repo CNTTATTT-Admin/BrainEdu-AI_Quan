@@ -1,14 +1,14 @@
-package com.brainedu.BrainEdu.service.authService.password;
+// package com.brainedu.BrainEdu.service.authService.password;
 
-import com.brainedu.BrainEdu.dto.request.AuthRequest.*;
+// import com.brainedu.BrainEdu.dto.request.AuthRequest.*;
 
-public interface PasswordResetService {
+// public interface PasswordResetService {
 
-    String forgotPassword(
-            ForgotPasswordRequest request
-    );
+//     String forgotPassword(
+//             ForgotPasswordRequest request
+//     );
 
-    String resetPassword(
-            ResetPasswordRequest request
-    );
-}
+//     String resetPassword(
+//             ResetPasswordRequest request
+//     );
+// }

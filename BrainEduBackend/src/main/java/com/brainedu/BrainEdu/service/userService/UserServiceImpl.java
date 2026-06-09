@@ -3,11 +3,14 @@ package com.brainedu.BrainEdu.service.userService;
 import com.brainedu.BrainEdu.common.enums.UserStatus;
 import com.brainedu.BrainEdu.config.ApiException;
 import com.brainedu.BrainEdu.constant.CacheNames;
+import com.brainedu.BrainEdu.dto.request.UserRequest.TopStudentRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateProfileRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateUserRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UserRequest;
 import com.brainedu.BrainEdu.dto.response.PagedResponse;
 import com.brainedu.BrainEdu.dto.response.UserResponse.InstructorResponse;
+import com.brainedu.BrainEdu.dto.response.UserResponse.TopInstructorResponse;
+import com.brainedu.BrainEdu.dto.response.UserResponse.TopStudentResponse;
 import com.brainedu.BrainEdu.dto.response.UserResponse.UserResponse;
 import com.brainedu.BrainEdu.entity.User;
 import com.brainedu.BrainEdu.mapper.UserMapper;
@@ -298,5 +301,39 @@ public class UserServiceImpl
         userRepository.delete(user);
 
         return "User deleted successfully";
+    }
+    @Override
+    public Page<TopStudentResponse> getTopStudents(TopStudentRequest request) {
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        Page<Object[]> rawResults = userRepository.findTopStudentsOverview(pageable);
+
+        return rawResults.map(row -> TopStudentResponse.builder()
+                        .studentId(((Number) row[0]).longValue())
+                        .studentName((String) row[1])
+                        .studentAvatar((String) row[2])
+                        .averageCompletionPercent(((Number) row[3]).doubleValue())
+                        .averageAssignmentScore(((Number) row[4]).doubleValue())
+                        .averageQuizScore(((Number) row[5]).doubleValue())
+                        .completedCourses(((Number) row[6]).longValue())
+                        .totalLearningTime(((Number) row[7]).longValue())
+                        .completedLessons(((Number) row[8]).longValue())
+                        .enrolledCourses(((Number) row[9]).longValue())
+                        .totalQuizzesTaken(((Number) row[10]).longValue())
+                        .overallPerformanceScore(((Number) row[11]).doubleValue())
+                        .build());
+    }
+
+    @Override
+    public Page<TopInstructorResponse> getTopInstructors(TopStudentRequest request) {
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        Page<Object[]> rawResults = userRepository.findTopInstructorsOverview(pageable);
+
+        return rawResults.map(row -> TopInstructorResponse.builder()
+                .instructorId(row[0] != null ? ((Number) row[0]).longValue() : null)
+                .instructorName(row[1] != null ? row[1].toString() : null)
+                .instructorAvatar(row[2] != null ? row[2].toString() : null)
+                .totalCourses(row[3] != null ? ((Number) row[3]).longValue() : 0L)
+                .totalStudentsEnrolled(row[4] != null ? ((Number) row[4]).longValue() : 0L)
+                .build());
     }
 }

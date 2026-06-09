@@ -8,10 +8,13 @@ import com.brainedu.BrainEdu.dto.request.AuthRequest.LogoutRequest;
 import com.brainedu.BrainEdu.dto.request.AuthRequest.RefreshTokenRequest;
 import com.brainedu.BrainEdu.dto.request.AuthRequest.RegisterRequest;
 import com.brainedu.BrainEdu.dto.request.AuthRequest.ResetPasswordRequest;
+import com.brainedu.BrainEdu.dto.request.EmailRequest.OtpRequest.SendOtp;
 import com.brainedu.BrainEdu.dto.response.AuthResponse.AuthResponse;
 import com.brainedu.BrainEdu.service.authService.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -78,31 +81,19 @@ public class AuthController {
         );
     }
 
-    @PostMapping("/forgot-password")
-    public ApiResponse<String>
-    forgotPassword(
-            @Valid
-            @RequestBody
-            ForgotPasswordRequest request
+    @PostMapping("/forgot-password/send-otp")
+    public ApiResponse<String> sendForgotPasswordOtp(
+            @Valid @RequestBody SendOtp request
     ) {
-
-        return ResponseFactory.success(
-                "Reset password email sent successfully",
-                authService.forgotPassword(request)
-        );
+        authService.sendForgotPasswordOtp(request);
+        return ResponseFactory.success("Mã OTP khôi phục mật khẩu đã được gửi thành công", null);
     }
 
-    @PostMapping("/reset-password")
-    public ApiResponse<String>
-    resetPassword(
-            @Valid
-            @RequestBody
-            ResetPasswordRequest request
+    @PostMapping("/forgot-password/reset")
+    public ApiResponse<String> resetPasswordWithOtp(
+            @Valid @RequestBody ResetPasswordRequest request
     ) {
-
-        return ResponseFactory.success(
-                "Password reset successful",
-                authService.resetPassword(request)
-        );
+        authService.resetPassword(request);
+        return ResponseFactory.success("Đặt lại mật khẩu mới thành công", null);
     }
 }

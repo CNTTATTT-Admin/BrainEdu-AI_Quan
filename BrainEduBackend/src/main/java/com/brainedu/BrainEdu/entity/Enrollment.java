@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+import com.brainedu.BrainEdu.common.enums.EnrollmentStatus;
+
 @Entity
 @Table(name = "enrollments")
 @Getter
@@ -34,5 +36,6 @@ public class Enrollment {
     @Column(name = "completion_percent")
     private Float completionPercent;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private EnrollmentStatus status;
 }

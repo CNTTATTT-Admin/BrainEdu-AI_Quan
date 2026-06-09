@@ -13,7 +13,7 @@ public interface RoadmapService {
             RoadmapRequest request
     );
 
-    Page<RoadmapResponse> getAll(int page, int size);
+    Page<RoadmapResponse> getAll(int page, int size, Long categoryId);
 
     RoadmapDetailResponse getById(
             Long id

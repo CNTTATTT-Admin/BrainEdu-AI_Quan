@@ -1,5 +1,6 @@
 import type { BackendResponse } from "../libs/shared/types/backend-response";
 import type {  UserRecord } from "../types/api-response";
+import type { NotificationRequest } from "../types/backend-request";
 import type { EventName, TrackingEvent } from "../types/tracking.types";
 import api from "./axios";
 
@@ -19,3 +20,8 @@ export const onAnalyticsApi = async <T extends EventName>(
   const data = await api.post("/behavior/track", payload);
   return data.data;
 };
+
+export const onCreateNotification = async (payload: NotificationRequest): Promise<BackendResponse<any>> => {
+    const data = await api.post("/notifications", payload);
+    return data.data;
+}

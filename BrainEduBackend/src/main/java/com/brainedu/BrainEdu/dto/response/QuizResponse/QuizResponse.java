@@ -22,4 +22,6 @@ public class QuizResponse {
     private Integer duration;
 
     private Float passingScore;
+
+    private Boolean isSubmitted;
 }

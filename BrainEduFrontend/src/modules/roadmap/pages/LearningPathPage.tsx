@@ -5,6 +5,7 @@ import CourseCard from '../component/Normal/CourseCard';
 import { useNavigate } from 'react-router-dom';
 import useGetRoadmap from '../hooks/useGetRoadmap';
 import { useAnalytics } from '../../../hooks/useAnalytics';
+import useGetCategory from '../../root/hooks/useGetCategory';
 
 interface RoadmapItem {
   id: number;
@@ -16,10 +17,14 @@ interface RoadmapItem {
 }
 
 const LearningPathPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState<number | 'all'>('all');
   const navigate = useNavigate();
 
-  const { data: roadmapData, isPending: roadmapPending } = useGetRoadmap();
+  const { data: categoryData } = useGetCategory();
+  const categories = categoryData?.data || [];
+
+  const selectedCategoryId = activeTab === 'all' ? undefined : activeTab;
+  const { data: roadmapData, isPending: roadmapPending } = useGetRoadmap(selectedCategoryId);
   const roadmaps: RoadmapItem[] = roadmapData?.data || [];
 
   const mapLevel = (level: string): 'Cơ bản' | 'Trung cấp' | 'Chuyên nghiệp' => {
@@ -44,12 +49,7 @@ const LearningPathPage: React.FC = () => {
     return 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=500';
   };
 
-  const filteredRoadmaps = roadmaps.filter((item) => {
-    if (activeTab === 'all') return true;
-    return item.categoryName?.toLowerCase() === activeTab?.toLowerCase();
-  });
-
-  const groupedRoadmaps = filteredRoadmaps.reduce<Record<string, RoadmapItem[]>>((acc, item) => {
+  const groupedRoadmaps = roadmaps.reduce<Record<string, RoadmapItem[]>>((acc, item) => {
     const groupName = item.categoryName || 'Khác';
     if (!acc[groupName]) {
       acc[groupName] = [];
@@ -58,15 +58,18 @@ const LearningPathPage: React.FC = () => {
     return acc;
   }, {});
 
-  const { trackEvent } = useAnalytics()
+  const { trackEvent } = useAnalytics();
   const trackBehavior = (id: number) => {
-    
-      trackEvent('roadmap_click', {
-        roadmapId: id
-      })
-      navigate(`/roadmap/detail`, { state: { roadmapId: id } })
-      
-  }
+    trackEvent('roadmap_click', {
+      roadmapId: id
+    });
+    navigate(`/roadmap/detail`, { state: { roadmapId: id } });
+  };
+
+  const tabs = [
+    { id: 'all', name: 'Tất cả' },
+    ...categories.map((cat: any) => ({ id: cat.id, name: cat.categoryName }))
+  ];
 
   return (
     <div className="min-h-screen bg-[#f8fafc] font-sans antialiased flex flex-col">
@@ -81,7 +84,11 @@ const LearningPathPage: React.FC = () => {
           </p>
         </div>
 
-        <FilterTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+        <FilterTabs 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+          tabs={tabs} 
+        />
 
         {roadmapPending ? (
           <div className="flex flex-col items-center justify-center py-20 gap-3">

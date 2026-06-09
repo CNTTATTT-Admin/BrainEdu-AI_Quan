@@ -29,15 +29,7 @@ export const onVerifyApi = async (
     });
     return data.data;
 }
-export const onForgotPasswordApi = async (
-    payload: { email: string }
-) : Promise<BackendResponse<any>> => {
-    const { email } = payload;
-    const data = await api.post("/auth/forgot-password", {
-        email
-    });
-    return data.data;
-}
+
 export const onResendOTPApi = async (
     payload: { email: string }
 ) : Promise<BackendResponse<any>> => {
@@ -47,20 +39,32 @@ export const onResendOTPApi = async (
     });
     return data.data;
 }
-export const onResetPasswordApi = async (
-    payload: { email: string; otp: string; newPassword: string }
-) : Promise<BackendResponse<any>> => {
-    const { email, otp, newPassword } = payload;
-    const data = await api.post("/auth/reset-password", {
-        email,
-        otp,
-        newPassword
-    });
-    return data.data;
-}
+
 export const onRegisterApi = async(
     payload: RegisterRequest
 ) : Promise<BackendResponse<RegisterResponse>> => {
     const data = await api.post("/auth/register", payload)
     return data.data
 }
+
+export const onForgotPasswordApi = async (
+    payload: { email: string }
+): Promise<BackendResponse<any>> => {
+    const { email } = payload;
+    const data = await api.post("/auth/forgot-password/send-otp", {
+        email
+    });
+    return data.data;
+};
+
+export const onResetPasswordApi = async (
+    payload: { email: string; otpCode: string; newPassword: string }
+): Promise<BackendResponse<any>> => {
+    const { email, otpCode, newPassword } = payload;
+    const data = await api.post("/auth/forgot-password/reset", {
+        email,
+        otpCode,
+        newPassword
+    });
+    return data.data;
+};

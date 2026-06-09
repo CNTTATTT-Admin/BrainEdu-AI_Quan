@@ -45,4 +45,6 @@ public interface QuizSubmissionRepository
             @Param("userId")
             Long userId
     );
+
+    boolean existsByUserIdAndQuizId(Long userId, Long quizId);
 }

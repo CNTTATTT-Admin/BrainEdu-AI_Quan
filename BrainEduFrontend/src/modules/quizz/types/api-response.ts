@@ -6,7 +6,8 @@ export type QuizzResponse = {
     quizType: string,
     totalQuestions: number,
     duration: number,
-    passingScore: number
+    passingScore: number,
+    isSubmitted: boolean
 }
 
 export type QuestionResponse = {
@@ -31,6 +32,7 @@ export type AnswerResponse = {
 
 export type QuizSubmissionResponse = {
     id: number,
+    submissionId: number,
     quizId: number,
     quizTitle: string,
     totalQuestions: number,

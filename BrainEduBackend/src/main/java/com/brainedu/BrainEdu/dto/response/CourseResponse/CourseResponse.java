@@ -40,4 +40,6 @@ public class CourseResponse {
     private LocalDateTime createdAt;
 
     private Long totalEnrolled;
+
+    private Long totalLessons;
 }

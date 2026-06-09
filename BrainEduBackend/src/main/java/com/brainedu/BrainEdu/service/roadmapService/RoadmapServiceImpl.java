@@ -93,26 +93,14 @@ public class RoadmapServiceImpl
     }
 
     @Override
-//    @Transactional(readOnly = true)
-//    @Cacheable(
-//            value = CacheNames.ROADMAPS,
-//            key = "'all:' + #page + ':' + #size",
-//            sync = true
-//    )
-    public Page<RoadmapResponse> getAll(
-            int page,
-            int size
-    ) {
+        public Page<RoadmapResponse> getAll(int page, int size, Long categoryId) {
 
-        Pageable pageable =
-                PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size);
 
         return roadmapRepository
-                .findAll(pageable)
-                .map(
-                        roadmapMapper::toResponse
-                );
-    }
+                .findAllByCategoryId(categoryId, pageable)
+                .map(roadmapMapper::toResponse);
+        }
 
         @Override
         @Transactional(readOnly = true)

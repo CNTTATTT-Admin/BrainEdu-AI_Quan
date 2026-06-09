@@ -16,6 +16,15 @@ public interface RoadmapRepository
             Pageable pageable
     );
 
+    @Query("""
+        SELECT r FROM Roadmap r 
+        WHERE (:categoryId IS NULL OR r.category.id = :categoryId)
+    """)
+    Page<Roadmap> findAllByCategoryId(
+            @Param("categoryId") Long categoryId, 
+            Pageable pageable
+    );
+
     Page<Roadmap> findByLevel(
             String level,
             Pageable pageable

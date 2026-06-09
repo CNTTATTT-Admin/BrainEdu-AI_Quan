@@ -46,6 +46,7 @@ const CourseGridList: React.FC<CourseGridListProps> = ({ courses, isPending }) =
           price={course.price || "Miễn phí"}
           thumbnail={course.thumbnail}
           id={course.id}
+          enrolled={course.enrolled}
         />
       ))}
     </div>

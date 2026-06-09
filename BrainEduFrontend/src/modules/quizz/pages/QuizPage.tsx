@@ -1,30 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation, useNavigate, useBlocker } from 'react-router-dom';
+import { ArrowLeft, WifiOff } from 'lucide-react';
 import QuizContent from '../component/CurrentQuiz.tsx/QuizzContent';
 import QuizSidebar from '../component/CurrentQuiz.tsx/QuizSidebar';
-import { useLocation, useNavigate } from 'react-router-dom';
+import QuizLeaveModal from '../component/CurrentQuiz.tsx/QuizLeaveModal';
+import QuizSubmittedState from '../component/CurrentQuiz.tsx/QuizSubmittedState';
 import useGetQuizz from '../hooks/useGetQuizz';
 import useGetQuestion from '../hooks/useGetQuestion';
 import useSubmitQuiz from '../hooks/useSubmitQuiz';
-import { AlertTriangle, RefreshCw, Home, ArrowLeft } from 'lucide-react';
 
 const QuizPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { lessonId } = location.state || {};
-  
+
   const { data: quizzData, isPending: isQuizzPending } = useGetQuizz(lessonId, !!lessonId);
   const quizzDataAvailable = quizzData?.data?.[0];
   const quizId = quizzDataAvailable?.id;
 
   const { data: questionDatas, isPending: isQuestionPending } = useGetQuestion(quizId, !!quizId);
   const questionsList = questionDatas?.data || [];
-  
-  const totalQuestions = questionsList?.length || questionsList.length || 0;
+  const totalQuestions = questionsList.length || 0;
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [answersMap, setAnswersMap] = useState<Record<number, number>>({});
-
-  const quizDurationLimit = quizzDataAvailable?.duration || 0;
   const [timeSpent, setTimeSpent] = useState<number>(0);
   const timeSpentRef = useRef<number>(0);
 
@@ -32,101 +31,133 @@ const QuizPage: React.FC = () => {
   const [showLeaveModal, setShowLeaveModal] = useState<boolean>(false);
   const nextTargetRef = useRef<string | null>(null);
 
+  const [isOffline, setIsOffline] = useState<boolean>(!navigator.onLine);
+
+  const quizDurationLimit = quizzDataAvailable?.duration || 0;
   const { mutate, isPending: isSubmitting } = useSubmitQuiz();
+  const isTimeOutTriggered = useRef<boolean>(false);
+
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      !hasSubmitted && currentLocation.pathname !== nextLocation.pathname
+  );
 
   useEffect(() => {
-    const handlePageShow = (event: PageTransitionEvent) => {
-      if (event.persisted) {
-        window.location.reload();
+    if (blocker.state === "blocked") {
+      setShowLeaveModal(true);
+    }
+  }, [blocker]);
+
+  useEffect(() => {
+    const handleGlobalClick = (e: MouseEvent) => {
+      if (hasSubmitted) return;
+      const target = e.target as HTMLElement;
+      const anchor = target.closest('a');
+      
+      if (anchor && anchor.getAttribute('href') !== '#') {
+        e.preventDefault();
+        e.stopPropagation();
+        nextTargetRef.current = anchor.getAttribute('href');
+        setShowLeaveModal(true);
       }
     };
 
-    window.addEventListener('pageshow', handlePageShow);
+    document.addEventListener('click', handleGlobalClick, true);
+    return () => document.removeEventListener('click', handleGlobalClick, true);
+  }, [hasSubmitted]);
+
+  useEffect(() => {
+    if (location.state?.isSubmitted) {
+      setHasSubmitted(true);
+      return;
+    }
+    if (quizzDataAvailable?.isSubmitted) {
+      setHasSubmitted(true);
+    }
+  }, [quizzDataAvailable, location.state]);
+
+  useEffect(() => {
+    if (hasSubmitted || !quizId) return;
+
+    const handleContextMenu = (e: MouseEvent) => e.preventDefault();
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.key === 'F12' || 
+        ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'C' || e.key === 'c' || e.key === 'J' || e.key === 'j')) ||
+        ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.key === 'u' || e.key === 'C' || e.key === 'c' || e.key === 'V' || e.key === 'v'))
+      ) {
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener('contextmenu', handleContextMenu);
+    window.addEventListener('keydown', handleKeyDown);
+
     return () => {
-      window.removeEventListener('pageshow', handlePageShow);
+      window.removeEventListener('contextmenu', handleContextMenu);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [hasSubmitted, quizId]);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
     };
   }, []);
 
   useEffect(() => {
-    if (quizId) {
-      const isQuizDone = localStorage.getItem(`quiz_submitted_${quizId}`);
-      if (isQuizDone === 'true' || location.state?.isSubmitted) {
-        setHasSubmitted(true);
-      }
-    }
-  }, [quizId, location.state]);
-
-  useEffect(() => {
-    if (hasSubmitted || isQuizzPending || isQuestionPending || !quizId) return;
-
-    window.history.pushState(null, '', window.location.href);
-
-    const handlePopState = () => {
-      window.history.pushState(null, '', window.location.href);
-      nextTargetRef.current = null; 
-      setShowLeaveModal(true);
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) window.location.reload();
     };
-
-    window.addEventListener('popstate', handlePopState);
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
-  }, [hasSubmitted, isQuizzPending, isQuestionPending, quizId]);
-
-  useEffect(() => {
-    if (isQuizzPending || isQuestionPending || !quizId || hasSubmitted) return;
-
-    const savedTime = localStorage.getItem(`quiz_time_${quizId}`);
-    if (savedTime) {
-      setTimeSpent(Number(savedTime));
-      timeSpentRef.current = Number(savedTime);
-    }
-
-    const timer = setInterval(() => {
-      setTimeSpent((prev) => {
-        const nextTime = prev + 1;
-        timeSpentRef.current = nextTime;
-        localStorage.setItem(`quiz_time_${quizId}`, String(nextTime));
-        return nextTime;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [isQuizzPending, isQuestionPending, quizId, hasSubmitted]);
-
-  useEffect(() => {
-    if (quizId && !hasSubmitted) {
-      const saved = localStorage.getItem(`quiz_progress_${quizId}`);
-      if (saved) {
-        setAnswersMap(JSON.parse(saved));
-      }
-    }
-  }, [quizId, hasSubmitted]);
+    window.addEventListener('pageshow', handlePageShow);
+    return () => window.removeEventListener('pageshow', handlePageShow);
+  }, []);
 
   useEffect(() => {
     if (hasSubmitted) return;
 
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
-      e.returnValue = 'Bạn có chắc chắn muốn rời khỏi trang?';
+      e.returnValue = '';
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [hasSubmitted]);
 
+  useEffect(() => {
+    if (isQuizzPending || isQuestionPending || !quizId || hasSubmitted || isOffline) return;
+
+    const timer = setInterval(() => {
+      setTimeSpent((prev) => {
+        const nextTime = prev + 1;
+        timeSpentRef.current = nextTime;
+
+        if (quizDurationLimit > 0 && nextTime >= quizDurationLimit && !isTimeOutTriggered.current) {
+          isTimeOutTriggered.current = true;
+          clearInterval(timer);
+          handleSubmitQuiz();
+        }
+
+        return nextTime;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isQuizzPending, isQuestionPending, quizId, hasSubmitted, isOffline, quizDurationLimit]);
+
   const handleRetakeQuiz = () => {
-    if (quizId) {
-      localStorage.removeItem(`quiz_progress_${quizId}`);
-      localStorage.removeItem(`quiz_time_${quizId}`);
-      localStorage.removeItem(`quiz_submitted_${quizId}`);
-    }
     setAnswersMap({});
     setCurrentIndex(0);
     setTimeSpent(0);
     timeSpentRef.current = 0;
     setHasSubmitted(false);
+    isTimeOutTriggered.current = false;
     window.history.replaceState({ lessonId }, document.title);
   };
 
@@ -134,14 +165,101 @@ const QuizPage: React.FC = () => {
     navigate('/');
   };
 
-  const handleConfirmLeave = () => {
-    setShowLeaveModal(false);
-    
-    if (nextTargetRef.current) {
-      navigate(nextTargetRef.current);
-    } else {
-      navigate(-2 as any);
+  const proceedNavigation = (resultData?: any) => {
+    if (blocker.state === "blocked") {
+      blocker.proceed();
     }
+    
+    if (resultData) {
+      navigate('/quiz-result', { 
+        state: { 
+          result: resultData,
+          submissionId: resultData?.submissionId || resultData?.id,
+          isSubmitted: true
+        },
+        replace: true
+      });
+    } else {
+      navigate(nextTargetRef.current || '/', { replace: true });
+    }
+  };
+
+  const handleConfirmLeave = () => {
+    if (!hasSubmitted) {
+      const payload = {
+        quizId: quizId,
+        durationSeconds: timeSpentRef.current,
+        answers: Object.entries(answersMap).map(([questionId, selectedOptionId]) => ({
+          questionId: Number(questionId),
+          answerId: Number(selectedOptionId),
+        })),
+      };
+
+      mutate(payload, {
+        onSuccess: (response) => {
+          setHasSubmitted(true);
+          setShowLeaveModal(false);
+          proceedNavigation(response.data);
+        },
+        onError: (err) => {
+          console.error("Lỗi khi nộp bài:", err);
+          setShowLeaveModal(false);
+          proceedNavigation();
+        }
+      });
+    } else {
+      setShowLeaveModal(false);
+      proceedNavigation();
+    }
+  };
+
+  const handleSelectAnswer = (answerId: number) => {
+    if (!currentQuestion || isOffline) return;
+    setAnswersMap((prev) => ({ ...prev, [currentQuestion.id]: answerId }));
+  };
+
+  const handlePrevQuestion = () => {
+    if (currentIndex > 0) setCurrentIndex((prev) => prev - 1);
+  };
+
+  const handleNextQuestion = () => {
+    if (currentIndex < questionsList.length - 1) setCurrentIndex((prev) => prev + 1);
+  };
+
+  const handleSubmitQuiz = () => {
+    if (!quizId) return;
+
+    const payload = {
+      quizId: quizId,
+      durationSeconds: timeSpentRef.current,
+      answers: Object.entries(answersMap).map(([questionId, selectedOptionId]) => ({
+        questionId: Number(questionId),
+        answerId: Number(selectedOptionId),
+      })),
+    };
+
+    mutate(payload, {
+      onSuccess: (response) => {
+        if (blocker.state === "blocked") {
+          blocker.proceed();
+        }
+
+        setHasSubmitted(true);
+
+        navigate('/quiz-result', { 
+          state: { 
+            result: response.data,
+            submissionId: response.data?.submissionId || response.data?.id,
+            isSubmitted: true
+          },
+          replace: true
+        });
+      },
+      onError: (err) => {
+        console.error(err);
+        isTimeOutTriggered.current = false;
+      }
+    });
   };
 
   if (isQuizzPending || isQuestionPending) {
@@ -156,37 +274,7 @@ const QuizPage: React.FC = () => {
   }
 
   if (hasSubmitted) {
-    return (
-      <div className="min-h-screen bg-[#f4f7fc] flex items-center justify-center p-4 font-sans antialiased text-gray-900">
-        <div className="max-w-md w-full bg-white border border-gray-100 rounded-2xl p-6 shadow-sm text-center space-y-5">
-          <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center mx-auto text-amber-500">
-            <AlertTriangle size={24} />
-          </div>
-          
-          <div className="space-y-1.5">
-            <h3 className="text-base font-bold text-gray-900">Bạn đã hoàn thành bài kiểm tra</h3>
-            <p className="text-xs text-gray-500 leading-relaxed">
-              Hệ thống ghi nhận bạn đã hoàn thành lượt làm bài này trước đó. Bạn có muốn làm lại bài mới không?
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 pt-2">
-            <button
-              onClick={handleGoHome}
-              className="w-full bg-gray-50 border border-gray-200 text-xs font-bold py-3 px-4 rounded-xl text-gray-700 hover:bg-gray-100 transition flex items-center justify-center gap-1.5"
-            >
-              <Home size={14} /> Quay về
-            </button>
-            <button
-              onClick={handleRetakeQuiz}
-              className="w-full bg-[#0052cc] hover:bg-blue-700 text-white font-bold text-xs py-3 px-4 rounded-xl shadow-sm transition flex items-center justify-center gap-1.5"
-            >
-              <RefreshCw size={14} /> Làm lại bài
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+    return <QuizSubmittedState onGoHome={handleGoHome} onRetake={handleRetakeQuiz} />;
   }
 
   if (!lessonId || !quizzDataAvailable || questionsList.length === 0) {
@@ -200,64 +288,6 @@ const QuizPage: React.FC = () => {
   }
 
   const currentQuestion = questionsList[currentIndex];
-
-  const handleSelectAnswer = (answerId: number) => {
-    if (!currentQuestion) return;
-
-    setAnswersMap((prev) => {
-      const updated = { ...prev, [currentQuestion.id]: answerId };
-      localStorage.setItem(`quiz_progress_${quizId}`, JSON.stringify(updated));
-      return updated;
-    });
-  };
-
-  const handlePrevQuestion = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex((prev) => prev - 1);
-    }
-  };
-
-  const handleNextQuestion = () => {
-    if (currentIndex < questionsList.length - 1) {
-      setCurrentIndex((prev) => prev + 1);
-    }
-  };
-
-  const handleSubmitQuiz = () => {
-    if (!quizId) return;
-
-    const payload = {
-      quizId: quizId,
-      durationSeconds: timeSpentRef.current,
-      answers: Object.entries(answersMap).map(([questionId, selectedOptionId]) => ({
-        questionId: Number(questionId),
-        answerId: Number(selectedOptionId),
-      })),
-    };
-    console.log(payload);
-    
-
-    mutate(payload, {
-      onSuccess: (response) => {
-        localStorage.removeItem(`quiz_progress_${quizId}`);
-        localStorage.removeItem(`quiz_time_${quizId}`);
-        localStorage.setItem(`quiz_submitted_${quizId}`, 'true');
-        
-        navigate('/quiz-result', { 
-          state: { 
-            result: response.data,
-            submissionId: response.data?.submissionId || response.data?.id,
-            isSubmitted: true
-          },
-          replace: true
-        });
-      },
-      onError: (err) => {
-        console.error("Lỗi khi nộp bài:", err);
-      }
-    });
-  };
-
   const questionStatuses: Record<number, 'completed' | 'current' | 'unassigned'> = {};
   questionsList.forEach((q: any, idx: number) => {
     const qNum = idx + 1;
@@ -271,22 +301,32 @@ const QuizPage: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#f4f7fc] p-6 antialiased font-sans relative">
-      
+    <div className="min-h-screen bg-[#f4f7fc] p-6 antialiased font-sans relative select-none w-full h-full overflow-y-auto">
+      {isOffline && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl border border-red-100">
+            <div className="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto animate-pulse">
+              <WifiOff size={24} />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-base font-bold text-gray-900">Mất kết nối mạng</h3>
+              <p className="text-xs text-gray-500 leading-relaxed">Hệ thống phát hiện thiết bị của bạn đang ngoại tuyến.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mb-4 max-w-7xl mx-auto flex items-center">
         <button 
-          onClick={() => {
-            nextTargetRef.current = '/';
-            setShowLeaveModal(true);
-          }}
+          onClick={() => setShowLeaveModal(true)}
           className="flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-gray-800 transition"
+          disabled={isOffline}
         >
           <ArrowLeft size={16} /> Thoát bài kiểm tra
         </button>
       </div>
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
         <QuizContent
           questionData={{
             id: currentQuestion?.id,
@@ -306,45 +346,17 @@ const QuizPage: React.FC = () => {
           currentQuestionId={currentIndex + 1}
           questionStatuses={questionStatuses}
           duration={quizDurationLimit}
-          onSelectQuestion={(index) => setCurrentIndex(index)}
+          onSelectQuestion={(index) => !isOffline && setCurrentIndex(index)}
           onSubmit={handleSubmitQuiz}
           isSubmitting={isSubmitting}
         />
-
       </div>
 
-      {showLeaveModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 max-w-sm w-full text-center space-y-4 shadow-xl">
-            <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto text-red-500">
-              <AlertTriangle size={24} />
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-base font-bold text-gray-900">Rời khỏi bài kiểm tra?</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">
-                Tiến trình làm bài và thời gian làm bài hiện tại sẽ tạm thời được đóng băng. Bạn có chắc muốn thoát không?
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-3 pt-1">
-              <button
-                onClick={() => {
-                  setShowLeaveModal(false);
-                }}
-                className="w-full bg-gray-50 border border-gray-200 text-xs font-bold py-2.5 rounded-xl text-gray-700 hover:bg-gray-100 transition"
-              >
-                Hủy bỏ
-              </button>
-              <button
-                onClick={handleConfirmLeave}
-                className="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-2.5 rounded-xl shadow-sm transition"
-              >
-                Xác nhận thoát
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
+      <QuizLeaveModal 
+        isOpen={showLeaveModal} 
+        onClose={() => setShowLeaveModal(false)} 
+        onSubmitAndLeave={handleConfirmLeave} 
+      />
     </div>
   );
 };

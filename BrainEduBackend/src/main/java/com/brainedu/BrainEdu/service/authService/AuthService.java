@@ -1,6 +1,7 @@
 package com.brainedu.BrainEdu.service.authService;
 
 import com.brainedu.BrainEdu.dto.request.AuthRequest.*;
+import com.brainedu.BrainEdu.dto.request.EmailRequest.OtpRequest.SendOtp;
 import com.brainedu.BrainEdu.dto.response.AuthResponse.*;
 
 public interface AuthService {
@@ -21,11 +22,10 @@ public interface AuthService {
             LogoutRequest request
     );
 
-    String forgotPassword(
-            ForgotPasswordRequest request
-    );
+//     String forgotPassword(
+//             ForgotPasswordRequest request
+//     );
 
-    String resetPassword(
-            ResetPasswordRequest request
-    );
+    void sendForgotPasswordOtp(SendOtp request);
+    void resetPassword(ResetPasswordRequest request);
 }

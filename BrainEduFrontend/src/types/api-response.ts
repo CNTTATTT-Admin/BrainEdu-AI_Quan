@@ -1,5 +1,5 @@
 export type UserRecord = {
-    id: string;
+    id: number;
     name: string;
     email: string;
     avatar?: string;

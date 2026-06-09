@@ -3,11 +3,14 @@ package com.brainedu.BrainEdu.controller;
 import com.brainedu.BrainEdu.common.response.ApiResponse;
 import com.brainedu.BrainEdu.common.response.PaginationMeta;
 import com.brainedu.BrainEdu.common.response.ResponseFactory;
+import com.brainedu.BrainEdu.dto.request.UserRequest.TopStudentRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateProfileRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UpdateUserRequest;
 import com.brainedu.BrainEdu.dto.request.UserRequest.UserRequest;
 import com.brainedu.BrainEdu.dto.response.PagedResponse;
 import com.brainedu.BrainEdu.dto.response.UserResponse.InstructorResponse;
+import com.brainedu.BrainEdu.dto.response.UserResponse.TopInstructorResponse;
+import com.brainedu.BrainEdu.dto.response.UserResponse.TopStudentResponse;
 import com.brainedu.BrainEdu.dto.response.UserResponse.UserResponse;
 import com.brainedu.BrainEdu.service.userService.UserService;
 
@@ -167,5 +170,33 @@ public class UserController {
                     "User deleted successfully",
                     userService.deleteUser(id)
                 );
+    }
+
+    @GetMapping("/top-students")
+    public ApiResponse<List<TopStudentResponse>> getTopStudents(
+            @Valid TopStudentRequest request
+    ) {
+        Page<TopStudentResponse> topStudents = userService.getTopStudents(request);
+        PaginationMeta meta = ResponseFactory.pagination(topStudents);
+
+        return ResponseFactory.success(
+                "Top students leaderboard fetched successfully",
+                topStudents.getContent(),
+                meta
+        );
+    }
+
+    @GetMapping("/top-instructors")
+    public ApiResponse<List<TopInstructorResponse>> getTopInstructors(
+            @Valid TopStudentRequest request
+    ) {
+        Page<TopInstructorResponse> topInstructors = userService.getTopInstructors(request);
+        PaginationMeta meta = ResponseFactory.pagination(topInstructors);
+
+        return ResponseFactory.success(
+                "Top instructors leaderboard fetched successfully",
+                topInstructors.getContent(),
+                meta
+        );
     }
 }

@@ -21,6 +21,7 @@ public class OtpServiceImpl implements OtpService {
 
     private static final String OTP_KEY_PREFIX = "otp:register:";
     private static final String RETRY_KEY_PREFIX = "otp:retry:";
+    private final OtpUtil otpUtil; 
 
     @Override
     public void sendRegisterOtp(SendOtp request) {
@@ -31,8 +32,8 @@ public class OtpServiceImpl implements OtpService {
             throw new ApiException("Tài khoản tạm thời bị khóa do thử sai quá nhiều lần. Vui lòng quay lại sau.");
         }
 
-        String rawOtp = OtpUtil.generateSecureOtp();
-        String hashedOtp = OtpUtil.hashSha256(rawOtp);
+        String rawOtp = otpUtil.generateAndSaveOtp(request.getEmail());
+        String hashedOtp = otpUtil.hashSha256(rawOtp);
 
         String otpKey = OTP_KEY_PREFIX + request.getEmail();
         redisTemplate.opsForValue().set(otpKey, hashedOtp, Duration.ofMinutes(5));
@@ -57,7 +58,7 @@ public class OtpServiceImpl implements OtpService {
             throw new ApiException("Mã OTP không tồn tại hoặc đã hết hạn sử dụng.");
         }
 
-        String hashedUserOtp = OtpUtil.hashSha256(request.getOtpCode());
+        String hashedUserOtp = otpUtil.hashSha256(request.getOtpCode());
 
         if (!savedHashedOtp.equals(hashedUserOtp)) {
             retryCount++;

@@ -9,6 +9,10 @@ const useEnrollCourse = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['lesson-progress-me'] });
         },
+        onError:(err)=>{
+            console.log(err);
+            
+        }
     })
     return {data, error, isPending, isError, mutate}
 }

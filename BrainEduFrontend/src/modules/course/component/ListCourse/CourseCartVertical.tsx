@@ -12,11 +12,12 @@ interface CourseProps {
   reviews: number;
   price: number | 'Miễn phí';
   thumbnail?: string;
-  id: number
+  id: number;
+  enrolled: boolean
 }
 
 const CourseCardVertical: React.FC<CourseProps> = ({
-  title, instructor, category, lessons, duration, rating, reviews, price, thumbnail, id
+  title, instructor, category, lessons, duration, rating, reviews, price, thumbnail, id, enrolled
 }) => {
   return (
     <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-2xs hover:shadow-xs transition flex flex-col justify-between">
@@ -75,7 +76,7 @@ const CourseCardVertical: React.FC<CourseProps> = ({
 
       <div className="p-4 pt-0 flex items-center justify-between border-t border-gray-50 mt-2">
         <span className="text-xs font-black text-blue-600">
-          {typeof price === 'number' ? `${price.toLocaleString()}đ` : price}
+          {enrolled ? "Đã đăng ký" : typeof price === 'number' ? `${price.toLocaleString()}đ` : price}
         </span>
         <button className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition cursor-pointer">
           <ShoppingCart size={14} />

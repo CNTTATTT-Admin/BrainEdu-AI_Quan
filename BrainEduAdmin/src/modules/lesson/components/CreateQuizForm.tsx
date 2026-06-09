@@ -11,6 +11,7 @@ export const CreateQuizForm: React.FC<CreateQuizFormProps> = ({ lessonId, onSucc
   const [title, setTitle] = useState("");
   const [duration, setDuration] = useState(15);
   const [passingScore, setPassingScore] = useState(80);
+  const [totalQuestions, setTotalQuestions] = useState(10);
 
   const { mutate: createQuiz, isPending } = useCreateQuiz();
 
@@ -23,7 +24,7 @@ export const CreateQuizForm: React.FC<CreateQuizFormProps> = ({ lessonId, onSucc
         lessonId,
         title: title.trim(),
         quizType: "MULTIPLE_CHOICE",
-        totalQuestions: 0,
+        totalQuestions: Number(totalQuestions),
         duration: Number(duration),
         passingScore: Number(passingScore),
       },
@@ -50,9 +51,21 @@ export const CreateQuizForm: React.FC<CreateQuizFormProps> = ({ lessonId, onSucc
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700">Thời gian làm bài (Phút)</label>
+            <label className="text-xs font-bold text-slate-700">Số lượng câu hỏi</label>
+            <input
+              type="number"
+              value={totalQuestions}
+              onChange={(e) => setTotalQuestions(Number(e.target.value))}
+              className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500 bg-slate-50/50"
+              min={1}
+              required
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-700">Thời gian (Phút)</label>
             <input
               type="number"
               value={duration}
@@ -62,8 +75,9 @@ export const CreateQuizForm: React.FC<CreateQuizFormProps> = ({ lessonId, onSucc
               required
             />
           </div>
+
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700">Điểm số vượt qua (%)</label>
+            <label className="text-xs font-bold text-slate-700">Điểm vượt qua (%)</label>
             <input
               type="number"
               value={passingScore}

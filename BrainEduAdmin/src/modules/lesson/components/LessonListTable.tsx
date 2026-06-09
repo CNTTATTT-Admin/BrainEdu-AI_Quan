@@ -2,6 +2,7 @@ import React from "react";
 import { Video, CheckSquare, ChevronUp, ChevronDown, Edit2, Trash2 } from "lucide-react";
 import { LessonQuizSubSection } from "./LessonQuizSubSection";
 import type { LessonsResponse } from "../types/api-response";
+import useDeleteLesson from "../hooks/useDeleteLesson";
 
 interface LessonListTableProps {
   lessons: LessonsResponse[];
@@ -10,6 +11,7 @@ interface LessonListTableProps {
   setActiveLessonId: (id: number | null) => void;
   onOpenCreateQuiz: (id: number, title: string) => void;
   onOpenManageQuestions: (id: number, title: string, quizId: number) => void;
+  onOpenUpdateLesson: (lesson: LessonsResponse) => void; 
 }
 
 export const LessonListTable: React.FC<LessonListTableProps> = ({
@@ -19,7 +21,16 @@ export const LessonListTable: React.FC<LessonListTableProps> = ({
   setActiveLessonId,
   onOpenCreateQuiz,
   onOpenManageQuestions,
+  onOpenUpdateLesson,
 }) => {
+  const { mutate: deleteLesson, isPending: isDeletePending } = useDeleteLesson();
+
+  const handleDeleteClick = (id: number, title: string) => {
+    if (window.confirm(`Bạn có chắc chắn muốn xóa bài học "${title}" không? Hành động này không thể hoàn tác.`)) {
+      deleteLesson(id);
+    }
+  };
+
   return (
     <table className="w-full text-left border-collapse text-xs">
       <thead>
@@ -87,10 +98,18 @@ export const LessonListTable: React.FC<LessonListTableProps> = ({
                 </td>
                 <td className="px-6 py-4 text-right whitespace-nowrap">
                   <div className="flex items-center justify-end gap-1">
-                    <button className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-lg transition-colors">
+                    <button 
+                      onClick={() => onOpenUpdateLesson(lesson)}
+                      disabled={isDeletePending}
+                      className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-lg transition-colors disabled:opacity-50"
+                    >
                       <Edit2 size={13} />
                     </button>
-                    <button className="p-1.5 hover:bg-red-50 text-red-500 rounded-lg transition-colors">
+                    <button 
+                      onClick={() => handleDeleteClick(Number(lesson.id), lesson.title)}
+                      disabled={isDeletePending}
+                      className="p-1.5 hover:bg-red-50 text-red-500 rounded-lg transition-colors disabled:opacity-50"
+                    >
                       <Trash2 size={13} />
                     </button>
                   </div>

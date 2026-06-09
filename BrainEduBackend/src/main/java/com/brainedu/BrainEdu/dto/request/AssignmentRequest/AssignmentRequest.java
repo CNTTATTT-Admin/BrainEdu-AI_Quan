@@ -16,7 +16,6 @@ public class AssignmentRequest {
     @NotNull
     private AssignmentType type;
 
-    @NotNull
     private AssignmentTarget target;
 
     private Long quizId;

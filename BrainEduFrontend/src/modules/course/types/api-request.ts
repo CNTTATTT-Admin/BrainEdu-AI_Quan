@@ -4,3 +4,8 @@ export type LessonProgressRequest = {
     learningTime: Number,
     completed: Boolean
 }
+
+export type CourseRatingRequest = {
+    rating?: number,
+    comment?: string
+}

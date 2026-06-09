@@ -2,6 +2,7 @@ package com.brainedu.BrainEdu.service.assignmentService;
 
 import com.brainedu.BrainEdu.dto.request.AssignmentRequest.GradeSubmissionRequest;
 import com.brainedu.BrainEdu.dto.request.AssignmentRequest.SubmitAssignmentRequest;
+import com.brainedu.BrainEdu.dto.response.AssignmentResponse.PendingAssignmentResponse;
 import com.brainedu.BrainEdu.dto.response.AssignmentResponse.SubmissionResponse;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,4 +28,6 @@ public interface SubmissionService {
 
     List<SubmissionResponse>
     mySubmissions();
+
+    List<PendingAssignmentResponse> getPendingAssignments();
 }

@@ -57,7 +57,7 @@ public class NotificationServiceImpl
                         .user(user)
                         .title(request.getTitle())
                         .content(request.getContent())
-                        .type(request.getType())
+                        .type(request.getType().name())
                         .isRead(false)
                         .createdAt(LocalDateTime.now())
                         .build();
@@ -83,7 +83,7 @@ public class NotificationServiceImpl
                             .user(user)
                             .title(request.getTitle())
                             .content(request.getContent())
-                            .type(request.getType())
+                            .type(request.getType().name())
                             .isRead(false)
                             .createdAt(LocalDateTime.now())
                             .build();
@@ -161,7 +161,7 @@ public class NotificationServiceImpl
         notification.setUser(user);
         notification.setTitle(request.getTitle());
         notification.setContent(request.getContent());
-        notification.setType(request.getType());
+        notification.setType(request.getType().name());
 
         notificationRepository.save(notification);
 
