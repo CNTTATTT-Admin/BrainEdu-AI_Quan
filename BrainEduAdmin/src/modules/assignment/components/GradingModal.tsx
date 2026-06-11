@@ -37,6 +37,8 @@ export default function GradingModal({
 
   const { mutate: createNotification } = useCreateNotification();
 
+  const isFileUpload = submission.attachmentUrl && submission.attachmentUrl.trim() !== "";
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -50,7 +52,7 @@ export default function GradingModal({
     createNotification({
       userId: submission.studentId,
       title: "Bài tập của bạn đã được chấm điểm",
-      content: `Bài nộp cho phần "${submission.assignmentTitle}" đạt kết quả: ${parsedScore}/10. Xem chi tiết nhận xét của giảng viên.`,
+      content: `Bài nộp cho phần "${submission.assignmentTitle}" đạt kết quả: ${parsedScore}/${maxScore}. Xem chi tiết nhận xét của giảng viên.`,
       type: "ASSIGNMENT_GRADED",
     });
 
@@ -79,27 +81,32 @@ export default function GradingModal({
         <form onSubmit={handleSubmit} className="flex-1 flex flex-col md:flex-row overflow-hidden">
           
           <div className="flex-1 p-6 bg-slate-50 overflow-y-auto space-y-4 border-b md:border-b-0 md:border-r border-slate-100">
-            <div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                Nội dung bài nộp của học viên
-              </span>
-              <div className="bg-white border border-slate-200/80 rounded-xl p-4 text-xs text-slate-700 leading-relaxed min-h-[150px] whitespace-pre-wrap shadow-sm">
-                {submission.answerText || <span className="text-slate-400 italic">Không có nội dung trả lời.</span>}
-              </div>
-            </div>
-
-            {submission.attachmentUrl && (
+            
+            {!isFileUpload ? (
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                  Tệp đính kèm
+                  Nội dung bài nộp của học viên
                 </span>
+                <div className="bg-white border border-slate-200/80 rounded-xl p-4 text-xs text-slate-700 leading-relaxed min-h-[150px] whitespace-pre-wrap shadow-sm">
+                  {submission.answerText || <span className="text-slate-400 italic">Không có nội dung trả lời.</span>}
+                </div>
+              </div>
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl p-8 bg-white shadow-sm min-h-[200px]">
+                <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4">
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                </div>
+                <h4 className="text-sm font-bold text-slate-700 mb-1">Bài tập đã nộp</h4>
+                <p className="text-xs text-slate-400 mb-6">Học viên đã tải lên một tệp đính kèm</p>
                 <a 
-                  href={submission.attachmentUrl} 
+                  href={submission.attachmentUrl!} 
                   target="_blank" 
                   rel="noreferrer"
-                  className="text-xs text-blue-600 font-semibold hover:underline bg-blue-50 border border-blue-100 px-3 py-2 rounded-lg inline-block"
+                  download
+                  className="px-6 py-3 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 flex items-center gap-2"
                 >
-                  Mở tệp đính kèm bài làm
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                  Tải xuống tệp đính kèm
                 </a>
               </div>
             )}

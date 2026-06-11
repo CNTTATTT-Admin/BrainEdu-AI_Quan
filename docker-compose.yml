@@ -25,6 +25,21 @@ services:
     volumes:
       - redis_data:/data
 
+  # Storage: MinIO
+  minio:
+    image: minio/minio
+    container_name: brainedu-minio
+    restart: always
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password123
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+
   # Backend: Java Spring Boot
   # Backend: Java Spring Boot
   backend:
@@ -36,6 +51,7 @@ services:
     depends_on:
       - mysql
       - redis
+      - minio
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
@@ -45,6 +61,10 @@ services:
       - SPRING_DATA_REDIS_PORT=6379
       - JWT_SECRET=${JWT_SECRET}
       - AI_SERVICE_URL=http://host.docker.internal:8000
+      - MINIO_URL=http://minio:9000
+      - MINIO_ACCESS_KEY=admin
+      - MINIO_SECRET_KEY=password123
+      - MINIO_BUCKET_NAME=lessons
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -64,3 +84,4 @@ services:
 volumes:
   mysql_data:
   redis_data:
+  minio_data: 

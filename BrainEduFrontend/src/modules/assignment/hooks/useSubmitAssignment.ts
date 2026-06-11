@@ -13,6 +13,8 @@ const useSubmitAssignment = () => {
       queryClient.invalidateQueries({ queryKey: ["my-assignment"] });
     },
     onError: (err) => {
+      console.log(err);
+      
         const msg = err?.message || "DEFAULT"
         toast.error(ERROR_MESSAGES[msg])
     },

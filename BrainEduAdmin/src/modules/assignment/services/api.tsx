@@ -58,3 +58,17 @@ export const onGradeApi = async(
     const data = await api.post(`/submissions/${submissionId}/grade`, payload)
     return data.data
 }
+
+export const onCloseAssignment = async(
+    id: number
+) : Promise<BackendResponse<AssignmentResponse>> => {
+    const data = await api.put(`/assignments/${id}/close`)
+    return data.data
+}
+
+export const onPublishAssignment = async(
+    id: number
+) : Promise<BackendResponse<AssignmentResponse>> => {
+    const data = await api.put(`/assignments/${id}/publish`)
+    return data.data
+}

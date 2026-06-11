@@ -5,10 +5,12 @@ import com.brainedu.BrainEdu.common.response.PaginationMeta;
 import com.brainedu.BrainEdu.common.response.ResponseFactory;
 import com.brainedu.BrainEdu.dto.request.LessonRequest.LessonRequest;
 import com.brainedu.BrainEdu.dto.response.LessonResponse.LessonResponse;
+import com.brainedu.BrainEdu.dto.response.LessonResponse.YoutubeInfoResponse;
 import com.brainedu.BrainEdu.service.lessonService.LessonService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -113,5 +115,26 @@ public class LessonController {
                 "Lesson deleted successfully",
                 lessonService.delete(id)
         );
+    }
+
+        @GetMapping("/youtube-duration")
+        public ResponseEntity<YoutubeInfoResponse> getYoutubeDuration(@RequestParam String videoUrl) {
+                String videoId = extractVideoId(videoUrl);
+                if (videoId == null) {
+                return ResponseEntity.badRequest().build();
+                }
+                
+                Integer duration = lessonService.getDurationInSeconds(videoId);
+                return ResponseEntity.ok(new YoutubeInfoResponse(duration));
+        }
+
+        private String extractVideoId(String url) {
+                String regex = "^.*(youtu.be\\/|v\\/|u\\/\\w\\/|embed\\/|watch\\?v=|&v=)([^#&?]*).*";
+                java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
+                java.util.regex.Matcher matcher = pattern.matcher(url);
+                if (matcher.find()) {
+                return matcher.group(2);
+                }
+                return null;
     }
 }

@@ -45,6 +45,7 @@ public class AssignmentServiceImpl
     public AssignmentResponse create(
             AssignmentRequest request
     ) {
+        User instructor = currentUserService.getCurrentUser();
 
         Assignment assignment =
                 assignmentMapper.toEntity(request);
@@ -64,8 +65,10 @@ public class AssignmentServiceImpl
             );
         }
 
+        assignment.setInstructor(instructor);
+
         assignment.setStatus(
-                AssignmentStatus.DRAFT
+                AssignmentStatus.PUBLISHED
         );
 
         assignment =
@@ -178,8 +181,7 @@ public class AssignmentServiceImpl
         Long userId =
                 currentUserService.getCurrentUserId();
 
-        List<AssignmentRecipient> recipients =
-                recipientRepository.findByStudentId(userId);
+        List<AssignmentRecipient> recipients = recipientRepository.findPublishedByStudentId(userId);
 
         return recipients.stream()
                 .map(recipient -> {
@@ -197,14 +199,12 @@ public class AssignmentServiceImpl
                     AssignmentResponse response =
                             assignmentMapper.toResponse(assignment);
 
-                    // submission status
                     response.setSubmissionStatus(
                             submission != null
                                     ? submission.getStatus()
                                     : SubmissionStatus.NOT_SUBMITTED
                     );
 
-                    // score + feedback
                     if (submission != null) {
                         response.setScore(submission.getScore());
                         response.setFeedback(submission.getFeedback());

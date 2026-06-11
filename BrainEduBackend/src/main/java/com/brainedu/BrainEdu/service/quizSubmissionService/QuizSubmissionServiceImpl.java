@@ -2,7 +2,6 @@ package com.brainedu.BrainEdu.service.quizSubmissionService;
 
 import com.brainedu.BrainEdu.config.ApiException;
 import com.brainedu.BrainEdu.dto.request.SubmitQuizRequest.java.*;
-import com.brainedu.BrainEdu.dto.request.SubmitQuizRequest.java.QuizAnswerRequest;
 import com.brainedu.BrainEdu.dto.response.QuizResponse.QuizReviewResponse;
 import com.brainedu.BrainEdu.dto.response.QuizSubmissionResponse.*;
 import com.brainedu.BrainEdu.entity.*;
@@ -16,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,163 +41,155 @@ public class QuizSubmissionServiceImpl
     private final CurrentUserService
             currentUserService;
 
-    @Override
-    public QuizSubmissionResponse submitQuiz(
-             SubmitQuizRequest request
-    ) {
+    @Transactional
+        @Override
+        public QuizSubmissionResponse submitQuiz(
+                SubmitQuizRequest request
+        ) {
 
-        User user =
-                currentUserService.getCurrentUser();
+        User user = currentUserService.getCurrentUser();
 
-        Quiz quiz =
-                quizRepository.findById(
-                                request.getQuizId()
-                        )
-                        .orElseThrow(
-                                () -> new ApiException(
-                                        "Quiz not found"
-                                )
+        Quiz quiz = quizRepository.findById(
+                        request.getQuizId()
+                )
+                .orElseThrow(() ->
+                        new ApiException("Quiz not found"));
+
+        Optional<QuizSubmission> existingSubmission =
+                quizSubmissionRepository
+                        .findByUserIdAndQuizId(
+                                user.getId(),
+                                quiz.getId()
                         );
+
+        if (existingSubmission.isPresent()) {
+                return quizSubmissionMapper.toResponse(
+                        existingSubmission.get()
+                );
+        }
+
+        List<Question> questions =
+                questionRepository.findByQuizId(
+                        quiz.getId()
+                );
+
+        Map<Long, Question> questionMap =
+                questions.stream()
+                        .collect(Collectors.toMap(
+                                Question::getId,
+                                Function.identity()
+                        ));
+
+        List<Answer> answers =
+                answerRepository.findByQuestionQuizId(
+                        quiz.getId()
+                );
+
+        Map<Long, Answer> answerMap =
+                answers.stream()
+                        .collect(Collectors.toMap(
+                                Answer::getId,
+                                Function.identity()
+                        ));
+
+        QuizSubmission submission =
+                QuizSubmission.builder()
+                        .user(user)
+                        .quiz(quiz)
+                        .submittedAt(LocalDateTime.now())
+                        .durationSeconds(
+                                request.getDurationSeconds()
+                        )
+                        .build();
 
         int correctCount = 0;
 
         List<UserAnswer> userAnswers =
                 new ArrayList<>();
 
-        QuizSubmission submission =
-                QuizSubmission.builder()
+        for (QuizAnswerRequest answerRequest : request.getAnswers()) {
 
-                        .user(user)
+                Question question =
+                        questionMap.get(
+                                answerRequest.getQuestionId()
+                        );
 
-                        .quiz(quiz)
+                if (question == null) {
+                throw new ApiException(
+                        "Question does not belong to quiz"
+                );
+                }
 
-                        .submittedAt(
-                                LocalDateTime.now()
-                        )
+                Answer selectedAnswer =
+                        answerMap.get(
+                                answerRequest.getAnswerId()
+                        );
 
-                        .durationSeconds(
-                                request.getDurationSeconds()
-                        )
+                if (
+                        selectedAnswer == null
+                                || !selectedAnswer
+                                .getQuestion()
+                                .getId()
+                                .equals(question.getId())
+                ) {
+                throw new ApiException(
+                        "Invalid answer for question"
+                );
+                }
 
-                        .build();
+                boolean isCorrect =
+                        Boolean.TRUE.equals(
+                                selectedAnswer.getIsCorrect()
+                        );
 
-        for (
-                QuizAnswerRequest answerRequest
-                : request.getAnswers()
-        ) {
-
-            Question question =
-                    questionRepository
-                            .findByIdAndQuizId(
-                                    answerRequest.getQuestionId(),
-                                    request.getQuizId()
-                            )
-                            .orElseThrow(
-                                    () -> new ApiException(
-                                            "Question does not belong to quiz"
-                                    )
-                            );
-
-
-            Answer selectedAnswer =
-                    answerRepository
-                            .findByIdAndQuestionId(
-                                    answerRequest.getAnswerId(),
-                                    answerRequest.getQuestionId()
-                            )
-                            .orElseThrow(
-                                    () -> new ApiException(
-                                            "Invalid answer for question"
-                                    )
-                            );
-
-
-            boolean isCorrect =
-                    selectedAnswer.getIsCorrect();
-
-            if (isCorrect) {
+                if (isCorrect) {
                 correctCount++;
-            }
+                }
 
-            UserAnswer userAnswer =
-                    UserAnswer.builder()
-
-                            .user(user)
-
-                            .question(question)
-
-                            .selectedAnswer(
-                                    selectedAnswer
-                            )
-
-                            .quizSubmission(
-                                    submission
-                            )
-
-                            .isCorrect(
-                                    isCorrect
-                            )
-
-                            .submittedAt(
-                                    LocalDateTime.now()
-                            )
-
-                            .build();
-
-            userAnswers.add(userAnswer);
+                userAnswers.add(
+                        UserAnswer.builder()
+                                .user(user)
+                                .question(question)
+                                .selectedAnswer(selectedAnswer)
+                                .quizSubmission(submission)
+                                .isCorrect(isCorrect)
+                                .submittedAt(LocalDateTime.now())
+                                .build()
+                );
         }
 
-        int totalQuestions = questionRepository.countByQuizId(quiz.getId());
-        int answeredQuestions = request.getAnswers().size();
-        int skippedQuestions = totalQuestions - answeredQuestions;
+        int totalQuestions = questions.size();
+
+        int answeredQuestions =
+                request.getAnswers().size();
+
+        int skippedQuestions =
+                totalQuestions - answeredQuestions;
 
         double score =
-                ((double) correctCount
-                        / totalQuestions) * 100;
+                totalQuestions == 0
+                        ? 0
+                        : ((double) correctCount / totalQuestions) * 100;
 
         boolean passed =
                 score >= quiz.getPassingScore();
 
-        submission.setAnswers(
-                userAnswers
-        );
-
-        submission.setTotalQuestions(
-                totalQuestions
-        );
-
-        submission.setCorrectAnswers(
-                correctCount
-        );
-
-        submission.setAnsweredQuestions(
-                answeredQuestions
-        );
-
-        submission.setSkippedQuestions(
-                skippedQuestions
-        );
-
+        submission.setAnswers(userAnswers);
+        submission.setTotalQuestions(totalQuestions);
+        submission.setCorrectAnswers(correctCount);
+        submission.setAnsweredQuestions(answeredQuestions);
+        submission.setSkippedQuestions(skippedQuestions);
         submission.setScore(score);
-
-        submission.setPassed(
-                passed
-        );
+        submission.setPassed(passed);
 
         QuizSubmission savedSubmission =
                 quizSubmissionRepository.save(
                         submission
                 );
 
-        userAnswerRepository.saveAll(
-                userAnswers
-        );
-
         return quizSubmissionMapper
-                .toResponse(
-                        savedSubmission
-                );
-    }
+                .toResponse(savedSubmission);
+        }
 
     @Override
     @Transactional(readOnly = true)

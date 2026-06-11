@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Save } from "lucide-react";
 import type { LessonsResponse } from "../types/api-response";
+import useGetDuration from "../hooks/useGetDuration";
 
 interface CreateLessonModalProps {
   isOpen: boolean;
@@ -24,6 +25,18 @@ export const CreateLessonModal: React.FC<CreateLessonModalProps> = ({
   const [videoUrl, setVideoUrl] = useState("");
   const [estimatedTime, setEstimatedTime] = useState(30);
   const [difficulty, setDifficulty] = useState("EASY");
+  
+  const [durationInSeconds, setDurationInSeconds] = useState(0);
+  const [queryUrl, setQueryUrl] = useState("");
+
+  const { data, isPending: pendingUrl } = useGetDuration(queryUrl);
+
+  useEffect(() => {
+    if (data?.durationSeconds) {
+      setDurationInSeconds(data.durationSeconds);
+      setEstimatedTime(Math.round(data.durationSeconds));
+    }
+  }, [data]);
 
   useEffect(() => {
     if (isOpen) {
@@ -32,6 +45,8 @@ export const CreateLessonModal: React.FC<CreateLessonModalProps> = ({
       setVideoUrl("");
       setEstimatedTime(30);
       setDifficulty("EASY");
+      setDurationInSeconds(0);
+      setQueryUrl("");
     }
   }, [isOpen]);
 
@@ -40,6 +55,12 @@ export const CreateLessonModal: React.FC<CreateLessonModalProps> = ({
   const nextOrder = existingLessons.length > 0 
     ? Math.max(...existingLessons.map((l) => l.lessonOrder || 0)) + 1 
     : 1;
+
+  const handleBlur = () => {
+    if (videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")) {
+      setQueryUrl(videoUrl);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +72,7 @@ export const CreateLessonModal: React.FC<CreateLessonModalProps> = ({
       content: content.trim(),
       videoUrl: videoUrl.trim(),
       lessonOrder: nextOrder,
-      estimatedTime: Number(estimatedTime),
+      estimatedTime: durationInSeconds > 0 ? durationInSeconds : Number(estimatedTime) * 60,
       difficulty,
     });
   };
@@ -85,12 +106,12 @@ export const CreateLessonModal: React.FC<CreateLessonModalProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-slate-500 uppercase">Thời lượng (Phút)</label>
+              <label className="text-[11px] font-bold text-slate-500 uppercase">Thời lượng (giây)</label>
               <input
                 type="number"
                 required
                 min={1}
-                disabled={isPending}
+                disabled={isPending || pendingUrl}
                 value={estimatedTime}
                 onChange={(e) => setEstimatedTime(Number(e.target.value))}
                 className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500 bg-slate-50/50"
@@ -118,9 +139,11 @@ export const CreateLessonModal: React.FC<CreateLessonModalProps> = ({
               disabled={isPending}
               value={videoUrl}
               onChange={(e) => setVideoUrl(e.target.value)}
+              onBlur={handleBlur}
               className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500 bg-slate-50/50"
-              placeholder="https://example.com/video"
+              placeholder="https://www.youtube.com/watch?v=... (Dán xong bấm ra ngoài để tự động tính thời lượng)"
             />
+            {pendingUrl && <p className="text-[10px] text-blue-500 font-medium animate-pulse">Đang lấy thông tin từ YouTube...</p>}
           </div>
 
           <div className="space-y-1.5">
@@ -139,7 +162,7 @@ export const CreateLessonModal: React.FC<CreateLessonModalProps> = ({
             <button type="button" onClick={onClose} disabled={isPending} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold transition-colors">
               Hủy bỏ
             </button>
-            <button type="submit" disabled={isPending} className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold transition-colors shadow-sm">
+            <button type="submit" disabled={isPending || pendingUrl} className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold transition-colors shadow-sm">
               <Save size={14} />
               {isPending ? "Đang lưu..." : "Lưu bài học"}
             </button>

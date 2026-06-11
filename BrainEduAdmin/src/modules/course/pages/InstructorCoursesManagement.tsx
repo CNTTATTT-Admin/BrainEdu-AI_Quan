@@ -7,8 +7,6 @@ import {
   Users, 
   Layers,
   Star,
-  CheckCircle, 
-  XCircle, 
   AlertCircle,
   Eye,
   Plus,
@@ -28,6 +26,7 @@ import { formatVND } from "../../../utils/helper";
 import type { CoursesResponse } from "../types/api-response";
 import type { CourseRequest } from "../types/api-request";
 import { ViewCourseModal } from "../components/ViewCourseModal";
+import useGetCategories from "../../root/hooks/useGetCategories";
 
 const InstructorCoursesManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -43,12 +42,15 @@ const InstructorCoursesManagement: React.FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [courseToDelete, setCourseToDelete] = useState<CoursesResponse | null>(null);
 
+  const { data: categoryData } = useGetCategories();
+  const categories = categoryData?.data || [];
+
   const { data, isPending, refetch } = useGetAllCourses({
     page: currentPage,
     size: 10,
     search: searchTerm,
     status: statusFilter,
-    category: categoryFilter
+    category: categoryFilter === "ALL" ? "" : categoryFilter
   });
 
   const { mutate: createCourse, isPending: isCreatePending } = useCreateCourse();
@@ -58,9 +60,7 @@ const InstructorCoursesManagement: React.FC = () => {
   const courses = data?.data || [];
   const pagination = data?.meta;
 
-  const categories = Array.from(new Set(courses.map((c: CoursesResponse) => c.categoryName).filter(Boolean)));
   const totalEnrolled = courses.reduce((sum: number, c: CoursesResponse) => sum + (c.totalEnrolled || 0), 0);
-  const pendingCount = courses.filter((c: CoursesResponse) => c.status === "PENDING").length;
 
   const handlePageChange = (targetPage: number) => {
     setCurrentPage(targetPage);
@@ -146,15 +146,6 @@ const InstructorCoursesManagement: React.FC = () => {
           </div>
         </div>
         <div className="bg-white p-4 rounded-2xl border border-slate-200/60 shadow-sm flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-            <AlertCircle size={20} />
-          </div>
-          <div>
-            <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Chờ xét duyệt</p>
-            <p className="text-xl font-bold text-slate-800">{pendingCount}</p>
-          </div>
-        </div>
-        <div className="bg-white p-4 rounded-2xl border border-slate-200/60 shadow-sm flex items-center gap-4">
           <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
             <Users size={20} />
           </div>
@@ -186,8 +177,8 @@ const InstructorCoursesManagement: React.FC = () => {
               className="bg-transparent text-xs font-medium text-slate-600 focus:outline-none cursor-pointer"
             >
               <option value="ALL">Tất cả danh mục</option>
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+              {categories.map((cat: any) => (
+                <option key={cat.id} value={cat.id}>{cat.categoryName}</option>
               ))}
             </select>
           </div>
@@ -216,7 +207,6 @@ const InstructorCoursesManagement: React.FC = () => {
                 <th className="px-6 py-3.5">Phân loại / Trình độ</th>
                 <th className="px-6 py-3.5 text-center">Giá bán</th>
                 <th className="px-6 py-3.5 text-center">Học viên</th>
-                <th className="px-6 py-3.5">Trạng thái duyệt</th>
                 <th className="px-6 py-3.5 text-right">Hành động</th>
               </tr>
             </thead>
@@ -265,18 +255,6 @@ const InstructorCoursesManagement: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 text-center whitespace-nowrap font-bold text-slate-600">
                       {course.totalEnrolled || 0}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        course.status === "APPROVED" ? "bg-emerald-50 text-emerald-600" :
-                        course.status === "PENDING" ? "bg-amber-50 text-amber-600 animate-pulse" :
-                        "bg-red-50 text-red-600"
-                      }`}>
-                        {course.status === "APPROVED" && <CheckCircle size={11} />}
-                        {course.status === "PENDING" && <AlertCircle size={11} />}
-                        {course.status === "REJECTED" && <XCircle size={11} />}
-                        {course.status === "APPROVED" ? "Đang chạy" : course.status === "PENDING" ? "Chờ duyệt" : "Từ chối"}
-                      </span>
                     </td>
                     <td className="px-6 py-4 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-1.5">

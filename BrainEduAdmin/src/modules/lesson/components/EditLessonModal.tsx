@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { X, Save } from "lucide-react";
 import type { LessonsResponse } from "../types/api-response";
 import type { LessonRequest } from "../types/api-request";
+import useGetDuration from "../hooks/useGetDuration";
 
 interface UpdateLessonModalProps {
   isOpen: boolean;
@@ -21,20 +22,37 @@ export const UpdateLessonModal: React.FC<UpdateLessonModalProps> = ({
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
-  const [estimatedTime, setEstimatedTime] = useState(30);
+  const [estimatedTime, setEstimatedTime] = useState(0);
   const [difficulty, setDifficulty] = useState("EASY");
+  
+  // State để quản lý việc gọi API
+  const [queryUrl, setQueryUrl] = useState("");
+  const { data, isPending: pendingUrl } = useGetDuration(queryUrl);
 
   useEffect(() => {
     if (isOpen && lessonData) {
       setTitle(lessonData.title || "");
       setContent(lessonData.content || "");
       setVideoUrl(lessonData.videoUrl || "");
-      setEstimatedTime(lessonData.estimatedTime || 30);
+      setEstimatedTime(Math.round((lessonData.estimatedTime || 30) / 60));
       setDifficulty(lessonData.difficulty || "EASY");
+      setQueryUrl(""); 
     }
   }, [isOpen, lessonData]);
 
+  useEffect(() => {
+    if (data?.durationSeconds) {
+      setEstimatedTime(data.durationSeconds); // Lấy thẳng giây từ API
+    }
+  }, [data]);
+
   if (!isOpen || !lessonData) return null;
+
+  const handleBlur = () => {
+    if (videoUrl.includes("youtube.com") || videoUrl.includes("youtu.be")) {
+      setQueryUrl(videoUrl);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +64,7 @@ export const UpdateLessonModal: React.FC<UpdateLessonModalProps> = ({
       content: content.trim(),
       videoUrl: videoUrl.trim(),
       lessonOrder: Number(lessonData.lessonOrder),
-      estimatedTime: Number(estimatedTime),
+      estimatedTime: Number(estimatedTime) * 60, // Gửi về backend đơn vị giây
       difficulty,
     });
   };
@@ -59,11 +77,7 @@ export const UpdateLessonModal: React.FC<UpdateLessonModalProps> = ({
             <h3 className="text-sm font-bold text-slate-900">Cập nhật bài học</h3>
             <p className="text-[11px] text-slate-500">Đang chỉnh sửa: Bài số {lessonData.lessonOrder}</p>
           </div>
-          <button 
-            onClick={onClose} 
-            disabled={isPending} 
-            className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-400 transition-colors"
-          >
+          <button onClick={onClose} disabled={isPending} className="p-1.5 hover:bg-slate-200 rounded-lg text-slate-400 transition-colors">
             <X size={16} />
           </button>
         </div>
@@ -84,12 +98,12 @@ export const UpdateLessonModal: React.FC<UpdateLessonModalProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-slate-500 uppercase">Thời lượng (Phút)</label>
+              <label className="text-[11px] font-bold text-slate-500 uppercase">Thời lượng (giây)</label>
               <input
                 type="number"
                 required
                 min={1}
-                disabled={isPending}
+                disabled={isPending || pendingUrl}
                 value={estimatedTime}
                 onChange={(e) => setEstimatedTime(Number(e.target.value))}
                 className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500 bg-slate-50/50"
@@ -117,9 +131,11 @@ export const UpdateLessonModal: React.FC<UpdateLessonModalProps> = ({
               disabled={isPending}
               value={videoUrl}
               onChange={(e) => setVideoUrl(e.target.value)}
+              onBlur={handleBlur}
               className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500 bg-slate-50/50"
-              placeholder="https://example.com/video"
+              placeholder="Dán link YouTube tại đây..."
             />
+            {pendingUrl && <p className="text-[10px] text-blue-500 font-medium animate-pulse">Đang cập nhật thời lượng...</p>}
           </div>
 
           <div className="space-y-1.5">
@@ -135,19 +151,10 @@ export const UpdateLessonModal: React.FC<UpdateLessonModalProps> = ({
           </div>
 
           <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-            <button 
-              type="button" 
-              onClick={onClose} 
-              disabled={isPending} 
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold transition-colors"
-            >
+            <button type="button" onClick={onClose} disabled={isPending} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold transition-colors">
               Hủy bỏ
             </button>
-            <button 
-              type="submit" 
-              disabled={isPending} 
-              className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold transition-colors shadow-sm"
-            >
+            <button type="submit" disabled={isPending || pendingUrl} className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold transition-colors shadow-sm">
               <Save size={14} />
               {isPending ? "Đang lưu..." : "Cập nhật bài học"}
             </button>

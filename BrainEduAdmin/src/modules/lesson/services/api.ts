@@ -1,7 +1,7 @@
 import type { BackendResponse } from "../../../libs/shared/types/backend-response";
 import api from "../../../services/axios";
 import type { AnswerRequest, LessonRequest, QuestionRequest, QuizRequest } from "../types/api-request";
-import type { LessonsResponse, QuestionResponse, QuizzResponse, SkillResponse } from "../types/api-response";
+import type { DurationResponse, LessonsResponse, QuestionResponse, QuizzResponse, SkillResponse } from "../types/api-response";
 
 
 export const onGetLessonsByCourseApi = async (
@@ -105,3 +105,12 @@ export const onDeleteLessonApi = async (lessonId: number): Promise<BackendRespon
   const data = await api.delete(`/lessons/${lessonId}`);
   return data.data;
 }
+
+export const onGetDurationApi = async (
+  videoUrl: string
+): Promise<BackendResponse<DurationResponse>> => {
+    const data = await api.get(`/lessons/youtube-duration`, {
+      params: {videoUrl: videoUrl}
+    });
+    return data.data;
+};

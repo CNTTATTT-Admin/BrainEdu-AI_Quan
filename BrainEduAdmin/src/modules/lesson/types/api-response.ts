@@ -38,3 +38,7 @@ export type QuestionResponse = {
   questionType: string;
   weightScore: number;
 };
+
+export type DurationResponse = {
+  durationSeconds: number
+}

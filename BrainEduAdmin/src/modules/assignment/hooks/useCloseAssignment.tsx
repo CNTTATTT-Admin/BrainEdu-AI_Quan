@@ -1,12 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { onCreateAssignment } from '../services/api'
+import { onCloseAssignment } from '../services/api'
 
-const useCreateAssignment = () => {
+const useCloseAssignment = () => {
     const queryClient = useQueryClient();
     const { mutate, error, isPending, isError } = useMutation({
-        mutationKey: ["create-assignment"],
-        mutationFn: onCreateAssignment,
+        mutationKey: ["close-assignment"],
+        mutationFn: onCloseAssignment,
         onSuccess: () => {
+            console.log("OK");
+            
             queryClient.invalidateQueries({ queryKey: ["assignment-course"] });
         },
         onError: (err) => {
@@ -18,4 +20,4 @@ const useCreateAssignment = () => {
     return { mutate, error, isError, isPending }
 }
 
-export default useCreateAssignment
+export default useCloseAssignment

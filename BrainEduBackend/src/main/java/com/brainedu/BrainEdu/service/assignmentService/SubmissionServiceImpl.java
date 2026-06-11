@@ -1,12 +1,8 @@
 package com.brainedu.BrainEdu.service.assignmentService;
-import com.brainedu.BrainEdu.common.enums.AssignmentType;
 import com.brainedu.BrainEdu.common.enums.SubmissionStatus;
 import com.brainedu.BrainEdu.dto.request.AssignmentRequest.GradeSubmissionRequest;
-import com.brainedu.BrainEdu.dto.request.AssignmentRequest.SubmitAssignmentRequest;
-import com.brainedu.BrainEdu.dto.request.AuthRequest.*;
 import com.brainedu.BrainEdu.dto.response.AssignmentResponse.PendingAssignmentResponse;
 import com.brainedu.BrainEdu.dto.response.AssignmentResponse.SubmissionResponse;
-import com.brainedu.BrainEdu.dto.response.AuthResponse.*;
 import com.brainedu.BrainEdu.entity.*;
 import com.brainedu.BrainEdu.mapper.SubmissionMapper;
 import com.brainedu.BrainEdu.repository.*;
@@ -19,8 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.brainedu.BrainEdu.common.enums.AssignmentType.ESSAY;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +35,8 @@ public class SubmissionServiceImpl
     private final CurrentUserService currentUserService;
 
     private final FileStorageService fileStorageService;
+
+    private final MinioStorageService minioStorageService;
     @Override
     @Transactional
     public SubmissionResponse submit(
@@ -106,18 +102,14 @@ public class SubmissionServiceImpl
 
             case FILE_UPLOAD -> {
                 if (file == null || file.isEmpty()) {
-                    throw new RuntimeException("File is required for FILE_UPLOAD");
+                        throw new RuntimeException("File is required");
                 }
-
-                String url =
-                        fileStorageService.uploadFile(file);
-
+                String url = minioStorageService.uploadFile(file); 
                 submission.setAttachmentUrl(url);
-                submission.setAnswerText(answerText); // optional note
+                submission.setAnswerText(answerText);
             }
 
             case QUIZ -> {
-                // tùy hệ thống quiz của bạn
                 submission.setAnswerText("QUIZ_SUBMITTED");
             }
 

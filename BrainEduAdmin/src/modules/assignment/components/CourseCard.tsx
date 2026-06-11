@@ -19,7 +19,6 @@ interface CourseCardProps {
   onOpenCreateModal: (students: any[]) => void;
   onOpenAssignModal: (assignment: AssignmentResponse, students: any[]) => void;
   onOpenSubmissionsModal: (assignment: AssignmentResponse) => void;
-  onUpdateStatus: (id: number, nextStatus: "PUBLISHED" | "CLOSED") => void;
 }
 
 export default function CourseCard({
@@ -29,7 +28,6 @@ export default function CourseCard({
   onOpenCreateModal,
   onOpenAssignModal,
   onOpenSubmissionsModal,
-  onUpdateStatus,
 }: CourseCardProps) {
   const { data: studentData } = useGetStudentEnrolled(course.id);
   const students = studentData?.data || [];
@@ -87,7 +85,6 @@ export default function CourseCard({
           assignments={assignments}
           onOpenAssignModal={(assignment) => onOpenAssignModal(assignment, students)}
           onOpenSubmissionsModal={onOpenSubmissionsModal}
-          onUpdateStatus={onUpdateStatus}
         />
       )}
     </div>

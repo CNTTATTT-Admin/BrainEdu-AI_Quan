@@ -7,7 +7,17 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "quiz_submissions")
+@Table(name = "quiz_submissions",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uk_user_quiz",
+            columnNames = {
+                    "user_id",
+                    "quiz_id"
+            }
+        )
+    }
+)
 @Getter
 @Setter
 @Builder

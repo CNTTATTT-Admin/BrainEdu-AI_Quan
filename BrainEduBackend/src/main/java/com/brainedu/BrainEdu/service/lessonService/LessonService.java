@@ -30,4 +30,5 @@ public interface LessonService {
     String delete(
             Long id
     );
+    Integer getDurationInSeconds(String videoId);
 }

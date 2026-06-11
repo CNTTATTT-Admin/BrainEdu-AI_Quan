@@ -1,18 +1,18 @@
 import { FileText, UserPlus, Send, Lock, CheckSquare } from "lucide-react";
 import type { AssignmentResponse } from "../types/api-response";
+import useCloseAssignment from "../hooks/useCloseAssignment";
+import usePublishAssignment from "../hooks/usePublishAssignment";
 
 interface AssignmentTableProps {
   assignments: AssignmentResponse[];
   onOpenAssignModal: (assignment: AssignmentResponse) => void;
   onOpenSubmissionsModal: (assignment: AssignmentResponse) => void;
-  onUpdateStatus: (id: number, nextStatus: "PUBLISHED" | "CLOSED") => void;
 }
 
 export default function AssignmentTable({
   assignments,
   onOpenAssignModal,
   onOpenSubmissionsModal,
-  onUpdateStatus,
 }: AssignmentTableProps) {
   if (assignments.length === 0) {
     return (
@@ -21,6 +21,18 @@ export default function AssignmentTable({
         Chưa có bài tập nào được tạo cho khóa học này. Hãy bấm "Thêm bài tập" để bắt đầu.
       </div>
     );
+  }
+  const { mutate: close, isPending: isClosing } = useCloseAssignment()
+  const { mutate: publish, isPending: isPublishing } = usePublishAssignment()
+
+  const handlePublishAssignment = (id: number) => {
+    if(!id) return;
+    publish(id)
+  }
+
+  const handleCloseAssignment = (id: number) => {
+    if(!id) return;
+    close(id)
   }
 
   return (
@@ -110,9 +122,9 @@ export default function AssignmentTable({
                     <UserPlus size={14} />
                   </button>
 
-                  {item.status === "DRAFT" && (
+                  {item.status === "CLOSED" && (
                     <button
-                      onClick={() => onUpdateStatus(item.id, "PUBLISHED")}
+                      onClick={() => handlePublishAssignment(item.id)}
                       className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
                       title="Phát hành bài tập"
                     >
@@ -122,7 +134,7 @@ export default function AssignmentTable({
 
                   {item.status === "PUBLISHED" && (
                     <button
-                      onClick={() => onUpdateStatus(item.id, "CLOSED")}
+                      onClick={() => handleCloseAssignment(item.id)}
                       className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
                       title="Khóa bài tập"
                     >

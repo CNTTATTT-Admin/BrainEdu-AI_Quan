@@ -47,4 +47,9 @@ public interface QuizSubmissionRepository
     );
 
     boolean existsByUserIdAndQuizId(Long userId, Long quizId);
+        Optional<QuizSubmission>
+        findByUserIdAndQuizId(
+                Long userId,
+                Long quizId
+        );
 }

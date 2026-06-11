@@ -120,9 +120,6 @@ export default function AssignmentManagement() {
     );
   };
 
-  const handleUpdateStatus = (id: number, nextStatus: "PUBLISHED" | "CLOSED") => {
-  };
-
   const filteredList = submissionList.filter((submission: any) => {
     if (activeTab === "ALL") return true;
     return submission.status === activeTab;
@@ -149,7 +146,6 @@ export default function AssignmentManagement() {
             onOpenCreateModal={(students) => handleOpenCreateModal(course.id, students)}
             onOpenAssignModal={handleOpenAssignModal}
             onOpenSubmissionsModal={handleOpenSubmissionsModal}
-            onUpdateStatus={handleUpdateStatus}
           />
         ))}
       </div>
