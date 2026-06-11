@@ -95,9 +95,6 @@ public class SubmissionServiceImpl
         submission.setAssignment(assignment);
         submission.setStudent(student);
 
-        // =========================
-        // VALIDATE + PROCESS BY TYPE
-        // =========================
         switch (assignment.getType()) {
 
             case ESSAY -> {

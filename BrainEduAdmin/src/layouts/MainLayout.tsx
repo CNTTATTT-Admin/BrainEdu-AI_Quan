@@ -87,13 +87,34 @@ if (isPending || !userRole) {
           )}
 
           {isInstructor && (
+            <>
+            
+              <NavLink 
+                to="/admin/my-courses" 
+                className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
+              >
+                <BookOpen size={18} />
+                Khóa học của tôi
+              </NavLink>
+
+              
             <NavLink 
-              to="/admin/my-courses" 
+              to="/admin/lessons" 
               className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
             >
-              <BookOpen size={18} />
-              Khóa học của tôi
+              <FileVideo size={18} />
+              Quản lý bài học & Quiz
             </NavLink>
+
+            
+          <NavLink 
+            to="/admin/assignments" 
+            className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
+          >
+            <ClipboardList size={18} />
+            Bài tập & Tiến độ học
+          </NavLink>
+            </>
           )}
 
           {/* Quyền chung */}
@@ -103,22 +124,6 @@ if (isPending || !userRole) {
           >
             <ClipboardList size={18} />
             Quản lý lộ trình học
-          </NavLink>
-
-          <NavLink 
-            to="/admin/lessons" 
-            className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
-          >
-            <FileVideo size={18} />
-            Quản lý bài học & Quiz
-          </NavLink>
-
-          <NavLink 
-            to="/admin/assignments" 
-            className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-slate-100'}`}
-          >
-            <ClipboardList size={18} />
-            Bài tập & Tiến độ học
           </NavLink>
 
           {/* CHỈ ADMIN mới nhìn thấy các nút này */}

@@ -1,18 +1,25 @@
 import json
 from collections import defaultdict
-
+from app.repositories.course_repository import (
+    get_course_map
+)
 class FeatureExtractor:
 
     @staticmethod
     def feature_extractor(events_df):
 
+        course_map = get_course_map()
+
         interests = defaultdict(float)
         skills = defaultdict(float)
         content_preferences = defaultdict(float)
+
         completed_courses = set()
+
         total_learning_time = 0
         lesson_completed_count = 0
         course_view_count = 0
+
         search_keywords = defaultdict(float)
 
         for _, row in events_df.iterrows():
@@ -26,6 +33,13 @@ class FeatureExtractor:
                 except Exception:
                     metadata = {}
 
+            course_id = metadata.get("courseId")
+
+            course_info = course_map.get(course_id, {})
+
+            category = course_info.get("category")
+            skill_name = course_info.get("skill")
+
             # =========================
             # COURSE VIEW
             # =========================
@@ -33,16 +47,11 @@ class FeatureExtractor:
 
                 course_view_count += 1
 
-                course_id = metadata.get("courseId")
-                category = metadata.get("categoryName")
-
                 if category:
                     interests[category] += 1
-                elif course_id:
-                    interests[f"course_{course_id}"] += 1
 
-                if course_id:
-                    skills[f"course_{course_id}"] += 0.5
+                if skill_name:
+                    skills[skill_name] += 0.5
 
             # =========================
             # LESSON COMPLETE
@@ -51,65 +60,93 @@ class FeatureExtractor:
 
                 lesson_completed_count += 1
 
-                learning_time = metadata.get("learningTime", 0)
+                learning_time = metadata.get(
+                    "learningTime",
+                    0
+                )
+
                 total_learning_time += learning_time
 
-                course_id = metadata.get("courseId")
-                lesson_title = metadata.get("lessonTitle")
+                lesson_title = metadata.get(
+                    "lessonTitle"
+                )
 
                 if course_id:
-                    completed_courses.add(course_id)
-                    skills[f"course_{course_id}"] += 1
+                    completed_courses.add(
+                        course_id
+                    )
+
+                if skill_name:
+                    skills[skill_name] += 1
 
                 if lesson_title:
-                    skills[lesson_title] += 1
+                    skills[
+                        lesson_title
+                    ] += 0.2
 
-                if metadata.get("isManualClick", False):
-                    content_preferences["project"] += 1
+                if metadata.get(
+                    "isManualClick",
+                    False
+                ):
+                    content_preferences[
+                        "project"
+                    ] += 1
 
             # =========================
             # SEARCH
             # =========================
             elif event_name == "search":
 
-                keyword = metadata.get("keyword")
+                keyword = metadata.get(
+                    "keyword"
+                )
+
                 if keyword:
-                    search_keywords[keyword] += 1
+                    search_keywords[
+                        keyword
+                    ] += 1
 
             # =========================
             # VIDEO WATCH
             # =========================
             elif event_name == "video_watch":
 
-                watch_percent = metadata.get("watchPercent", 0)
+                watch_percent = metadata.get(
+                    "watchPercent",
+                    0
+                )
+
                 if watch_percent >= 70:
-                    content_preferences["video"] += 1
+                    content_preferences[
+                        "video"
+                    ] += 1
 
             # =========================
             # ARTICLE READ
             # =========================
             elif event_name == "article_read":
 
-                read_time = metadata.get("readTime", 0)
-                if read_time >= 60:
-                    content_preferences["article"] += 1
+                read_time = metadata.get(
+                    "readTime",
+                    0
+                )
 
-        # =========================
-        # NORMALIZE
-        # =========================
+                if read_time >= 60:
+                    content_preferences[
+                        "article"
+                    ] += 1
+
         normalized_skills = {
+
             skill: round(score, 2)
-            for skill, score in skills.items()
+
+            for skill, score
+
+            in skills.items()
         }
 
-        # =========================
-        # 🔥 IMPORTANT FIX (AVOID EMPTY PROFILE)
-        # =========================
         if not interests:
             interests = {"general": 1}
-
-        if not completed_courses:
-            completed_courses = set()
 
         return {
 
@@ -117,17 +154,24 @@ class FeatureExtractor:
 
             "skills": normalized_skills,
 
-            "completed_courses": list(completed_courses),
+            "completed_courses": list(
+                completed_courses
+            ),
 
-            "total_learning_time": total_learning_time,
+            "total_learning_time":
+                total_learning_time,
 
-            "lesson_completed_count": lesson_completed_count,
+            "lesson_completed_count":
+                lesson_completed_count,
 
-            "course_view_count": course_view_count,
+            "course_view_count":
+                course_view_count,
 
-            "content_preferences": dict(content_preferences),
+            "content_preferences":
+                dict(content_preferences),
 
-            "search_keywords": dict(search_keywords)
+            "search_keywords":
+                dict(search_keywords)
         }
 
     @staticmethod
@@ -263,11 +307,15 @@ class FeatureExtractor:
 
         for skill, stats in skill_stats.items():
 
-            ratio = round(
-                stats["correct"]
-                / stats["total"],
-                2
-            )
+            ratio = 0
+
+            if stats["total"] > 0:
+                ratio = round(
+                    stats["correct"]
+                    /
+                    stats["total"],
+                    2
+                )
 
             skills_performance.append({
 

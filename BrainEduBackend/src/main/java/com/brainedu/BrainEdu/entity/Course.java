@@ -94,6 +94,22 @@ public class Course extends BaseEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "total_enrolled")
+    @Builder.Default
+    private Long totalEnrolled = 0L;
+
+    @Column(name = "total_lessons")
+    @Builder.Default
+    private Long totalLessons = 0L;
+
+    @Column(name = "average_rating")
+    @Builder.Default
+    private Double averageRating = 0.0;
+
+    @Column(name = "total_ratings")
+    @Builder.Default
+    private Long totalRatings = 0L;
+
     public boolean isFree() {
     return price == null || price == 0;
 }

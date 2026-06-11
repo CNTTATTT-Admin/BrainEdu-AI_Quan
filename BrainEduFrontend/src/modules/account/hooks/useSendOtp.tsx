@@ -1,15 +1,18 @@
 import { useMutation } from "@tanstack/react-query"
 import { onSendOtp } from "../services/api"
+import toast from "react-hot-toast"
+import { ERROR_MESSAGES } from "../../../types/error-types"
 
 const useRegister = () => {
     const { data, error, isPending, isError, mutate } = useMutation({
         mutationKey: ["send-otp"],
         mutationFn: onSendOtp,
         onSuccess: () => {
-            console.log("OK");
+            toast.success("Gửi mã OTP thành công!")
         },
-        onError: () => {
-            console.log("FAIL");
+        onError: (err) => {
+            const msg = err?.message || "DEFAULT"
+            toast.error(ERROR_MESSAGES[msg])
         }
     })
     return {data, error, isPending, isError, mutate}

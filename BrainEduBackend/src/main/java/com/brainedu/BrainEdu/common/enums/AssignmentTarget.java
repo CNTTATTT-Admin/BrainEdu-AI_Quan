@@ -4,7 +4,5 @@ public enum AssignmentTarget {
 
     COURSE,
 
-    GROUP,
-
     STUDENT
 }

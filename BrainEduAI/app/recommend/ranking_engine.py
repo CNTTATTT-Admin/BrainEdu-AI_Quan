@@ -1,3 +1,5 @@
+import math
+
 from app.recommend.engines.semantic_engine import (
     SemanticEngine
 )
@@ -26,8 +28,8 @@ from app.recommend.engines.workload_engine import (
     WorkloadEngine
 )
 
-from app.recommend.engines.semantic_weight_engine import (
-    SemanticWeightEngine
+from app.config.recommendation_weights import (
+    RECOMMENDATION_WEIGHTS
 )
 
 
@@ -42,50 +44,44 @@ class RankingEngine:
 
         ranked = []
 
-
         weights = (
-
-            SemanticWeightEngine
-            .get_weights(
-
-                profile[
-                    "experience_level"
-                ]
-            )
+            RECOMMENDATION_WEIGHTS
         )
 
-
         completed_courses = set(
-
             profile.get(
                 "completed_courses",
                 []
             )
         )
 
-
         interests = [
 
-            str(interest).lower()
+            str(
+                interest
+            ).lower()
 
-            for interest in profile.get(
+            for interest in
+            profile.get(
                 "interests",
                 []
             )
         ]
-
 
         user_skills = profile.get(
             "skills",
             {}
         )
 
+        knowledge_profile = profile.get(
+            "knowledge_profile",
+            {}
+        )
 
         for course in courses:
 
             if course["id"] in completed_courses:
                 continue
-
 
             semantic_score = (
 
@@ -154,6 +150,44 @@ class RankingEngine:
                         []
                     )
                 )
+            )
+
+
+            knowledge_gap_bonus = 0
+
+            course_skills = course.get(
+                "skills"
+            )
+
+            if not course_skills:
+                course_skills = []
+
+            if isinstance(
+                course_skills,
+                str
+            ):
+                course_skills = [
+                    s.strip()
+                    for s in course_skills.split(",")
+                ]
+
+            for skill in course_skills:
+
+                mastery = (
+                    knowledge_profile.get(
+                        skill,
+                        None
+                    )
+                )
+
+                if mastery is not None:
+
+                    knowledge_gap_bonus += (
+                        1 - mastery
+                    ) * 0.10
+
+            skill_gap_score += (
+                knowledge_gap_bonus
             )
 
 
@@ -244,47 +278,107 @@ class RankingEngine:
                 +
 
                 keyword_bonus
+                * weights["interest"]
 
                 +
 
                 skill_gap_score
+                * weights["skill_gap"]
 
                 +
 
                 learning_style_bonus
+                * weights["learning_style"]
 
                 +
 
                 diversity_bonus
+                * weights["diversity"]
 
                 +
 
                 timeline_bonus
+                * weights["timeline"]
 
                 -
 
                 workload_penalty
+                * weights["workload"]
 
                 -
 
                 level_penalty
+                * weights["level"]
             )
 
             ranked.append({
 
                 **course,
 
-                "match_score": round(
-                    float(final_score),
-                    4
-                )
+                "score_breakdown": {
+
+                    "semantic":
+                        round(
+                            semantic_score,
+                            4
+                        ),
+
+                    "interest":
+                        round(
+                            keyword_bonus,
+                            4
+                        ),
+
+                    "skill_gap":
+                        round(
+                            skill_gap_score,
+                            4
+                        ),
+
+                    "learning_style":
+                        round(
+                            learning_style_bonus,
+                            4
+                        ),
+
+                    "diversity":
+                        round(
+                            diversity_bonus,
+                            4
+                        ),
+
+                    "timeline":
+                        round(
+                            timeline_bonus,
+                            4
+                        ),
+
+                    "workload_penalty":
+                        round(
+                            workload_penalty,
+                            4
+                        ),
+
+                    "level_penalty":
+                        round(
+                            level_penalty,
+                            4
+                        )
+                },
+
+                "match_score":
+                    round(
+                        float(
+                            final_score
+                        ),
+                        4
+                    )
             })
 
         ranked.sort(
 
-            key=lambda x: x[
-                "match_score"
-            ],
+            key=lambda x:
+            x["match_score"],
 
             reverse=True
         )

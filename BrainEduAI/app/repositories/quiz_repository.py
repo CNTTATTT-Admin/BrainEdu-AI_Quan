@@ -122,3 +122,26 @@ def get_quiz_submission_answers(
 
         params=(quiz_submission_id,)
     )
+
+def get_user_quiz_submissions(
+        user_id
+):
+
+    query = """
+
+        SELECT
+            id
+
+        FROM quiz_submissions
+
+        WHERE user_id = %s
+
+        ORDER BY submitted_at DESC
+
+    """
+
+    return pd.read_sql(
+        query,
+        con=engine,
+        params=(user_id,)
+    )

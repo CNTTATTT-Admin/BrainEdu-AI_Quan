@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import com.brainedu.BrainEdu.common.enums.CourseStatus;
 import com.brainedu.BrainEdu.dto.request.FilterRequest.CourseFilterRequest;
 import com.brainedu.BrainEdu.entity.Course;
 
@@ -45,6 +46,12 @@ public class CourseSpecification {
                 );
             }
 
+            predicates.add(
+                cb.equal(
+                        root.get("status"),
+                        CourseStatus.PUBLISHED
+                )
+            );
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }

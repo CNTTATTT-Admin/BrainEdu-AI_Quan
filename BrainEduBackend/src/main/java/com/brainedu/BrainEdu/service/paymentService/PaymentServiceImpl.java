@@ -3,17 +3,13 @@ package com.brainedu.BrainEdu.service.paymentService;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.TreeMap;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
 
@@ -45,12 +41,9 @@ public class PaymentServiceImpl implements PaymentService {
     private final UserRepository userRepository;
     private final VnpayConfig config;
 
-    // PaymentServiceImpl.java
     @Override
     @Transactional
     public PaymentResponse createPayment(Long userId, Long courseId, String ip) {
-
-        // 1. Idempotency: nếu đã có payment PENDING → trả về luôn
         Optional<Payment> existingPayment = paymentRepository
             .findByUserIdAndCourseIdAndStatus(userId, courseId, PaymentStatus.PENDING);
         if (existingPayment.isPresent()) {
@@ -58,14 +51,12 @@ public class PaymentServiceImpl implements PaymentService {
             return buildPaymentUrl(p);
         }
 
-        // 2. Nếu đã SUCCESS → không cho tạo lại
         boolean alreadyPaid = paymentRepository
             .existsByUserIdAndCourseIdAndStatus(userId, courseId, PaymentStatus.SUCCESS);
         if (alreadyPaid) {
             throw new ApiException("Course already purchased");
         }
 
-        // 3. Tạo Payment
         String txnRef = UUID.randomUUID().toString();
         Course courseDetail = courseRepository.findById(courseId)
             .orElseThrow(() -> new ApiException("Course not found"));
@@ -79,7 +70,6 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
         paymentRepository.save(payment);
 
-        // 4. Tạo Enrollment PENDING_PAYMENT nếu chưa có
         boolean alreadyEnrolled = enrollmentRepository
             .existsByUserIdAndCourseId(userId, courseId);
         if (!alreadyEnrolled) {
@@ -139,7 +129,6 @@ public class PaymentServiceImpl implements PaymentService {
             String fieldName = itr.next();
             String fieldValue = params.get(fieldName);
             if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                // ✅ Dùng raw value, không encode
                 hashData.append(fieldName).append('=').append(fieldValue);
                 if (itr.hasNext()) {
                     hashData.append('&');
@@ -173,6 +162,13 @@ public class PaymentServiceImpl implements PaymentService {
                     .orElseThrow(() -> new ApiException("Enrollment not found"));
 
             enrollment.setStatus(EnrollmentStatus.ACTIVE);
+            Course course = enrollment.getCourse();
+
+            course.setTotalEnrolled(
+                    course.getTotalEnrolled() + 1
+            );
+
+            courseRepository.save(course);
             enrollment.setEnrolledAt(LocalDateTime.now());
 
             enrollmentRepository.save(enrollment);

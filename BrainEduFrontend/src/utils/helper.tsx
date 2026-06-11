@@ -1,3 +1,5 @@
+import type { MyResultResponse } from "../modules/quizz/types/api-response";
+
 export const lazyLoad = (importFunc: () => Promise<any>) => {
     return async () => {
         const module = await importFunc()
@@ -25,30 +27,28 @@ export const formatDate = (dateString: string): string => {
 export const formatSubmissionTime = (isoString: string | undefined | null): string => {
   if (!isoString) return '';
 
-  // Bắt buộc thêm ký tự 'Z' nếu chuỗi chưa có để ép JavaScript parse theo giờ UTC
   const formattedIso = isoString.endsWith('Z') ? isoString : `${isoString}Z`;
   const dateParsed = new Date(formattedIso);
   
   if (isNaN(dateParsed.getTime())) return '';
-
-  const hours = String(dateParsed.getHours()).padStart(2, '0');
-  const minutes = String(dateParsed.getMinutes()).padStart(2, '0');
-  const day = String(dateParsed.getDate()).padStart(2, '0');
-  const month = String(dateParsed.getMonth() + 1).padStart(2, '0');
-  const year = dateParsed.getFullYear();
+  const hours = String(dateParsed.getUTCHours()).padStart(2, '0');
+  const minutes = String(dateParsed.getUTCMinutes()).padStart(2, '0');
+  const day = String(dateParsed.getUTCDate()).padStart(2, '0');
+  const month = String(dateParsed.getUTCMonth() + 1).padStart(2, '0');
+  const year = dateParsed.getUTCFullYear();
 
   const now = new Date();
   const isToday = 
-    dateParsed.getDate() === now.getDate() &&
-    dateParsed.getMonth() === now.getMonth() &&
-    dateParsed.getFullYear() === now.getFullYear();
+    dateParsed.getUTCDate() === now.getUTCDate() &&
+    dateParsed.getUTCMonth() === now.getUTCMonth() &&
+    dateParsed.getUTCFullYear() === now.getUTCFullYear();
 
-  const yesterday = new Date();
-  yesterday.setDate(now.getDate() - 1);
+  const yesterday = new Date(now);
+  yesterday.setUTCDate(now.getUTCDate() - 1);
   const isYesterday = 
-    dateParsed.getDate() === yesterday.getDate() &&
-    dateParsed.getMonth() === yesterday.getMonth() &&
-    dateParsed.getFullYear() === yesterday.getFullYear();
+    dateParsed.getUTCDate() === yesterday.getUTCDate() &&
+    dateParsed.getUTCMonth() === yesterday.getUTCMonth() &&
+    dateParsed.getUTCFullYear() === yesterday.getUTCFullYear();
 
   if (isToday) {
     return `${hours}:${minutes} - Hôm nay`;
@@ -121,4 +121,27 @@ export const formatDisplayQuantity = (quantity: any, unit: string | undefined) =
 
   const formattedNum = !isNaN(num) ? parseFloat(num.toFixed(3)) : quantity;
   return `${formattedNum} ${unit}`.trim();
+};
+
+
+export const calculateQuizStats = (submissionList: MyResultResponse[]) => {
+  if (!submissionList || submissionList.length === 0) {
+    return {
+      averageScore: 0,
+      passedRate: 0,
+    };
+  }
+
+  const totalSubmissions = submissionList.length;
+
+  const totalScores = submissionList.reduce((acc, curr) => acc + curr.score, 0);
+  const averageScoreRaw = totalScores / totalSubmissions;
+  const averageScoreTen = averageScoreRaw / 10;
+  const passedSubmissionsCount = submissionList.filter(s => s.passed === true).length;
+  const passedRate = (passedSubmissionsCount / totalSubmissions) * 100;
+
+  return {
+    averageScore: Number(averageScoreTen.toFixed(1)),
+    passedRate: Number(passedRate.toFixed(1)),
+  };
 };

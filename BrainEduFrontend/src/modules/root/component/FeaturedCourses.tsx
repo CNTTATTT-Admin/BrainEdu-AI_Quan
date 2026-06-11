@@ -50,7 +50,7 @@ const FeaturedCourses = () => {
                   level={course.courseType === "FREE" ? "Cơ bản" : "Trung cấp"}
                   lessons={course.totalLessons || 0}
                   hours={course.estimatedDuration}
-                  rating={course.averageRating || 5.0}
+                  rating={course.averageRating}
                   reviewsCount={course.totalReviews?.toString() || "0"}
                   price={course.courseType === "FREE" ? 0 : course.price}
                   originalPrice={course.originalPrice}

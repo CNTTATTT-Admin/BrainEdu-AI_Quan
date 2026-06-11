@@ -1,6 +1,5 @@
 import React from 'react';
 import { ArrowRight, Search } from 'lucide-react';
-
 const Hero = () => {
   return (
     <section className="w-full bg-gradient-to-b from-[#f3f7ff] to-white pt-12 pb-20 px-8 md:px-16 max-w-7xl mx-auto">
@@ -37,20 +36,6 @@ const Hero = () => {
             />
           </div>
         </div>
-      </div>
-
-      <div className="max-w-3xl mx-auto mt-16 bg-white p-2 rounded-2xl shadow-xl border border-gray-100 flex items-center gap-2">
-        <div className="flex-1 flex items-center gap-3 pl-4">
-          <Search size={20} className="text-gray-400" />
-          <input 
-            type="text" 
-            placeholder="Bạn muốn học gì hôm nay?" 
-            className="w-full text-sm text-gray-800 focus:outline-none placeholder-gray-400"
-          />
-        </div>
-        <button className="bg-[#0052cc] text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-[#0043a8] transition-colors">
-          Tìm Kiếm
-        </button>
       </div>
     </section>
   );

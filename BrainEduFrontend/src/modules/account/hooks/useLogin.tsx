@@ -5,6 +5,8 @@ import { onLogInApi } from "../services/api"
 import { jwtDecode } from "jwt-decode"
 import type { JwtPayload } from "../../../libs/shared/types/jwt-payload"
 import { setRefreshToken, setToken } from "../../../utils/token"
+import toast from "react-hot-toast"
+import { ERROR_MESSAGES } from "../../../types/error-types"
 
 const useLogin = () => {
     const navigate = useNavigate()
@@ -14,8 +16,6 @@ const useLogin = () => {
         mutationKey: ["login"],
         mutationFn: onLogInApi,
         onSuccess: (data) => {
-            console.log(data);
-            
             if (data && data.data) {
                 const { accessToken } = data.data;
                 const { refreshToken } = data.data;
@@ -24,8 +24,12 @@ const useLogin = () => {
                 setRefreshToken(refreshToken);
                 setUserData(userData);
                 navigate("/");
+                toast.success("Đăng nhập thành công")
             }
-
+        },
+        onError: (err: any) => {
+            const errorCode = err.message || "DEFAULT";
+            toast.error(ERROR_MESSAGES[errorCode]);
         }
     })
     return {data, error, isPending, isError, mutate}

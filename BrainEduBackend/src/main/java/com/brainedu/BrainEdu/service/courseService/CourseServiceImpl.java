@@ -116,9 +116,21 @@ public class CourseServiceImpl
         User user = currentUserService.getCurrentUser();
         Long userId = user.getId();
 
-        Sort sort = request.getSortDirection().equalsIgnoreCase("asc")
-                ? Sort.by(request.getSortBy()).ascending()
-                : Sort.by(request.getSortBy()).descending();
+        Sort sort;
+
+                if (request.getSortBy() == null || request.getSortBy().isBlank()) {
+
+                sort = Sort.by(
+                        Sort.Order.desc("totalEnrolled"),
+                        Sort.Order.desc("averageRating")
+                );
+
+                } else {
+
+                sort = request.getSortDirection().equalsIgnoreCase("asc")
+                        ? Sort.by(request.getSortBy()).ascending()
+                        : Sort.by(request.getSortBy()).descending();
+                }
 
         Pageable pageable = PageRequest.of(
                 request.getPage(),
@@ -134,16 +146,16 @@ public class CourseServiceImpl
         return courses.map(course -> {
 
                 boolean isEnrolled =
-                        enrollmentRepository.existsByUserIdAndCourseId(userId, course.getId());
+                        enrollmentRepository.existsByUserIdAndCourseId(
+                                userId,
+                                course.getId()
+                        );
 
-                Long totalEnrolled =
-                        enrollmentRepository.countByCourseId(course.getId());
-
-                int totalLessons = 
-                        lessonRepository.countByCourseId(course.getId());
-
-                return courseMapper.toResponse(course, isEnrolled, totalEnrolled, totalLessons);
-        });
+                return courseMapper.toResponse(
+                        course,
+                        isEnrolled
+                );
+                });
         }
 
         @Override
@@ -155,7 +167,7 @@ public class CourseServiceImpl
 
         Long userId = user.getId();
 
-        return courseRepository.findByCategoryId(categoryId, pageable)
+        return courseRepository.findByCategoryId(categoryId, CourseStatus.PUBLISHED, pageable)
                 .map(course -> {
 
                         boolean isEnrolled =
@@ -167,21 +179,38 @@ public class CourseServiceImpl
                         return courseMapper.toResponse(course, isEnrolled);
                 });
         }
-    @Override
-        public CourseResponse getById(Long id) {
+        @Override
+                public CourseResponse getById(Long id) {
 
-        Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new ApiException("Course not found"));
+                Course course = courseRepository.findById(id)
+                        .orElseThrow(() -> new ApiException("Course not found"));
 
-        User user = currentUserService.getCurrentUser();
+                User user = currentUserService.getCurrentUser();
 
-        boolean isEnrolled =
-                enrollmentRepository.existsByUserIdAndCourseId(
-                        user.getId(),
-                        id
+                boolean isEnrolled =
+                        enrollmentRepository.existsByUserIdAndCourseId(
+                                user.getId(),
+                                id
+                        );
+
+                if (course.getStatus() == CourseStatus.DRAFT) {
+                        throw new ApiException(
+                                "Course is not published yet"
+                        );
+                }
+
+                if (course.getStatus() == CourseStatus.ARCHIVED
+                        && !isEnrolled) {
+
+                        throw new ApiException(
+                                "Course is no longer available"
+                        );
+                }
+
+                return courseMapper.toResponse(
+                        course,
+                        isEnrolled
                 );
-
-        return courseMapper.toResponse(course, isEnrolled);
         }
         @Override
         public List<MyCourseResponse> getMyCourses() {
@@ -195,15 +224,21 @@ public class CourseServiceImpl
                 );
 
         return enrollments.stream()
+
+                .filter(enrollment ->
+                        enrollment.getCourse().getStatus()
+                                != CourseStatus.DRAFT
+                )
+
                 .map(enrollment -> {
 
                         Course course =
                                 enrollment.getCourse();
 
                         int totalLessons =
-                                lessonRepository.countByCourseId(
-                                        course.getId()
-                                );
+                                course.getTotalLessons() == null
+                                        ? 0
+                                        : course.getTotalLessons().intValue();
 
                         long completedLessons =
                                 lessonProgressRepository
@@ -230,49 +265,24 @@ public class CourseServiceImpl
                                         .orElse(null);
 
                         return MyCourseResponse.builder()
-
-                                .enrollmentId(
-                                        enrollment.getId()
-                                )
-
-                                .courseId(
-                                        course.getId()
-                                )
-
-                                .courseTitle(
-                                        course.getTitle()
-                                )
-
-                                .thumbnail(
-                                        course.getThumbnail()
-                                )
-
-                                .progressPercent(
-                                        progress
-                                )
-
-                                .completedLessons(
-                                        completedLessons
-                                )
-
-                                .totalLessons(
-                                        totalLessons
-                                )
-
+                                .enrollmentId(enrollment.getId())
+                                .courseId(course.getId())
+                                .courseTitle(course.getTitle())
+                                .thumbnail(course.getThumbnail())
+                                .progressPercent(progress)
+                                .completedLessons(completedLessons)
+                                .totalLessons(totalLessons)
                                 .nextLessonId(
                                         nextLesson != null
                                                 ? nextLesson.getId()
                                                 : null
                                 )
-
                                 .nextLessonTitle(
                                         nextLesson != null
                                                 ? nextLesson.getTitle()
                                                 : null
                                 )
-
                                 .status(enrollment.getStatus().name())
-
                                 .build();
                 })
                 .toList();
@@ -315,10 +325,9 @@ public class CourseServiceImpl
         return courseMapper.toResponse(course, isEnrolled);
         }
 
-    @Override
-    public String delete(
-            Long id
-    ) {
+        @Override
+        @Transactional
+        public String delete(Long id) {
 
         Course course =
                 courseRepository
@@ -329,17 +338,29 @@ public class CourseServiceImpl
                                 )
                         );
 
-        courseRepository.delete(course);
+        course.setStatus(CourseStatus.ARCHIVED);
 
-        return "Course deleted successfully";
-    }
+        return "Course archived successfully";
+        }
 
     @Override
-    @Transactional
-    public CourseReviewResponse upsertReview(Long courseId, Long userId, CourseReviewRequest request) {
-        boolean isEnrolled = enrollmentRepository.existsByUserIdAndCourseId(userId, courseId);
+        @Transactional
+        public CourseReviewResponse upsertReview(
+                Long courseId,
+                Long userId,
+                CourseReviewRequest request
+        ) {
+
+        boolean isEnrolled =
+                enrollmentRepository.existsByUserIdAndCourseId(
+                        userId,
+                        courseId
+                );
+
         if (!isEnrolled) {
-            throw new ApiException("You must be enrolled in this course to leave a review");
+                throw new ApiException(
+                        "You must be enrolled in this course to leave a review"
+                );
         }
 
         CourseReview review = courseReviewRepository
@@ -347,35 +368,54 @@ public class CourseServiceImpl
                 .orElse(null);
 
         if (review == null) {
-            Course course = courseRepository.findById(courseId)
-                    .orElseThrow(() -> new ApiException("Course not found"));
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new ApiException("User not found"));
 
-            review = CourseReview.builder()
-                    .course(course)
-                    .user(user)
-                    .rating(request.getRating())
-                    .comment(request.getComment())
-                    .build();
-            
-            courseReviewRepository.save(review);
+                Course course = courseRepository.findById(courseId)
+                        .orElseThrow(() -> new ApiException("Course not found"));
+
+                User user = userRepository.findById(userId)
+                        .orElseThrow(() -> new ApiException("User not found"));
+
+                review = CourseReview.builder()
+                        .course(course)
+                        .user(user)
+                        .rating(request.getRating())
+                        .comment(request.getComment())
+                        .build();
+
+                courseReviewRepository.save(review);
+
+                updateCourseRatingForNewReview(
+                        course,
+                        request.getRating()
+                );
+
         } else {
-            CourseReviewHistory historyLog = CourseReviewHistory.builder()
-                    .courseReview(review)
-                    .oldRating(review.getRating())
-                    .oldComment(review.getComment())
-                    .build();
-            courseReviewHistoryRepository.save(historyLog);
 
-            review.setRating(request.getRating());
-            review.setComment(request.getComment());
-            
-            courseReviewRepository.save(review);
+                Integer oldRating = review.getRating();
+
+                CourseReviewHistory historyLog =
+                        CourseReviewHistory.builder()
+                                .courseReview(review)
+                                .oldRating(oldRating)
+                                .oldComment(review.getComment())
+                                .build();
+
+                courseReviewHistoryRepository.save(historyLog);
+
+                review.setRating(request.getRating());
+                review.setComment(request.getComment());
+
+                courseReviewRepository.save(review);
+
+                updateCourseRatingForEditedReview(
+                        review.getCourse(),
+                        oldRating,
+                        request.getRating()
+                );
         }
 
         return courseReviewMapper.toResponse(review);
-    }
+        }
 
     @Override
     public Page<CourseReviewResponse> getReviewsByCourse(Long courseId, int page, int size) {
@@ -400,4 +440,58 @@ public class CourseServiceImpl
                 .totalReviews(row[7] != null ? ((Number) row[7]).longValue() : 0L)
                 .build());
     }
+
+
+    private void updateCourseRatingForNewReview(
+        Course course,
+        int rating
+        ) {
+
+        long totalRatings =
+                course.getTotalRatings() == null
+                        ? 0
+                        : course.getTotalRatings();
+
+        double averageRating =
+                course.getAverageRating() == null
+                        ? 0.0
+                        : course.getAverageRating();
+
+        double newAverage =
+                (averageRating * totalRatings + rating)
+                        / (totalRatings + 1);
+
+        course.setAverageRating(newAverage);
+        course.setTotalRatings(totalRatings + 1);
+
+        courseRepository.save(course);
+        }
+
+        private void updateCourseRatingForEditedReview(
+                Course course,
+                int oldRating,
+                int newRating
+        ) {
+
+        long totalRatings =
+                course.getTotalRatings() == null
+                        ? 0
+                        : course.getTotalRatings();
+
+        if (totalRatings == 0) {
+                return;
+        }
+
+        double sum =
+                course.getAverageRating()
+                        * totalRatings;
+
+        sum = sum - oldRating + newRating;
+
+        course.setAverageRating(
+                sum / totalRatings
+        );
+
+        courseRepository.save(course);
+        }
 }

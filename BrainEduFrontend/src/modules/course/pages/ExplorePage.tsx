@@ -31,8 +31,10 @@ const ExplorePage: React.FC = () => {
     size: 9,
     filters: filters
   });
-
+  
+  
   const courseList = data?.data || [];
+  console.log(courseList);
   const pagination = data?.meta;
 
   useEffect(() => {

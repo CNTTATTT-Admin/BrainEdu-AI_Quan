@@ -42,11 +42,8 @@ def get_all_courses():
         LEFT JOIN categories cat
             ON cat.id = c.category_id
 
-        LEFT JOIN course_skills cs
-            ON cs.course_id = c.id
-
         LEFT JOIN skills s
-            ON s.id = cs.skill_id
+            ON s.category_id = c.category_id
 
         LEFT JOIN lessons l
             ON l.course_id = c.id
@@ -54,10 +51,52 @@ def get_all_courses():
         LEFT JOIN quizzes q
             ON q.course_id = c.id
 
-        WHERE c.deleted = 0
+        WHERE c.deleted = 0 AND c.status = 'PUBLISHED'
 
         GROUP BY c.id
 
     """
 
     return pd.read_sql(query, con=engine)
+
+def get_course_map():
+
+    query = """
+
+        SELECT
+
+            c.id,
+
+            cat.category_name AS category,
+
+            s.skill_name AS skill
+
+        FROM courses c
+
+        LEFT JOIN categories cat
+            ON cat.id = c.category_id
+
+        LEFT JOIN skills s
+            ON s.category_id = c.category_id
+
+        WHERE c.deleted = 0
+
+    """
+
+    df = pd.read_sql(
+        query,
+        con=engine
+    )
+
+    result = {}
+
+    for _, row in df.iterrows():
+
+        result[row["id"]] = {
+
+            "category": row["category"],
+
+            "skill": row["skill"]
+        }
+
+    return result

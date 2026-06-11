@@ -1,20 +1,9 @@
-import json
-
-from app.repositories.quiz_repository import (
-    get_quiz_submission,
-    get_quiz_submission_answers
+from app.recommend.quiz_feature_service import (
+    QuizFeatureService
 )
 
-from app.recommend.feature_extractor import (
-    FeatureExtractor
-)
-
-from app.ai.prompt_builder import (
-    build_quiz_prompt
-)
-
-from app.ai.grok_client import (
-    GroqClient
+from app.recommend.quiz_ai_service import (
+    QuizAIService
 )
 
 
@@ -22,50 +11,20 @@ class QuizAnalysisService:
 
     @staticmethod
     def analyze(
-
-            user_id,
-
-            quiz_submission_id
+        user_id,
+        quiz_submission_id
     ):
 
-
-        submission = (
-            get_quiz_submission(
-                quiz_submission_id
-            )
-        )
-
-        if not submission:
-
-            raise Exception(
-                f"Quiz submission {quiz_submission_id} not found"
-            )
-
-
-        answers_df = (
-            get_quiz_submission_answers(
+        features = (
+            QuizFeatureService
+            .build(
                 quiz_submission_id
             )
         )
 
         print(
-            "ANSWER COLUMNS:",
-            answers_df.columns.tolist()
+            "\n========== QUIZ FEATURES ==========\n"
         )
-
-
-        features = (
-            FeatureExtractor
-            .extract_quiz_features(
-
-                submission,
-
-                answers_df
-            )
-        )
-
-
-        print("\n========== QUIZ FEATURES ==========\n")
 
         print(
             "Accuracy:",
@@ -101,71 +60,11 @@ class QuizAnalysisService:
             )
         )
 
-        print(
-            "\nSample Wrong Question:\n",
-            (
-                features.get(
-                    "wrong_questions",
-                    []
-                )[:1]
-            )
-        )
-
-        print(
-            "\nSample Correct Question:\n",
-            (
-                features.get(
-                    "correct_questions",
-                    []
-                )[:1]
-            )
-        )
-
-
-        prompt = (
-            build_quiz_prompt(
+        insight = (
+            QuizAIService
+            .analyze(
                 features
             )
         )
-
-
-        content = (
-            GroqClient.generate(
-                prompt
-            )
-        )
-
-
-        content = (
-            content
-            .replace(
-                "```json",
-                ""
-            )
-            .replace(
-                "```",
-                ""
-            )
-            .strip()
-        )
-
-
-        try:
-
-            insight = json.loads(
-                content
-            )
-
-        except Exception as ex:
-
-            print(
-                "\n========== RAW AI RESPONSE ==========\n"
-            )
-
-            print(content)
-
-            raise Exception(
-                f"Invalid JSON returned by AI: {str(ex)}"
-            )
 
         return insight

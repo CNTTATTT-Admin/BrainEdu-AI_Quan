@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { CheckCircle2, XCircle, AlertCircle, Clock, Award, Star, BookOpen, Lightbulb, MessageSquare, ShieldAlert, ShieldCheck, Loader2 } from 'lucide-react';
 import useGetReviewQuiz from '../hooks/useGetReviewQuiz';
@@ -8,7 +8,12 @@ const QuizResultPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { submissionId } = location?.state || {};
-
+  useEffect(() => {
+    console.log('[QUIZ_RESULT] Page mounted', {
+      locationState: location.state,
+      hasResult: !!location.state?.result
+    });
+  }, []);
   const { data, isPending: isQuizPending } = useGetReviewQuiz(submissionId);
   const { data: aiInsightData, isPending: isAiPending } = useGetAIInsight(submissionId);
   

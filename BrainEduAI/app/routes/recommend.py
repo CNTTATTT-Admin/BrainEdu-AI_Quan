@@ -1,5 +1,8 @@
-# app/routes/recommend.py
+import json
 
+from app.recommend.quiz_feature_service import (
+    QuizFeatureService
+)
 from fastapi import (
     APIRouter,
     Depends
@@ -17,6 +20,9 @@ from app.services.recommendation_service import (
 
 from app.services.quiz_analysis_service import (
     QuizAnalysisService
+)
+from app.utils.json_utils import (
+    sanitize_json
 )
 router = APIRouter()
 
@@ -43,7 +49,12 @@ def recommend_roadmap(
         )
     )
 
-    return result
+    json.dumps(
+        sanitize_json(result),
+        allow_nan=False
+    )
+
+    return sanitize_json(result)
 
 
 
@@ -56,6 +67,22 @@ def analyze_quiz(request: dict):
 
             request["user_id"],
 
+            request[
+                "quiz_submission_id"
+            ]
+        )
+    )
+
+@router.post(
+    "/quiz/features"
+)
+def quiz_features(
+    request: dict
+):
+
+    return (
+        QuizFeatureService
+        .build(
             request[
                 "quiz_submission_id"
             ]

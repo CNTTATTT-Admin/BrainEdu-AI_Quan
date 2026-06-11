@@ -1,5 +1,6 @@
 package com.brainedu.BrainEdu.repository;
 
+import com.brainedu.BrainEdu.common.enums.CourseStatus;
 import com.brainedu.BrainEdu.entity.Course;
 import com.brainedu.BrainEdu.entity.User;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,7 @@ public interface CourseRepository
 
     Page<Course> findByCategoryId(
             Long categoryId,
+            CourseStatus status,
             Pageable pageable
     );
 

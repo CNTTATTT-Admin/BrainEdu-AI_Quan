@@ -45,32 +45,42 @@ public class EnrollmentServiceImpl
     private final PaymentRepository 
                 paymentRepository;
 
-    @Override
-        public EnrollmentResponse enroll(EnrollmentRequest request) {
+        @Override
+                public EnrollmentResponse enroll(EnrollmentRequest request) {
 
-        User user = currentUserService.getCurrentUser();
+                User user = currentUserService.getCurrentUser();
 
-        Course course = courseRepository.findById(request.getCourseId())
-                .orElseThrow(() -> new ApiException("Course not found"));
+                Course course = courseRepository.findById(request.getCourseId())
+                        .orElseThrow(() -> new ApiException("Course not found"));
 
-        boolean alreadyEnrolled = enrollmentRepository
-                .findByUserIdAndCourseId(user.getId(), course.getId())
-                .isPresent();
+                boolean alreadyEnrolled = enrollmentRepository
+                        .findByUserIdAndCourseId(user.getId(), course.getId())
+                        .isPresent();
 
-        if (alreadyEnrolled) {
-                throw new ApiException("Already enrolled");
-        }
+                if (alreadyEnrolled) {
+                        throw new ApiException("Already enrolled");
+                }
 
-        Enrollment enrollment = Enrollment.builder()
-                .user(user)
-                .course(course)
-                .completionPercent(0F)
-                .status(course.isFree() ? EnrollmentStatus.ACTIVE : EnrollmentStatus.PENDING_PAYMENT)
-                .enrolledAt(LocalDateTime.now())
-                .build();
+                EnrollmentStatus status = course.isFree()
+                        ? EnrollmentStatus.ACTIVE
+                        : EnrollmentStatus.PENDING_PAYMENT;
 
-        enrollmentRepository.save(enrollment);
-        return enrollmentMapper.toResponse(enrollment);
+                Enrollment enrollment = Enrollment.builder()
+                        .user(user)
+                        .course(course)
+                        .completionPercent(0F)
+                        .status(status)
+                        .enrolledAt(LocalDateTime.now())
+                        .build();
+
+                enrollmentRepository.save(enrollment);
+
+                if (status == EnrollmentStatus.ACTIVE) {
+                        course.setTotalEnrolled(course.getTotalEnrolled() + 1);
+                        courseRepository.save(course);
+                }
+
+                return enrollmentMapper.toResponse(enrollment);
         }
     @Override
     public List<EnrollmentResponse> myCourses() {

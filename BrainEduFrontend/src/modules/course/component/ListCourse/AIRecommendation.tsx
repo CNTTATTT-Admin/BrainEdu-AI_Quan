@@ -10,6 +10,7 @@ const AiRecommendation: React.FC = () => {
   const { data: recommendCourse, isPending: isRecommendPending } = useGetPersonalRoadmap(meData?.data.id);
   
   const recommendList = recommendCourse?.recommended_roadmap[0]?.courses || [];
+  
   const isLoading = isMePending || isRecommendPending;
 
   return (
@@ -63,7 +64,7 @@ const AiRecommendation: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex items-center justify-between pt-4 border-t border-gray-50 mt-3">
-                  <span className="text-xs font-black text-blue-600">{formatVND(course.price)}</span>
+                  <span className="text-xs font-black text-blue-600">{course.price == 0 ? "MIỄN PHÍ" : formatVND(course.price)}</span>
                   <NavLink to="/course" state={{ courseId: course.id }}>
                     <span className="text-[11px] font-bold text-gray-400 group-hover:text-purple-600 flex items-center gap-1 transition cursor-pointer">
                       Xem ngay <ArrowRight size={12} />

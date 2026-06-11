@@ -62,7 +62,7 @@ public class PaymentController {
     @GetMapping("/mock")
     public ResponseEntity<String> mockPaymentPage(
             @RequestParam String txnRef,
-            @RequestParam Long amount,
+            @RequestParam Float amount,
             @RequestParam String returnUrl) {
 
         String html = """
@@ -85,7 +85,7 @@ public class PaymentController {
                 <body>
                   <div class="card">
                     <h2>🏦 Mock Payment Gateway</h2>
-                    <div class="amount">%,d VND</div>
+                    <div class="amount">%.0f VND</div>
                     <div class="txn">Mã GD: %s</div>
                     <a href="%s?vnp_ResponseCode=00&vnp_TxnRef=%s">
                       <button class="btn-success">✅ Thanh toán thành công</button>
@@ -109,14 +109,12 @@ public class PaymentController {
                 @RequestParam String vnp_ResponseCode,
                 @RequestParam String vnp_TxnRef) {
 
-        // Tìm payment
         Payment payment = paymentRepository.findByTxnRef(vnp_TxnRef)
                 .orElseThrow(() -> new ApiException("Payment not found"));
 
-        // Idempotency: đã xử lý rồi thì bỏ qua
         if (payment.getStatus() == PaymentStatus.SUCCESS) {
                 return ResponseEntity.ok().contentType(MediaType.TEXT_HTML)
-                        .body(resultPage("✅ Khóa học đã được kích hoạt.", "#43a047"));
+                        .body(resultPage("✅ Khóa học đã được kích hoạt từ trước.", "#43a047"));
         }
 
         if ("00".equals(vnp_ResponseCode)) {
@@ -125,7 +123,6 @@ public class PaymentController {
                 payment.setVnpResponseCode(vnp_ResponseCode);
                 paymentRepository.save(payment);
 
-                // Tìm và active enrollment — nếu không thấy thì tạo mới
                 Enrollment enrollment = enrollmentRepository
                         .findByUserIdAndCourseId(payment.getUserId(), payment.getCourseId())
                         .orElseGet(() -> {
@@ -146,26 +143,41 @@ public class PaymentController {
 
                 return ResponseEntity.ok().contentType(MediaType.TEXT_HTML)
                         .body(resultPage("✅ Thanh toán thành công! Khóa học đã được kích hoạt.", "#43a047"));
-        } else {
+        } 
+        
+        else {
                 payment.setStatus(PaymentStatus.FAILED);
+                payment.setVnpResponseCode(vnp_ResponseCode); 
                 paymentRepository.save(payment);
+                
+                
                 return ResponseEntity.ok().contentType(MediaType.TEXT_HTML)
-                        .body(resultPage("❌ Thanh toán thất bại hoặc đã bị hủy.", "#e53935"));
+                        .body(resultPage("❌ Thanh toán thất bại. Vui lòng thử lại.", "#e53935"));
         }
         }
     private String resultPage(String message, String color) {
         return """
-                <html><head><meta charset="UTF-8">
-                <style>
-                  body { font-family: Arial; text-align: center; padding: 60px; background: #f5f5f5; }
-                  .card { background: white; border-radius: 12px; padding: 40px; max-width: 400px;
-                          margin: auto; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
-                  h2 { color: %s; }
-                </style></head>
-                <body><div class="card"><h2>%s</h2></div></body>
+                <html>
+                <head>
+                        <meta charset="UTF-8">
+                        <meta http-equiv="refresh" content="3;url=http://localhost:5173/">
+                        <style>
+                        body { font-family: Arial; text-align: center; padding: 60px; background: #f5f5f5; }
+                        .card { background: white; border-radius: 12px; padding: 40px; max-width: 400px;
+                                margin: auto; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+                        h2 { color: %s; }
+                        p { color: #666; font-size: 14px; }
+                        </style>
+                </head>
+                <body>
+                        <div class="card">
+                        <h2>%s</h2>
+                        <p>Đang chuyển hướng về trang chủ sau 3 giây...</p>
+                        </div>
+                </body>
                 </html>
                 """.formatted(color, message);
-    }
+        }
 
 
     @GetMapping("/vnpay/ipn")

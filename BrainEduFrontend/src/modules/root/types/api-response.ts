@@ -18,7 +18,9 @@ export type CoursesResponse = {
     enrolled: boolean,
     totalLessons: number,
     rating: number,
-    reviewsCount: number
+    reviewsCount: number,
+    totalEnrolled: number,
+    averageRating: number
 }
 
 export type TopStudent = {

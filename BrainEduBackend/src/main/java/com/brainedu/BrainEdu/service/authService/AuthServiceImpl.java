@@ -108,7 +108,7 @@ public class AuthServiceImpl
 
         boolean isOtpValid = otpUtil.verifyOtp(request.getEmail(), request.getOtpCode());
         if (!isOtpValid) {
-            throw new ApiException("Mã OTP không chính xác hoặc đã hết hạn");
+            throw new ApiException("OTP is invalid or expired");
         }
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));

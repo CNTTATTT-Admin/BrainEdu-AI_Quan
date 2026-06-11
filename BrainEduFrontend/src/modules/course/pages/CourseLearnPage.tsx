@@ -24,6 +24,9 @@ const CourseLearnPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { courseId } = location.state || {};
+  useEffect(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [courseId]);
 
   const { trackEvent } = useAnalytics();
 

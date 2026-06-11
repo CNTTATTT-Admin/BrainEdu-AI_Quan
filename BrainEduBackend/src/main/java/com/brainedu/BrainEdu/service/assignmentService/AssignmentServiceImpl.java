@@ -3,9 +3,7 @@ package com.brainedu.BrainEdu.service.assignmentService;
 import com.brainedu.BrainEdu.common.enums.AssignmentStatus;
 import com.brainedu.BrainEdu.common.enums.SubmissionStatus;
 import com.brainedu.BrainEdu.dto.request.AssignmentRequest.AssignmentRequest;
-import com.brainedu.BrainEdu.dto.request.AuthRequest.*;
 import com.brainedu.BrainEdu.dto.response.AssignmentResponse.AssignmentResponse;
-import com.brainedu.BrainEdu.dto.response.AuthResponse.*;
 import com.brainedu.BrainEdu.dto.response.UserResponse.UserResponse;
 import com.brainedu.BrainEdu.entity.*;
 import com.brainedu.BrainEdu.mapper.AssignmentMapper;
@@ -15,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -41,8 +38,6 @@ public class AssignmentServiceImpl
     private final UserRepository userRepository;
 
     private final EnrollmentRepository enrollmentRepository;
-
-    private final StudentGroupMemberRepository memberRepository;
 
     private final CurrentUserService currentUserService;
 
@@ -146,33 +141,6 @@ public class AssignmentServiceImpl
                         });
             }
 
-            case GROUP -> {
-
-                List<StudentGroupMember>
-                        members =
-                        memberRepository
-                                .findByGroupId(
-                                        request.getGroupId()
-                                );
-
-                members.forEach(member -> {
-
-                    AssignmentRecipient recipient =
-                            new AssignmentRecipient();
-
-                    recipient.setAssignment(
-                            assignment
-                    );
-
-                    recipient.setStudent(
-                            member.getStudent()
-                    );
-
-                    recipientRepository.save(
-                            recipient
-                    );
-                });
-            }
         }
     }
 

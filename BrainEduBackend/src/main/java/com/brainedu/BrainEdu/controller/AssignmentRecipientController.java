@@ -31,9 +31,7 @@ public class AssignmentRecipientController {
             "/assignment/{assignmentId}"
     )
     public ApiResponse<
-                List<
-                                    AssignmentRecipientResponse
-                                    >
+                List<AssignmentRecipientResponse>
                 >
     getStudents(
             @PathVariable Long assignmentId

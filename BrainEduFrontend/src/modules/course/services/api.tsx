@@ -2,7 +2,7 @@ import type { BackendResponse } from "../../../libs/shared/types/backend-respons
 import api from "../../../services/axios";
 import type { CoursesResponse } from "../../root/types/api-response";
 import type { CourseRatingRequest, LessonProgressRequest } from "../types/api-request";
-import type { CategoryResponse, CourseCategoryResponse, CourseRatingResponse, LessonResponse, MyCourseResponse, ProgressItem } from "../types/api-response";
+import type { CategoryResponse, CourseCategoryResponse, CourseRatingResponse, LessonResponse, MyCourseResponse, PaymentResponse, ProgressItem } from "../types/api-response";
 export const onGetLessonsApi = async(
     courseId: Number
 ) : Promise<BackendResponse<LessonResponse[]>> => {

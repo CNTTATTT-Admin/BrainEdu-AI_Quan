@@ -152,7 +152,6 @@ export default function CreateAssignmentModal({
               >
                 <option value="STUDENT">Giao theo danh sách cá nhân</option>
                 <option value="COURSE">Giao toàn bộ khóa học</option>
-                <option value="GROUP">Giao theo đội nhóm</option>
               </select>
             </div>
           </div>

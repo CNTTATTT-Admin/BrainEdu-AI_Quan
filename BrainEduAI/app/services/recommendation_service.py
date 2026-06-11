@@ -1,11 +1,28 @@
 from collections import defaultdict
+import json
+from app.recommend.course_cache import (
+    CourseCache
+)
 
+from app.recommend.knowledge_cache import (
+    KnowledgeCache
+)
+
+from app.recommend.recommendation_cache import (
+    RecommendationCache
+)
 from app.repositories.course_repository import (
     get_all_courses
 )
 
 from app.repositories.behavior_repository import (
     get_user_behaviors
+)
+
+from app.repositories.quiz_repository import (
+    get_user_quiz_submissions,
+    get_quiz_submission,
+    get_quiz_submission_answers
 )
 
 from app.recommend.feature_extractor import (
@@ -16,16 +33,16 @@ from app.recommend.profile_builder import (
     UserProfileBuilder
 )
 
+from app.recommend.quiz_knowledge_analyzer import (
+    QuizKnowledgeAnalyzer
+)
+
 from app.recommend.embedding_service import (
     EmbeddingService
 )
 
 from app.recommend.ranking_engine import (
     RankingEngine
-)
-
-from app.recommend.roadmap_generator import (
-    RoadmapGenerator
 )
 
 from app.utils.text_utils import (
@@ -37,92 +54,218 @@ class RecommendationService:
 
     @staticmethod
     def recommend(user_id):
-
-        events_df = get_user_behaviors(user_id)
-        print("EVENTS SIZE:", len(events_df))
-        print(events_df.head(5))
-        print(events_df["metadata"].head(10))
-        features = FeatureExtractor.feature_extractor(events_df)
-        print("FEATURES:", features)
-        profile = UserProfileBuilder.build(features)
-
-        profile_text = UserProfileBuilder.build_embedding_text(profile)
-
-        user_embedding = EmbeddingService.create_embedding(profile_text)
-
-        courses_df = get_all_courses()
-
-        prepared_courses = []
-
-        for _, row in courses_df.iterrows():
-
-            course = row.to_dict()
-
-            course_text = build_course_text(course)
-
-            course_embedding = EmbeddingService.create_embedding(course_text)
-
-            prepared_courses.append({
-                **course,
-                "embedding": course_embedding,
-                "skills": str(course.get("skills", ""))
-            })
-
-        ranked_courses = RankingEngine.rank_courses(
-            user_embedding,
-            prepared_courses,
-            profile
+        cached = (
+            RecommendationCache.get(
+                user_id
+            )
         )
 
-        category_groups = defaultdict(list)
+        if cached:
 
-        for course in ranked_courses:
+            print(
+                "USING RECOMMEND CACHE"
+            )
 
-            category = course.get("category")
+            return cached
 
-            if not category:
-                category = "General"
 
-            category_groups[category].append(course)
+        events_df = get_user_behaviors(
+            user_id
+        )
+
+        behavior_features = (
+            FeatureExtractor
+            .feature_extractor(
+                events_df
+            )
+        )
+
+        profile = (
+            UserProfileBuilder
+            .build(
+                behavior_features
+            )
+        )
+
+        knowledge_profile = (
+            KnowledgeCache.get(
+                user_id
+            )
+        )
+
+        if knowledge_profile is None:
+
+            try:
+
+                quiz_df = (
+                    get_user_quiz_submissions(
+                        user_id
+                    )
+                )
+
+                knowledge_profile = (
+
+                    QuizKnowledgeAnalyzer
+                    .build_knowledge_profile(
+                        quiz_df,
+                        get_quiz_submission,
+                        get_quiz_submission_answers
+                    )
+                )
+
+                KnowledgeCache.set(
+                    user_id,
+                    knowledge_profile
+                )
+
+            except Exception as ex:
+
+                print(
+                    "QUIZ PROFILE ERROR:",
+                    ex
+                )
+
+                knowledge_profile = {}
+
+        profile[
+            "knowledge_profile"
+        ] = knowledge_profile
+
+        profile[
+            "weak_skills"
+        ] = [
+
+            skill
+
+            for skill, score
+            in knowledge_profile.items()
+
+            if score < 0.5
+        ]
+
+        profile[
+            "strong_skills"
+        ] = [
+
+            skill
+
+            for skill, score
+            in knowledge_profile.items()
+
+            if score >= 0.8
+        ]
+
+
+        profile_text = (
+            UserProfileBuilder
+            .build_embedding_text(
+                profile
+            )
+        )
+
+        user_embedding = (
+
+            EmbeddingService
+            .create_embedding(
+                profile_text
+            )
+        )
+
+
+        prepared_courses = (
+            CourseCache.get_courses()
+        )
+
+
+        ranked_courses = (
+
+            RankingEngine
+            .rank_courses(
+
+                user_embedding,
+
+                prepared_courses,
+
+                profile
+            )
+        )
 
         roadmap = []
 
-        weak_skills = profile.get("weak_skills", [])
+        grouped = defaultdict(list)
 
-        for idx, (category, courses) in enumerate(category_groups.items()):
+        for course in ranked_courses:
+
+            category = (
+                course.get(
+                    "category"
+                )
+                or
+                "General"
+            )
+
+            grouped[
+                category
+            ].append(
+                course
+            )
+
+        weak_skills = set(
+
+            profile.get(
+                "weak_skills",
+                []
+            )
+        )
+
+        for idx, (
+            category,
+            courses
+        ) in enumerate(
+            grouped.items()
+        ):
 
             sorted_courses = sorted(
+
                 courses,
-                key=lambda x: x["match_score"],
+
+                key=lambda x:
+                x[
+                    "match_score"
+                ],
+
                 reverse=True
             )
 
-            boost = 1.2 if any(
-                ws.lower() in category.lower()
-                for ws in weak_skills
-            ) else 1.0
-
             roadmap.append({
-                "step": idx + 1,
 
-                "category": category,
+                "step":
+                    idx + 1,
 
-                "title": f"{category} Learning Path",
+                "category":
+                    category,
 
-                "description": f"Personalized path for {category}",
+                "title":
+                    f"{category} Learning Path",
 
-                "boost_factor": boost,
-
-                "courses": sorted_courses[:3]
+                "courses":
+                    sorted_courses[:3]
             })
-
-        roadmap = sorted(
-            roadmap,
-            key=lambda x: x["boost_factor"],
-            reverse=True
-        )[:3]
-
-        return {
+        response = {
             "user_profile": profile,
-            "recommended_roadmap": roadmap
+            "recommended_roadmap": roadmap[:3]
         }
+
+        try:
+            json.dumps(response)
+            print("JSON OK")
+        except Exception as e:
+            print("JSON ERROR:", e)
+            print(response)
+
+        RecommendationCache.set(
+            user_id,
+            response
+        )
+
+        return response

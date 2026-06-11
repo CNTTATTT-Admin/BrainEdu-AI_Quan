@@ -124,7 +124,7 @@ const CourseReviewSection = ({ courseId }: CourseReviewSectionProps) => {
               <div key={review.id} className="flex gap-3 pt-4 first:pt-0 items-start">
                 <img
                   src={review.userAvatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop"}
-                  alt={review.userName}
+                  alt={review.studentName}
                   className="w-9 h-9 rounded-full object-cover border border-gray-100 shrink-0"
                 />
                 <div className="flex-1 min-w-0 space-y-1">
@@ -144,6 +144,9 @@ const CourseReviewSection = ({ courseId }: CourseReviewSectionProps) => {
                       />
                     ))}
                   </div>
+                   <p className="text-sm text-black-600 font-bold leading-relaxed">
+                    {review.studentName}
+                  </p>
 
                   <p className="text-xs text-gray-600 leading-relaxed pt-1">
                     {review.comment}

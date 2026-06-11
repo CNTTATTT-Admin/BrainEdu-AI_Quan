@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { onSubmitAssignment } from "../services/api";
+import toast from "react-hot-toast";
+import { ERROR_MESSAGES } from "../../../types/error-types";
 
 const useSubmitAssignment = () => {
   const queryClient = useQueryClient();
@@ -7,11 +9,12 @@ const useSubmitAssignment = () => {
     mutationKey: ["submit-assignment"],
     mutationFn: onSubmitAssignment,
     onSuccess: () => {
+      toast.success("Nộp bài tập thành công")
       queryClient.invalidateQueries({ queryKey: ["my-assignment"] });
     },
-    onError: (err: any) => {
-      const backendMessage = err?.response?.data?.message || err?.message || "Đã xảy ra lỗi không xác định";
-      console.error("Backend Error Message:", backendMessage);
+    onError: (err) => {
+        const msg = err?.message || "DEFAULT"
+        toast.error(ERROR_MESSAGES[msg])
     },
     retry: 0,
   });

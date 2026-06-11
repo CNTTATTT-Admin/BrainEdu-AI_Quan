@@ -42,4 +42,6 @@ public class CourseResponse {
     private Long totalEnrolled;
 
     private Long totalLessons;
+
+    private Double averageRating; 
 }

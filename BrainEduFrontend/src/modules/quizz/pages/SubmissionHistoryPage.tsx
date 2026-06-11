@@ -1,13 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FileText, Award, CheckCircle2, Search, Eye, RefreshCw, Turntable } from 'lucide-react';
 import AITutorSidebar from '../component/HistoryQuizz/AITutorSidebar';
 import useGetSubmissionHistory from '../hooks/useGetSubmissionHistory';
-import { formatSubmissionTime } from '../../../utils/helper';
+import { calculateQuizStats, formatSubmissionTime } from '../../../utils/helper';
 import { NavLink } from 'react-router';
 
 const SubmissionHistoryPage: React.FC = () => {
   const { data, isPending } = useGetSubmissionHistory()
   const submissionList = data?.data || []
+  const stat = calculateQuizStats(submissionList)
+  const [statusFilter, setStatusFilter] = useState<string>('all'); 
+  const [sortOrder, setSortOrder] = useState<string>('newest'); 
+
+  const filteredSubmissions = [...submissionList]
+    .filter((item) => {
+      if (statusFilter === 'passed') return item.passed === true;
+      if (statusFilter === 'failed') return item.passed === false;
+      return true;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.submittedAt || '').getTime();
+      const dateB = new Date(b.submittedAt || '').getTime();
+      return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+    });
+  
   return (
     <div className="min-h-screen bg-gray-50/40 font-sans antialiased">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
@@ -17,7 +33,6 @@ const SubmissionHistoryPage: React.FC = () => {
           <p className="text-xs text-gray-500 font-medium">Theo dõi và xem lại các bài kiểm tra đã thực hiện trên nền tảng.</p>
         </div>
 
-        {/* 3 KHỐI THỐNG KÊ (STATS CARDS) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white border border-gray-100 rounded-2xl p-4 flex items-center gap-4 shadow-2xs">
             <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
@@ -25,7 +40,7 @@ const SubmissionHistoryPage: React.FC = () => {
             </div>
             <div className="space-y-0.5">
               <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Tổng số bài kiểm tra</span>
-              <p className="text-lg font-black text-gray-900">24</p>
+              <p className="text-lg font-black text-gray-900">{submissionList.length}</p>
             </div>
           </div>
 
@@ -35,7 +50,7 @@ const SubmissionHistoryPage: React.FC = () => {
             </div>
             <div className="space-y-0.5">
               <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Điểm trung bình</span>
-              <p className="text-lg font-black text-gray-900">8.5<span className="text-xs text-gray-400 font-normal">/10</span></p>
+              <p className="text-lg font-black text-gray-900">{stat.averageScore}<span className="text-xs text-gray-400 font-normal">/10</span></p>
             </div>
           </div>
 
@@ -45,18 +60,15 @@ const SubmissionHistoryPage: React.FC = () => {
             </div>
             <div className="space-y-0.5">
               <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Tỷ lệ hoàn thành</span>
-              <p className="text-lg font-black text-gray-900">92%</p>
+              <p className="text-lg font-black text-gray-900">{stat.passedRate}%</p>
             </div>
           </div>
         </div>
 
-        {/* BỐ CỤC CHÍNH: LIST BÀI LÀM + SIDEBAR */}
         <div className="flex flex-col lg:flex-row gap-6 items-start">
           
-          {/* KHU VỰC DANH SÁCH BÀI KIỂM TRA (TRÁI) */}
           <div className="flex-1 w-full space-y-4">
             
-            {/* THANH TÌM KIẾM VÀ FILTER */}
             <div className="flex flex-wrap items-center gap-3 bg-white p-3 border border-gray-100 rounded-2xl shadow-2xs">
               <div className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 flex-1 min-w-[200px]">
                 <Search size={14} className="text-gray-400 shrink-0" />
@@ -67,21 +79,30 @@ const SubmissionHistoryPage: React.FC = () => {
                 />
               </div>
               <div className="flex gap-2">
-                <select className="text-xs font-bold text-gray-700 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 cursor-pointer outline-hidden">
-                  <option>Tất cả trạng thái</option>
-                  <option>Hoàn thành</option>
-                  <option>Đang xử lý</option>
+                <select 
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="text-xs font-bold text-gray-700 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 cursor-pointer outline-hidden"
+                >
+                  <option value="all">Tất cả trạng thái</option>
+                  <option value="passed">Đạt</option>
+                  <option value="failed">Chưa đạt</option>
                 </select>
-                <select className="text-xs font-bold text-gray-700 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 cursor-pointer outline-hidden">
-                  <option>Mới nhất</option>
-                  <option>Cũ nhất</option>
+                
+                <select 
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value)}
+                  className="text-xs font-bold text-gray-700 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 cursor-pointer outline-hidden"
+                >
+                  <option value="newest">Mới nhất</option>
+                  <option value="oldest">Cũ nhất</option>
                 </select>
               </div>
             </div>
 
             <div className="space-y-3.5">
-              {submissionList.map((item) => {
-                const isComp = item.passed ? "COMPLETED" : "";
+              {filteredSubmissions.map((item) => {
+                const isComp = item.passed ? "ĐẠT" : "CHƯA ĐẠT";
 
                 return (
                   <div key={item.id} className="bg-white border border-gray-100 rounded-2xl p-4 shadow-2xs hover:border-gray-200/80 transition space-y-4">
@@ -115,7 +136,7 @@ const SubmissionHistoryPage: React.FC = () => {
                             ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
                             : 'bg-indigo-50 text-indigo-700 border-indigo-100 animate-pulse'
                         }`}>
-                          {isComp ? 'Hoàn thành' : 'Đang xử lý'}
+                          {item.passed ? 'ĐẠT' : 'CHƯA ĐẠT'}
                         </span>
                       </div>
                     </div>
