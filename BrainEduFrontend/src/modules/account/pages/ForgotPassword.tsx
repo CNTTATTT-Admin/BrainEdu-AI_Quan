@@ -52,7 +52,6 @@ function ForgotPassword() {
       },
       {
         onSuccess: () => {
-          alert("Đổi mật khẩu thành công! Bạn sẽ được chuyển hướng về trang đăng nhập.");
           navigate("/account/login");
         },
         onError: (err) => {

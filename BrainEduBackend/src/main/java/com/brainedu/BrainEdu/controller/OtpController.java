@@ -41,4 +41,15 @@ public class OtpController {
                 null
         );
     }
+
+    @PostMapping("/invite")
+        public ApiResponse<String> sendInvitation(
+                @RequestBody InviteLecturerRequest request
+        ) {
+        otpService.sendInvitationEmail(request);
+        return ResponseFactory.success(
+                "Lời mời hợp tác đã được gửi đến email của giảng viên",
+                null
+        );
+        }
 }

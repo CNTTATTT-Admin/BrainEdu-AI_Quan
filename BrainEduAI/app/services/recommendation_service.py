@@ -1,10 +1,10 @@
 from collections import defaultdict
 import json
-from app.recommend.course_cache import (
+from app.recommend.cache.course_cache import (
     CourseCache
 )
 
-from app.recommend.knowledge_cache import (
+from app.recommend.cache.knowledge_cache import (
     KnowledgeCache
 )
 

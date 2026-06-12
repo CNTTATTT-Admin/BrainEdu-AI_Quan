@@ -1,4 +1,4 @@
-package com.brainedu.BrainEdu.constant;
+package com.brainedu.BrainEdu.common.enums;
 
 public enum AnalysisStatus {
 

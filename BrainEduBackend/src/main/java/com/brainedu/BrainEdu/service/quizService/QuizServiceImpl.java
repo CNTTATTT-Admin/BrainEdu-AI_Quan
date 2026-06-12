@@ -16,6 +16,8 @@ import com.brainedu.BrainEdu.service.quizService.*;
 import com.brainedu.BrainEdu.ultils.CurrentUserService;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -139,81 +141,28 @@ public class QuizServiceImpl
                 });
         }
 
-    @Override
-    public List<QuizQuestionAnswerResponse>
-    getQuizQuestions(
-            Long quizId
-    ) {
+    @Cacheable(value = "quiz_questions", key = "#quizId")
+        @Override
+        public List<QuizQuestionAnswerResponse> getQuizQuestions(Long quizId) {
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new ApiException("Quiz not found"));
 
-        Quiz quiz =
-                quizRepository.findById(
-                                quizId
-                        )
-                        .orElseThrow(
-                                () -> new ApiException(
-                                        "Quiz not found"
-                                )
-                        );
+        List<Question> questions = questionRepository.findAllWithAnswersByQuizId(quiz.getId());
 
-        List<Question> questions =
-                questionRepository
-                        .findByQuizId(
-                                quiz.getId()
-                        );
-
-        return questions.stream()
-                .map(question ->
-
-                        QuizQuestionAnswerResponse
-                                .builder()
-
-                                .id(
-                                        question.getId()
-                                )
-
-                                .questionText(
-                                        question.getQuestionText()
-                                )
-
-                                .difficultyLevel(
-                                        question.getDifficultyLevel()
-                                )
-
-                                .questionType(
-                                        question.getQuestionType()
-                                )
-
-                                .answers(
-                                        question.getAnswers()
-                                                .stream()
-                                                .map(answer ->
-
-                                                        QuizQuestionAnswerResponse
-                                                                .AnswerItem
-                                                                .builder()
-
-                                                                .id(
-                                                                        answer.getId()
-                                                                )
-
-                                                                .answerText(
-                                                                        answer.getAnswerText()
-                                                                )
-
-                                                                .isCorrect(
-                                                                        answer.getIsCorrect()
-                                                                )
-
-                                                                .build()
-                                                )
-                                                .toList()
-                                )
-
-                                .build()
-                )
-                .toList();
-    }
-
+        return questions.stream().map(question -> 
+                QuizQuestionAnswerResponse.builder()
+                .id(question.getId())
+                .questionText(question.getQuestionText())
+                .answers(question.getAnswers().stream().map(answer -> 
+                        QuizQuestionAnswerResponse.AnswerItem.builder()
+                        .id(answer.getId())
+                        .answerText(answer.getAnswerText())
+                        .isCorrect(answer.getIsCorrect())
+                        .build()
+                ).toList())
+                .build()
+        ).toList();
+        }
     @Override
     public QuizResponse update(
             Long id,

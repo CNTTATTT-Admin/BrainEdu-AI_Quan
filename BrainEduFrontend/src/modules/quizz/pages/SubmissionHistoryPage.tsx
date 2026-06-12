@@ -178,41 +178,10 @@ const SubmissionHistoryPage: React.FC = () => {
 
           </div>
 
-          {/* AI TUTOR SIDEBAR (PHẢI) */}
-          <AITutorSidebar />
+          {/* <AITutorSidebar /> */}
 
         </div>
       </main>
-
-      {/* CHÂN TRANG (FOOTER) */}
-      <footer className="bg-white border-t border-gray-100 pt-12 pb-6 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8 text-xs text-gray-500 font-medium">
-          <div className="space-y-3">
-            <h4 className="text-sm font-black text-gray-900">SmartLearn AI</h4>
-            <p className="leading-relaxed">Nền tảng học tập cá nhân hóa hàng đầu Việt Nam, giúp học viên chinh phục kiến thức thông qua sức mạnh của trí tuệ nhân tạo.</p>
-            <div className="flex gap-2 pt-2">
-              <div className="w-6 h-6 rounded-full bg-gray-50" />
-              <div className="w-6 h-6 rounded-full bg-gray-50" />
-              <div className="w-6 h-6 rounded-full bg-gray-50" />
-            </div>
-          </div>
-          <div className="space-y-2.5">
-            <h5 className="font-bold text-gray-900 uppercase tracking-wider">Khám phá</h5>
-            <p className="hover:text-blue-600 cursor-pointer">Về chúng tôi</p>
-            <p className="hover:text-blue-600 cursor-pointer">Đội ngũ</p>
-            <p className="hover:text-blue-600 cursor-pointer">Tuyển dụng</p>
-          </div>
-          <div className="space-y-2.5">
-            <h5 className="font-bold text-gray-900 uppercase tracking-wider">Chính sách</h5>
-            <p className="hover:text-blue-600 cursor-pointer">Điều khoản</p>
-            <p className="hover:text-blue-600 cursor-pointer">Bảo mật</p>
-            <p className="hover:text-blue-600 cursor-pointer">Liên hệ</p>
-          </div>
-        </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-gray-50 mt-10 pt-4 text-center text-[11px] text-gray-400">
-          © 2026 SmartLearn AI. Nền tảng học tập cá nhân hóa hàng đầu Việt Nam.
-        </div>
-      </footer>
     </div>
   );
 };

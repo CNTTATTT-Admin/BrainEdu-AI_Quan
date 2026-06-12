@@ -1,7 +1,8 @@
 import React from 'react';
-import { Share2, ArrowRight, RefreshCw, ChevronRight } from 'lucide-react';
+import { ArrowRight, RefreshCw } from 'lucide-react';
 import StatSummary from './StatSummary';
 import type { QuestionStatus } from '../../types/api-response';
+import { NavLink } from 'react-router';
 
 interface ReviewSidebarProps {
   score: number;
@@ -34,9 +35,6 @@ const ReviewSidebar: React.FC<ReviewSidebarProps> = ({
             <span className="text-gray-300 font-normal text-lg">/10</span>
           </div>
         </div>
-        <button className="flex items-center gap-2 bg-gray-50 border border-gray-200 text-xs font-bold px-4 py-2.5 rounded-xl text-gray-700 hover:bg-gray-100 transition shadow-sm">
-          <Share2 size={14} /> Chia sẻ
-        </button>
       </div>
 
       <StatSummary correct={correctCount} wrong={wrongCount} skipped={skippedCount} />
@@ -77,27 +75,11 @@ const ReviewSidebar: React.FC<ReviewSidebarProps> = ({
       </div>
 
       <div className="space-y-3">
-        <button className="w-full bg-[#0052cc] hover:bg-blue-700 text-white font-bold text-sm py-4 px-4 rounded-xl shadow-sm transition flex items-center justify-center gap-2">
-          Tiếp tục lộ trình <ArrowRight size={16} />
-        </button>
-        <button className="w-full bg-[#eef2ff] hover:bg-blue-100 text-[#0052cc] font-bold text-sm py-4 px-4 rounded-xl transition flex items-center justify-center gap-2">
-          <RefreshCw size={15} /> Làm lại bài kiểm tra
-        </button>
-      </div>
-
-      <div className="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-2xl p-5 text-white shadow-md space-y-4 relative overflow-hidden">
-        <div className="space-y-1 relative z-10">
-          <h4 className="text-base font-bold">Cải thiện điểm số?</h4>
-          <p className="text-xs text-indigo-100 leading-relaxed">
-            Dựa trên kết quả này, AI Tutor đã chuẩn bị một bài tập riêng cho bạn về phần kiến thức này.
-          </p>
-        </div>
-        <button className="bg-white text-indigo-700 text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-indigo-50 transition shadow-sm flex items-center gap-1">
-          Xem bài học gợi ý <ChevronRight size={14} />
-        </button>
-        <div className="absolute right-[-15px] bottom-[-20px] opacity-10 text-white">
-          <span className="text-9xl font-black">⚙</span>
-        </div>
+        <NavLink to="/quizz" >
+          <button className="w-full bg-[#eef2ff] hover:bg-blue-100 text-[#0052cc] font-bold text-sm py-4 px-4 rounded-xl transition flex items-center justify-center gap-2">
+            <RefreshCw size={15} /> Làm lại bài kiểm tra
+          </button>
+        </NavLink>
       </div>
 
     </div>

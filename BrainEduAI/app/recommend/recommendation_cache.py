@@ -1,6 +1,6 @@
 # app/recommend/recommendation_cache.py
 
-from app.recommend.cache_manager import (
+from app.recommend.cache.cache_manager import (
     RECOMMENDATION_CACHE
 )
 

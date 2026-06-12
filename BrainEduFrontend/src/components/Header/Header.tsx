@@ -92,8 +92,6 @@ const Header = () => {
           <NavLink to="/pathways" className={navLinkClass}>Lộ trình</NavLink>
           <NavLink to="/personal-roadmap" className={navLinkClass}>Lộ trình cá nhân</NavLink>
           <NavLink to="/all-course" className={navLinkClass}>Danh sách khóa học</NavLink>
-          <NavLink to="/community" className={navLinkClass}>Cộng đồng</NavLink>
-          <NavLink to="/support" className={navLinkClass}>Hỗ trợ</NavLink>
         </nav>
       </div>
 

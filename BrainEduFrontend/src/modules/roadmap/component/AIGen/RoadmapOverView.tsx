@@ -27,7 +27,7 @@ const RoadmapOverview: React.FC<OverviewProps> = ({
           Lộ trình cá nhân hóa của bạn
         </h1>
         <p className="text-xs text-gray-500 leading-relaxed max-w-xl">
-          Dựa trên mục tiêu trở thành <strong className="text-gray-800">{targetJob}</strong> của bạn, AI đã thiết kế lộ trình tối ưu này. Chúng tôi tập trung vào việc lấp đầy các khoảng trống kỹ năng của bạn một cách nhanh nhất.
+          Dựa trên kết quả các bài kiểm tra và những lần tương tác với hệ thống, chúng tôi đề xuất những lộ trình học tập dưới đây để phù hợp với năng lực của bạn hiện tại.
         </p>
         <div className="flex flex-wrap items-center gap-3 pt-2">
           <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition flex items-center gap-1.5 shadow-2xs cursor-pointer">

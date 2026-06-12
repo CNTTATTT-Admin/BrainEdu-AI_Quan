@@ -26,4 +26,29 @@ public class EmailTemplateUtil {
                 "  </p>" +
                 "</div>";
     }
+
+    public static String buildInvitationEmail(String lecturerName, String courseTitle) {
+        return "<div style=\"font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;\">" +
+                "  <div style=\"text-align: center; margin-bottom: 32px;\">" +
+                "    <h2 style=\"color: #0052cc; margin: 0; font-size: 28px;\">✨ BrainEdu AI</h2>" +
+                "    <div style=\"margin-top: 8px; color: #64748b; font-size: 14px;\">Đồng hành cùng tri thức</div>" +
+                "  </div>" +
+                "  <div style=\"color: #334155; line-height: 1.7;\">" +
+                "    <p style=\"margin-bottom: 20px;\">Chào giảng viên <b>" + lecturerName + "</b>,</p>" +
+                "    <p style=\"margin-bottom: 20px;\">Chúng tôi rất ấn tượng với chuyên môn và kinh nghiệm của bạn. Với tầm nhìn phát triển nền tảng học tập cá nhân hóa, <b>BrainEdu AI</b> trân trọng mời bạn tham gia hợp tác xây dựng và giảng dạy khóa học:</p>" +
+                "    <div style=\"background-color: #f1f5f9; padding: 20px; border-left: 4px solid #0052cc; border-radius: 4px; margin-bottom: 24px;\">" +
+                "      <h3 style=\"margin: 0; color: #0052cc; font-size: 18px;\">" + courseTitle + "</h3>" +
+                "    </div>" +
+                "    <p style=\"margin-bottom: 24px;\">Sự góp mặt của bạn sẽ mang đến giá trị thực tiễn to lớn cho cộng đồng học viên của chúng tôi. Chúng tôi hy vọng có cơ hội thảo luận chi tiết hơn về lộ trình hợp tác này.</p>" +
+                "  </div>" +
+                "  <div style=\"text-align: center; margin: 32px 0;\">" +
+                "    <a href=\"#\" style=\"background-color: #0052cc; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block;\">Xem chi tiết lời mời</a>" +
+                "  </div>" +
+                "  <hr style=\"border: none; border-top: 1px solid #edf2f7; margin: 32px 0;\">" +
+                "  <p style=\"font-size: 12px; color: #94a3b8; text-align: center; margin: 0;\">" +
+                "    BrainEdu AI - Nền tảng học tập cá nhân hóa hàng đầu.<br>" +
+                "    Nếu bạn có bất kỳ thắc mắc nào, vui lòng phản hồi lại email này để bộ phận hỗ trợ đối tác giải đáp." +
+                "  </p>" +
+                "</div>";
+    }
 }

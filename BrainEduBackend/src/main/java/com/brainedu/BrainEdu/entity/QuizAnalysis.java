@@ -2,13 +2,11 @@ package com.brainedu.BrainEdu.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-import com.brainedu.BrainEdu.constant.AnalysisStatus;
+
+import com.brainedu.BrainEdu.common.enums.AnalysisStatus;
 import com.brainedu.BrainEdu.constant.ReliabilityLevel;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(

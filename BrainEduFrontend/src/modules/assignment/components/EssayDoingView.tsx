@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FileEdit, Send, ArrowLeft } from "lucide-react";
 import type { MyAssignmentResponse } from "../types/api-response";
 import useSubmitAssignment from "../hooks/useSubmitAssignment";
+import toast from "react-hot-toast";
 
 interface EssayDoingViewProps {
   assignment: MyAssignmentResponse;
@@ -16,7 +17,7 @@ const EssayDoingView: React.FC<EssayDoingViewProps> = ({ assignment, onBack, onS
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!essayContent.trim()) {
-      alert("Vui lòng nhập nội dung bài luận trước khi nộp!");
+      toast.loading("Vui lòng nhập nội dung bài luận trước khi nộp!")
       return;
     }
 
@@ -28,9 +29,6 @@ const EssayDoingView: React.FC<EssayDoingViewProps> = ({ assignment, onBack, onS
       {
         onSuccess: () => {
           onSubmitSuccess();
-        },
-        onError: (err: any) => {
-          alert(err?.response?.data?.message || "Nộp bài thất bại!");
         }
       }
     );

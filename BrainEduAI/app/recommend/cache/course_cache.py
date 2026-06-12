@@ -12,7 +12,7 @@ from app.utils.text_utils import (
     build_course_text
 )
 
-from app.recommend.cache_manager import (
+from app.recommend.cache.cache_manager import (
     COURSE_CACHE
 )
 

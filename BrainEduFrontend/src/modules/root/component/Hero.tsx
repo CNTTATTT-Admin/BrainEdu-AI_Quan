@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight, Search } from 'lucide-react';
+import { NavLink } from 'react-router';
 const Hero = () => {
   return (
     <section className="w-full bg-gradient-to-b from-[#f3f7ff] to-white pt-12 pb-20 px-8 md:px-16 max-w-7xl mx-auto">
@@ -18,9 +19,11 @@ const Hero = () => {
           </p>
 
           <div className="flex items-center gap-4 pt-2">
-            <button className="bg-[#0052cc] text-white font-medium px-6 py-3 rounded-xl hover:bg-[#0043a8] transition-colors flex items-center gap-2 shadow-md">
-              Bắt đầu học ngay <ArrowRight size={16} />
-            </button>
+            <NavLink to="/all-course">
+              <button className="bg-[#0052cc] text-white font-medium px-6 py-3 rounded-xl hover:bg-[#0043a8] transition-colors flex items-center gap-2 shadow-md">
+                Bắt đầu học ngay <ArrowRight size={16} />
+              </button>
+            </NavLink>
             <button className="border border-gray-200 bg-white text-gray-700 font-medium px-6 py-3 rounded-xl hover:bg-gray-50 transition-colors">
               Tìm hiểu thêm
             </button>

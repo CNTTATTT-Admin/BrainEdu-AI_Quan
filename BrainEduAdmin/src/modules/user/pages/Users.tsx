@@ -207,10 +207,6 @@ export default function UsersManagement() {
                     </td>
                     <td className="px-6 py-4 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-1.5">
-                        <button className="p-1.5 bg-slate-50 hover:bg-slate-100 text-slate-500 rounded-lg transition-colors" title="Gửi Email">
-                          <Mail size={14} />
-                        </button>
-
                         <button 
                           onClick={() => handleEditUserClick(user)}
                           className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors" 

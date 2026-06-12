@@ -130,13 +130,31 @@ def get_user_quiz_submissions(
     query = """
 
         SELECT
-            id
 
-        FROM quiz_submissions
+            qs.id,
 
-        WHERE user_id = %s
+            qs.score,
 
-        ORDER BY submitted_at DESC
+            qs.passed,
+
+            qs.correct_answers,
+
+            qs.total_questions,
+
+            qs.duration_seconds,
+
+            qs.submitted_at,
+
+            q.title AS quiz_title
+
+        FROM quiz_submissions qs
+
+        INNER JOIN quizzes q
+            ON q.id = qs.quiz_id
+
+        WHERE qs.user_id = %s
+
+        ORDER BY qs.submitted_at DESC
 
     """
 

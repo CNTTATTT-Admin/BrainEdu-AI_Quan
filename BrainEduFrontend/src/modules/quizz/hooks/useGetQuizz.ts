@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { onGetQuizzApi } from '../services/api'
 
-const useGetQuizz = (lessonId: number, enabled: boolean = true) => {
+const useGetQuizz = (lessonId: number | null, enabled: boolean = true) => {
     const { data, error, isPending, isError, refetch, isFetched } = useQuery({
         queryKey: ["quizz", lessonId],
         queryFn: () => onGetQuizzApi(lessonId),

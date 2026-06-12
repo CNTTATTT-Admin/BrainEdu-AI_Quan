@@ -1,6 +1,7 @@
 package com.brainedu.BrainEdu.service.mailService;
 
 import com.brainedu.BrainEdu.config.ApiException;
+import com.brainedu.BrainEdu.dto.request.EmailRequest.InviteLecturerRequest;
 import com.brainedu.BrainEdu.dto.request.EmailRequest.OtpRequest.SendOtp;
 import com.brainedu.BrainEdu.dto.request.EmailRequest.OtpRequest.VerifyOtp;
 import com.brainedu.BrainEdu.service.mailService.*;
@@ -68,5 +69,18 @@ public class OtpServiceImpl implements OtpService {
 
         redisTemplate.delete(otpKey);
         redisTemplate.delete(retryKey);
+    }
+
+    @Override
+    public void sendInvitationEmail(InviteLecturerRequest request) {
+        if (request.getEmail() == null || request.getEmail().isEmpty()) {
+            throw new ApiException("Email giảng viên không được để trống");
+        }
+
+        emailService.sendInvitationEmail(
+                request.getEmail(),
+                request.getLecturerName(),
+                request.getCourseTitle()
+        );
     }
 }

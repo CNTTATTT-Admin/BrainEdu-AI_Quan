@@ -16,9 +16,12 @@ import com.brainedu.BrainEdu.repository.UserRepository;
 import com.brainedu.BrainEdu.service.enrollmentService.*;
 import com.brainedu.BrainEdu.ultils.CurrentUserService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,40 +47,40 @@ public class EnrollmentServiceImpl
             currentUserService;
     private final PaymentRepository 
                 paymentRepository;
+    private final StringRedisTemplate redisTemplate;
 
+
+        @Transactional
         @Override
                 public EnrollmentResponse enroll(EnrollmentRequest request) {
-
                 User user = currentUserService.getCurrentUser();
+                String lockKey = "course_enroll:" + request.getCourseId();
+
+                Long currentEnrollment = redisTemplate.opsForValue().increment(lockKey);
+                if (currentEnrollment != null && currentEnrollment > 100) { // Thay 100 bằng giới hạn của khóa học
+                        redisTemplate.opsForValue().decrement(lockKey);
+                        throw new ApiException("Khóa học đã hết chỗ!");
+                }
 
                 Course course = courseRepository.findById(request.getCourseId())
                         .orElseThrow(() -> new ApiException("Course not found"));
 
-                boolean alreadyEnrolled = enrollmentRepository
-                        .findByUserIdAndCourseId(user.getId(), course.getId())
-                        .isPresent();
-
-                if (alreadyEnrolled) {
+                if (enrollmentRepository.existsByUserIdAndCourseId(user.getId(), course.getId())) {
                         throw new ApiException("Already enrolled");
                 }
-
-                EnrollmentStatus status = course.isFree()
-                        ? EnrollmentStatus.ACTIVE
-                        : EnrollmentStatus.PENDING_PAYMENT;
 
                 Enrollment enrollment = Enrollment.builder()
                         .user(user)
                         .course(course)
                         .completionPercent(0F)
-                        .status(status)
+                        .status(course.isFree() ? EnrollmentStatus.ACTIVE : EnrollmentStatus.PENDING_PAYMENT)
                         .enrolledAt(LocalDateTime.now())
                         .build();
 
                 enrollmentRepository.save(enrollment);
 
-                if (status == EnrollmentStatus.ACTIVE) {
-                        course.setTotalEnrolled(course.getTotalEnrolled() + 1);
-                        courseRepository.save(course);
+                if (enrollment.getStatus() == EnrollmentStatus.ACTIVE) {
+                        courseRepository.incrementTotalEnrolled(course.getId());
                 }
 
                 return enrollmentMapper.toResponse(enrollment);

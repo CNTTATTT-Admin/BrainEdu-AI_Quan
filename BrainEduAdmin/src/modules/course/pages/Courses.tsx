@@ -124,7 +124,7 @@ const AllCoursesManagement: React.FC = () => {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">Quản lý khóa học</h1>
-          <p className="text-xs text-slate-500">Giám sát toàn bộ kho khóa học, phê duyệt nội dung bài giảng mới và thiết lập tiêu điểm trang chủ.</p>
+          <p className="text-xs text-slate-500">Giám sát toàn bộ kho khóa học.</p>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}

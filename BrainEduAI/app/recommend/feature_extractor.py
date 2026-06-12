@@ -40,9 +40,6 @@ class FeatureExtractor:
             category = course_info.get("category")
             skill_name = course_info.get("skill")
 
-            # =========================
-            # COURSE VIEW
-            # =========================
             if event_name == "course_view":
 
                 course_view_count += 1
@@ -53,9 +50,6 @@ class FeatureExtractor:
                 if skill_name:
                     skills[skill_name] += 0.5
 
-            # =========================
-            # LESSON COMPLETE
-            # =========================
             elif event_name == "lesson_complete":
 
                 lesson_completed_count += 1
@@ -92,9 +86,6 @@ class FeatureExtractor:
                         "project"
                     ] += 1
 
-            # =========================
-            # SEARCH
-            # =========================
             elif event_name == "search":
 
                 keyword = metadata.get(
@@ -106,9 +97,6 @@ class FeatureExtractor:
                         keyword
                     ] += 1
 
-            # =========================
-            # VIDEO WATCH
-            # =========================
             elif event_name == "video_watch":
 
                 watch_percent = metadata.get(
@@ -121,9 +109,6 @@ class FeatureExtractor:
                         "video"
                     ] += 1
 
-            # =========================
-            # ARTICLE READ
-            # =========================
             elif event_name == "article_read":
 
                 read_time = metadata.get(

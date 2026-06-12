@@ -1,6 +1,6 @@
 # app/recommend/knowledge_cache.py
 
-from app.recommend.cache_manager import (
+from app.recommend.cache.cache_manager import (
     KNOWLEDGE_PROFILE_CACHE
 )
 

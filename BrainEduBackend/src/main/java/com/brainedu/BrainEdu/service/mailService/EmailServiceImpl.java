@@ -45,4 +45,27 @@ public class EmailServiceImpl implements EmailService {
             throw new ApiException("Không thể gửi email xác thực hệ thống");
         }
     }
+
+    public void sendInvitationEmail(String to, String lecturerName, String courseTitle) {
+        log.info("Bắt đầu xử lý gửi email mời hợp tác đến {} trên thread: {}", to, Thread.currentThread().getName());
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail, "BrainEdu AI Partnership");
+            helper.setTo(to);
+            helper.setSubject("Lời mời hợp tác cùng BrainEdu AI - " + courseTitle);
+
+            String htmlContent = EmailTemplateUtil.buildInvitationEmail(lecturerName, courseTitle);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+            log.info("Gửi email mời hợp tác thành công tới: {}", to);
+
+        } catch (Exception e) {
+            log.error("Gửi email mời hợp tác thất bại tới {}. Lỗi chi tiết: ", to, e);
+            throw new ApiException("Không thể gửi email mời hợp tác");
+        }
+    }
 }

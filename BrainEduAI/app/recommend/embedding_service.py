@@ -25,7 +25,6 @@ class EmbeddingService:
         if text in embedding_cache:
             cached = embedding_cache[text]
 
-            # 🔥 FIX: ensure list (NOT numpy)
             if hasattr(cached, "tolist"):
                 return cached.tolist()
 
@@ -36,7 +35,6 @@ class EmbeddingService:
             normalize_embeddings=True
         )
 
-        # 🔥 FIX: convert numpy -> list ngay khi tạo
         embedding_list = embedding.tolist()
 
         embedding_cache[text] = embedding_list

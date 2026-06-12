@@ -13,6 +13,8 @@ const useEnrollCourse = () => {
             toast.success("Tham gia khóa học thành công!")
         },
         onError: (err) => {
+            console.log(err);
+            
             const msg = err.message || "DEFAULT"
             toast.error(ERROR_MESSAGES[msg])
         }

@@ -146,7 +146,6 @@ const MyAssignmentPage: React.FC = () => {
   };
 
   const handleSubmissionsSuccess = () => {
-    alert("Nộp bài tập thành công!");
     handleCloseModal();
   };
 

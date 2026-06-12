@@ -22,7 +22,6 @@ const MyCoursesContent = () => {
     { id: 1, label: 'Tổng thời gian học', value: '48h', sub: '+2h tuần này', icon: '⏱️', bgColor: 'bg-indigo-50', textColor: 'text-indigo-600' },
     { id: 2, label: 'Khóa đang học', value: String(studyingCount), icon: '💬', bgColor: 'bg-purple-50', textColor: 'text-purple-600' },
     { id: 3, label: 'Đã hoàn thành', value: String(completedCount), icon: '🏅', bgColor: 'bg-orange-50', textColor: 'text-orange-600' },
-    { id: 4, label: 'Chuỗi học tập (Streak)', value: '12 Ngày', icon: '🔥', bgColor: 'bg-rose-50', textColor: 'text-rose-600' },
   ];
 
   const filteredCourses = myCourseList.filter((course) => {

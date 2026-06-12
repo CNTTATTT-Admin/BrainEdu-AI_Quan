@@ -3,7 +3,7 @@ import api from "../../../services/axios";
 import type { SubmitQuizRequest } from "../types/api-request";
 import type { QuestionResponse, QuizzResponse, QuizSubmissionResponse, QuizReviewResponse, MyResultResponse, AIInsightResponse } from "../types/api-response";
 export const onGetQuizzApi = async(
-    lessonId: Number
+    lessonId: number | null
 ) : Promise<BackendResponse<QuizzResponse>> => {
     const data = await api.get(`/quizzes/lesson/${lessonId}`)
 

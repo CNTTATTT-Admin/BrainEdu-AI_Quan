@@ -33,8 +33,6 @@ const QuizReviewPage: React.FC = () => {
 
   const handleSelectQuestion = (displayId: number) => {
     setActiveQuestionId(displayId);
-    console.log(displayId);
-    
     
     const element = questionRefs.current[displayId];
     if (element) {

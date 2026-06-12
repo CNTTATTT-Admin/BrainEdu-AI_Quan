@@ -15,6 +15,8 @@ const useSubmitQuiz = () => {
             queryClient.invalidateQueries({ queryKey: ['lesson-progress-me'] });
         },
         onError: (err) => {
+            console.log(err);
+            
             const msg = err?.message || "DEFAULT"
             toast.error(ERROR_MESSAGES[msg])
         },

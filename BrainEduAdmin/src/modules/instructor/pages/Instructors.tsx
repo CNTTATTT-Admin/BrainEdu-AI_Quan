@@ -22,6 +22,8 @@ import useDeleteUser from "../../user/hooks/useDeleteUser";
 import useUpdateUser from "../../user/hooks/useUpdateUser";
 import EditUserModal from "../../user/components/EditUserModal";
 import type { UpdateUserRequest, UserRequest } from "../../user/types/api-request";
+import InviteInstructorModal from "../components/InviteInstructorModal";
+import useInviteInstructor from "../hooks/useInviteInstructor";
 
 export default function InstructorsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,6 +32,9 @@ export default function InstructorsManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedInstructor, setSelectedInstructor] = useState<any>(null);
+
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const { mutate: inviteInstructor, isPending: isInvitePending } = useInviteInstructor();
 
   const { data: instructorsData, isPending: isGetInstructorsPending } = useGetInstructor({ page: 0, size: 10, search: searchTerm });
   const instructors = instructorsData?.data || [];
@@ -100,7 +105,10 @@ export default function InstructorsManagement() {
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">Quản lý giảng viên</h1>
           <p className="text-xs text-slate-500">Giám sát danh sách đối tác, kiểm soát trạng thái hoạt động và quản trị tài khoản giảng viên.</p>
         </div>
-        <button className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-colors self-start sm:self-auto">
+        <button 
+          onClick={() => setIsInviteModalOpen(true)}
+          className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-colors self-start sm:self-auto"
+        >
           <UserPlus size={16} />
           Mời giảng viên hợp tác
         </button>
@@ -203,10 +211,6 @@ export default function InstructorsManagement() {
                     </td>
                     <td className="px-6 py-4 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-1.5">
-                        <button className="p-1.5 bg-slate-50 hover:bg-slate-100 text-slate-500 rounded-lg transition-colors" title="Liên hệ">
-                          <Mail size={14} />
-                        </button>
-                        
                         <button 
                           onClick={() => handleEditInstructorClick(ins)}
                           className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors" 
@@ -288,6 +292,17 @@ export default function InstructorsManagement() {
         onSubmit={handleEditInstructorSubmit} 
         isPending={isUpdateUserPending}
         userData={selectedInstructor}
+      />
+
+      <InviteInstructorModal 
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        isPending={isInvitePending}
+        onSubmit={(data) => {
+          inviteInstructor(data, {
+            onSuccess: () => setIsInviteModalOpen(false)
+          });
+        }}
       />
     </div>
   );

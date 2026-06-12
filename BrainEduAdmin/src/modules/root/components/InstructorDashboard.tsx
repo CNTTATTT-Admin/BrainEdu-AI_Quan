@@ -55,15 +55,7 @@ export function InstructorDashboard() {
       icon: FileCheck, 
       change: instructorStats?.pendingAssignments && instructorStats.pendingAssignments > 0 ? "Mới nộp" : "Hoàn thành", 
       changeType: instructorStats?.pendingAssignments && instructorStats.pendingAssignments > 0 ? "warning" : "neutral" 
-    },
-    { 
-      id: 4, 
-      name: "Tỷ lệ hoàn thành", 
-      value: "76.4%", 
-      icon: BarChart3, 
-      change: "Mục tiêu: 80%", 
-      changeType: "neutral" 
-    },
+    }
   ];
 
   const logs = [
